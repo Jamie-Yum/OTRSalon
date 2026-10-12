@@ -1,0 +1,510 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>관리자 — Off the Record Salon</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Where real questions meet real answers. 기록되지 않는 질문과 답이 오가는 공간.">
+<meta property="og:title" content="Off the Record Salon"><meta property="og:description" content="기록되지 않는 질문과 답이 오가는 공간">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+<style>
+:root{--bg:#F4F3EF;--wh:#FFFFFF;--dk:#141414;--dk2:#1E1E1E;--ac:#9E2A2B;--ac2:#7A1F20;--ts:#3A3A3A;--tl:#7A7A7A;--bd:rgba(20,20,20,.12);--sw:0 2px 16px rgba(20,20,20,.07);--r:14px;--r-sm:10px;--r-pill:20px}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--dk);overflow-x:hidden;line-height:1.8}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.en{font-family:'DM Sans',sans-serif}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:0 2.5rem;height:68px;display:flex;align-items:center;justify-content:space-between;transition:all .4s}
+.nav.scrolled{background:rgba(20,20,20,.92);backdrop-filter:blur(20px)}
+.nav-logo{display:flex;flex-direction:column;text-decoration:none;line-height:1.15}
+.nav-logo-text{font-family:'DM Sans',sans-serif;font-weight:800;font-size:.95rem;color:#fff;letter-spacing:.02em}
+.nav-logo-sub{font-family:'DM Sans',sans-serif;font-size:.68rem;color:rgba(255,255,255,.45);letter-spacing:.12em}
+.nav-links{display:flex;list-style:none}
+.nav-links a{display:block;padding:.5rem 1rem;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.7);text-decoration:none;transition:color .25s}
+.nav-links a:hover{color:#fff}
+.nav-cta{display:inline-flex;padding:.55rem 1.4rem;background:var(--ac);color:#fff;text-decoration:none;border-radius:var(--r-pill);font-size:.8rem;font-weight:700;letter-spacing:.04em;font-family:'DM Sans',sans-serif;transition:all .3s;margin-left:1rem}
+.nav-cta:hover{background:var(--ac2);transform:translateY(-1px)}
+.mobile-toggle{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px}
+.mobile-toggle span{width:24px;height:2px;background:#fff}
+
+/* COMMON */
+.section{padding:8rem 2rem}.container{max-width:1200px;margin:0 auto}
+.eyebrow{display:flex;align-items:center;gap:.6rem;font-family:'DM Sans',sans-serif;font-size:.76rem;font-weight:700;color:var(--ac);letter-spacing:.2em;text-transform:uppercase;margin-bottom:1.25rem}
+.eyebrow::before{content:'';width:9px;height:9px;background:var(--ac)}
+.title{font-family:'DM Sans','Pretendard',sans-serif;font-size:clamp(2rem,4vw,3rem);font-weight:700;letter-spacing:-.03em;line-height:1.25;margin-bottom:1.5rem}
+.desc{font-size:1.05rem;color:var(--ts);line-height:1.9;max-width:620px}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .8s,transform .8s}.reveal.visible{opacity:1;transform:none}
+@keyframes fU{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+.tag{display:inline-block;font-size:.72rem;font-weight:600;padding:.2rem .7rem;border-radius:var(--r-pill);background:rgba(158,42,43,.1);color:var(--ac);border:1px solid rgba(158,42,43,.3);white-space:nowrap}
+
+/* HERO */
+.hero{min-height:100vh;background:var(--dk);position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(158,42,43,.22),transparent 55%)}
+.hero-top{position:relative;padding:8rem 3rem 0;max-width:640px}
+.hero-label{font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.3em;color:rgba(255,255,255,.55);display:flex;align-items:center;gap:.6rem;animation:fU .9s ease both}
+.hero-label::before{content:'';width:10px;height:10px;background:var(--ac)}
+.hero-copy{font-family:'DM Sans',sans-serif;font-style:italic;font-size:clamp(1.2rem,2.4vw,1.6rem);color:#fff;margin-top:1.5rem;animation:fU .9s ease .2s both}
+.hero-sub{color:rgba(255,255,255,.6);font-size:1rem;margin-top:.25rem;animation:fU .9s ease .3s both}
+.hero-cta{display:inline-flex;margin-top:2rem;color:rgba(255,255,255,.8);font-size:.85rem;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.3);padding-bottom:.2rem;font-family:'DM Sans',sans-serif;letter-spacing:.04em;animation:fU .9s ease .4s both}
+.hero-cta:hover{color:#fff;border-color:#fff}
+.hero-bottom{position:relative;padding:0 2rem 2.5rem}
+.hero-badge{display:inline-flex;align-items:center;gap:.75rem;padding:.5rem 1rem .5rem .5rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:var(--r-sm);margin-bottom:1.25rem;text-decoration:none;animation:fU .9s ease .5s both}
+.hero-badge i{width:28px;height:28px;border-radius:50%;background:var(--ac);display:flex;align-items:center;justify-content:center}
+.hero-badge span{font-size:.72rem;font-weight:700;color:#fff;letter-spacing:.1em;font-family:'DM Sans',sans-serif}
+.hero-wordmark{font-family:'DM Sans',sans-serif;font-size:clamp(3.5rem,11vw,10rem);font-weight:800;color:#fff;line-height:.9;letter-spacing:-.04em;animation:fU .9s ease .1s both}
+.hero-wordmark span{color:var(--ac)}
+.hero-meta{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem;margin-top:2rem;padding-top:1.25rem;border-top:1px solid rgba(255,255,255,.12);font-size:.8rem;color:rgba(255,255,255,.5);font-family:'DM Sans',sans-serif;letter-spacing:.04em}
+
+/* ABOUT */
+.about{background:var(--ac);color:#fff}
+.about-grid{display:grid;grid-template-columns:1fr 1.5fr;gap:6rem;align-items:start}
+.about-left{position:sticky;top:6rem}
+.about .eyebrow{color:rgba(255,255,255,.6)}.about .eyebrow::before{background:#fff}
+.about-big{font-size:clamp(2.2rem,4.5vw,3.6rem);font-weight:700;letter-spacing:-.04em;line-height:1.2}
+.about-big span{display:block;color:rgba(255,255,255,.5)}
+.about-lead{font-size:1.15rem;line-height:1.9;color:rgba(255,255,255,.9);margin-bottom:2.5rem}
+.about-items{display:flex;flex-direction:column;gap:1.75rem}
+.about-items h4{font-family:'DM Sans',sans-serif;font-size:.76rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:.3rem}
+.about-items p{color:rgba(255,255,255,.88)}
+
+/* CONCEPT */
+.concept-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:3rem}
+.concept-card{padding:2.5rem 2rem;border-radius:var(--r);background:var(--wh);box-shadow:var(--sw)}
+.concept-card.dark{background:var(--dk);color:#fff}
+.concept-card h3{font-family:'DM Sans',sans-serif;font-size:1.1rem;margin-bottom:1.25rem;color:var(--tl)}
+.concept-card.dark h3{color:#fff}
+.concept-card ul{list-style:none;display:flex;flex-direction:column;gap:.75rem}
+.concept-card li{padding-left:1.25rem;position:relative;color:var(--ts)}
+.concept-card.dark li{color:rgba(255,255,255,.85)}
+.concept-card li::before{content:'';position:absolute;left:0;top:.75em;width:6px;height:6px;background:var(--tl)}
+.concept-card.dark li::before{background:var(--ac)}
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:3rem;counter-reset:f}
+.flow-step{background:var(--wh);border-radius:var(--r-sm);padding:1.5rem;border-top:3px solid var(--dk);position:relative}
+.flow-step::before{counter-increment:f;content:'0' counter(f);font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:700;color:var(--ac);letter-spacing:.1em}
+.flow-step h4{font-family:'DM Sans',sans-serif;font-size:1.05rem;margin:.25rem 0 .25rem}
+.flow-step p{font-size:.85rem;color:var(--tl);line-height:1.6}
+
+/* SPEAKERS */
+.speakers{background:var(--wh)}
+.sp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;margin-top:3rem}
+.sp-card{background:var(--bg);border-radius:var(--r);padding:2rem 1.5rem;transition:all .4s;display:flex;flex-direction:column}
+.sp-card:hover{transform:translateY(-4px);box-shadow:0 14px 40px rgba(20,20,20,.12)}
+.sp-no{font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:700;color:var(--ac);letter-spacing:.12em}
+.sp-avatar{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#3A3A3A,var(--dk));margin:1.25rem 0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.5rem;font-weight:600}
+.sp-card h4{font-size:1.15rem;font-weight:700}
+.sp-role{font-size:.88rem;color:var(--ts)}
+.sp-field{margin-top:auto;padding-top:1.25rem;font-family:'DM Sans',sans-serif;font-size:.78rem;color:var(--tl);letter-spacing:.04em}
+.sp-card.tbc{background:transparent;border:2px dashed var(--bd)}
+.sp-card.tbc .sp-avatar{background:transparent;border:2px dashed var(--bd);color:var(--tl)}
+.note{font-size:.82rem;color:var(--tl);margin-top:1.5rem}
+
+/* SCHEDULE */
+.sch-list{margin-top:3rem;max-width:860px}
+.sch-row{display:grid;grid-template-columns:150px 1fr auto;gap:1.5rem;padding:1.6rem 1.25rem;border-bottom:1px solid var(--bd);align-items:center;transition:background .2s}
+.sch-row:hover{background:rgba(20,20,20,.04)}
+.sch-date{font-family:'DM Sans',sans-serif;font-weight:700;color:var(--ac)}
+.sch-date small{display:block;font-size:.72rem;color:var(--tl);letter-spacing:.12em;font-weight:600}
+.sch-event{font-weight:600}.sch-event p{font-size:.85rem;color:var(--tl);font-weight:400}
+
+/* PROGRAM */
+.program{background:var(--dk);color:#fff}
+.program .title{color:#fff}.program .desc{color:rgba(255,255,255,.55)}
+.steps{display:grid;grid-template-columns:repeat(7,1fr);gap:.75rem;margin-top:3.5rem}
+.step{padding:1.5rem 1rem;border-top:1.5px solid rgba(255,255,255,.2);transition:background .3s;border-radius:0 0 var(--r-sm) var(--r-sm)}
+.step:hover{background:rgba(255,255,255,.05)}
+.step.hl{border-top-color:var(--ac)}
+.step small{font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.14em;color:var(--ac)}
+.step h4{font-family:'DM Sans',sans-serif;font-size:.98rem;line-height:1.35;margin:.4rem 0 .5rem}
+.step p{font-size:.8rem;color:rgba(255,255,255,.55);line-height:1.6}
+.program-quote{margin-top:4rem;font-family:'DM Sans',sans-serif;font-size:clamp(1.4rem,3vw,2.2rem);font-weight:700;letter-spacing:-.02em}
+.program-quote span{color:var(--ac)}
+
+/* PASS */
+.pass-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-top:3rem}
+.pass-card{background:var(--wh);border-radius:var(--r);padding:2.5rem 2rem;box-shadow:var(--sw);position:relative;transition:all .4s}
+.pass-card:hover{transform:translateY(-4px)}
+.pass-card.best{background:var(--dk);color:#fff}
+.pass-card .tag{position:absolute;top:1.5rem;right:1.5rem}
+.pass-card.best .tag{background:var(--ac);color:#fff;border-color:var(--ac)}
+.pass-name{font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tl)}
+.pass-card.best .pass-name{color:rgba(255,255,255,.55)}
+.pass-kr{font-size:1.1rem;font-weight:600;margin-top:.2rem}
+.pass-price{font-family:'DM Sans',sans-serif;font-size:2.6rem;font-weight:800;letter-spacing:-.03em;margin:1.25rem 0 .25rem}
+.pass-price small{font-size:1rem;font-weight:600}
+.pass-per{font-size:.85rem;color:var(--tl)}
+.pass-card.best .pass-per{color:rgba(255,255,255,.55)}
+.member-row{margin-top:1.25rem;padding:1.25rem 2rem;border-radius:var(--r-sm);border:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+.member-row b{font-family:'DM Sans',sans-serif}
+
+/* INVITATION */
+.invite{background:var(--wh)}
+.inv-q{font-size:clamp(1.3rem,2.6vw,1.9rem);font-weight:700;letter-spacing:-.02em;line-height:1.5;max-width:820px;margin-top:1rem}
+.inv-q::before{content:'“';color:var(--ac)}.inv-q::after{content:'”';color:var(--ac)}
+.inv-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;margin-top:3rem}
+.inv-card{padding:2rem 1.5rem;border-top:2px solid var(--dk);background:var(--bg);border-radius:0 0 var(--r-sm) var(--r-sm)}
+.inv-card b{font-family:'DM Sans',sans-serif;font-size:1.6rem;color:var(--ac)}
+.inv-card p{margin-top:.5rem;font-weight:500;line-height:1.6}
+.inv-stats{display:flex;gap:3rem;flex-wrap:wrap;margin-top:3rem}
+.inv-stats div{font-family:'DM Sans',sans-serif}
+.inv-stats b{display:block;font-size:2.4rem;font-weight:800;letter-spacing:-.03em}
+.inv-stats span{font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--tl);font-weight:600}
+
+/* APPLY */
+.apply{background:var(--dk);color:#fff}
+.apply-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:5rem;align-items:start}
+.apply .title{color:#fff}.apply .desc{color:rgba(255,255,255,.55)}
+.form{display:flex;flex-direction:column;gap:1rem}
+.form label{font-size:.8rem;color:rgba(255,255,255,.6);font-weight:500;display:block;margin-bottom:.35rem}
+.form input,.form select,.form textarea{width:100%;padding:.85rem 1rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:var(--r-sm);color:#fff;font:inherit;font-size:.95rem;outline:none;transition:border .2s}
+.form input:focus,.form select:focus,.form textarea:focus{border-color:var(--ac)}
+.form select option{color:var(--dk)}
+.form textarea{min-height:120px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.form-hint{font-size:.78rem;color:rgba(255,255,255,.4);margin-top:.35rem}
+.btn{display:inline-flex;justify-content:center;padding:1rem 2.25rem;background:#fff;color:var(--dk);border:none;border-radius:var(--r-pill);font-size:.95rem;font-weight:700;font-family:'DM Sans','Pretendard',sans-serif;cursor:pointer;transition:all .3s}
+.btn:hover{background:var(--ac);color:#fff}
+.form-msg{display:none;padding:1rem;border-radius:var(--r-sm);background:rgba(158,42,43,.2);border:1px solid rgba(158,42,43,.5);font-size:.9rem}
+
+/* FAQ */
+.faq-list{margin-top:3rem;max-width:760px}
+.faq-item{border-bottom:1px solid var(--bd);padding:1.5rem 0}
+.faq-q{font-weight:600;font-size:1.05rem;cursor:pointer;display:flex;justify-content:space-between;gap:1rem}
+.faq-q::after{content:'+';color:var(--ac);font-size:1.2rem;transition:transform .3s}
+.faq-item.open .faq-q::after{transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s,padding .4s;color:var(--ts);font-size:.95rem}
+.faq-item.open .faq-a{max-height:300px;padding-top:.75rem}
+
+/* CLOSING / FOOTER */
+.closing{background:var(--dk);color:#fff;text-align:center;padding:7rem 2rem;border-top:1px solid rgba(255,255,255,.06)}
+.closing h2{font-size:clamp(1.6rem,3.4vw,2.6rem);font-weight:700;letter-spacing:-.03em;line-height:1.5}
+.closing h2 span{color:var(--ac)}
+.closing p{margin-top:1.5rem;font-family:'DM Sans',sans-serif;color:rgba(255,255,255,.45);letter-spacing:.1em;font-size:.85rem}
+footer{background:var(--dk);padding:2rem;border-top:1px solid rgba(255,255,255,.05)}
+footer p{font-size:.76rem;color:rgba(255,255,255,.25);letter-spacing:.04em;text-align:center;font-family:'DM Sans',sans-serif}
+
+@media(max-width:900px){
+  .nav{padding:0 1.5rem}.mobile-toggle{display:flex}.nav-cta{display:none}
+  .nav-links{display:none;position:fixed;top:68px;left:0;right:0;background:rgba(20,20,20,.97);flex-direction:column;padding:1.5rem 2rem}
+  .nav-links.open{display:flex}.nav-links li{border-bottom:1px solid rgba(255,255,255,.1)}.nav-links a{padding:.8rem 0;color:#fff;font-size:.95rem}
+  .hero-top{padding:7rem 1.5rem 0}.hero-bottom{padding:0 1.5rem 2rem}
+  .about-grid,.apply-grid{grid-template-columns:1fr;gap:2.5rem}.about-left{position:static}
+  .sp-grid,.inv-grid{grid-template-columns:repeat(2,1fr)}
+  .steps{grid-template-columns:repeat(2,1fr)}
+  .flow{grid-template-columns:repeat(2,1fr)}
+  .pass-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .section{padding:4.5rem 1rem}
+  .concept-grid,.sp-grid,.inv-grid,.form-row{grid-template-columns:1fr}
+  .sch-row{grid-template-columns:1fr;gap:.4rem;padding:1.25rem .5rem}
+  .hero-meta{flex-direction:column}
+}
+.admin-bar{background:var(--dk);color:#fff;padding:1.25rem 2.5rem;display:flex;justify-content:space-between;align-items:center}
+.admin-bar a{color:rgba(255,255,255,.6);font-size:.82rem;text-decoration:none}.admin-bar a:hover{color:#fff}
+.admin-bar span{font-family:'DM Sans',sans-serif;font-weight:800;letter-spacing:.04em}.admin-bar small{color:var(--ac);margin-left:.6rem;font-weight:700;letter-spacing:.14em;font-size:.72rem}
+.gate{position:fixed;inset:0;z-index:2000;background:var(--dk);display:flex;align-items:center;justify-content:center;padding:1rem}
+.gate-box{width:100%;max-width:360px;text-align:center;color:#fff}
+.gate-box h2{font-family:'DM Sans',sans-serif;font-size:1.3rem;margin-bottom:1.5rem;letter-spacing:.02em}
+.gate-box input{width:100%;padding:.85rem 1rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:var(--r-sm);color:#fff;font:inherit;outline:none;margin-bottom:.75rem}
+.gate-box p{font-size:.82rem;color:#e58b8b;min-height:1.2em;margin-top:.5rem}
+.mn-head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem}
+.mn-btn{padding:.65rem 1.4rem;border:none;border-radius:var(--r-pill);background:var(--dk);color:#fff;font:inherit;font-size:.88rem;font-weight:600;cursor:pointer;transition:background .2s}
+.mn-btn:hover{background:var(--ac)}.mn-btn.ghost{background:transparent;color:var(--ts);border:1px solid var(--bd)}.mn-btn.ghost:hover{color:var(--ac);border-color:var(--ac)}
+.mn-btn.danger{background:transparent;color:var(--ac);border:1px solid rgba(158,42,43,.4)}
+.mn-editor{display:none;margin-top:2rem;background:var(--wh);border-radius:var(--r);box-shadow:var(--sw);padding:2rem;flex-direction:column;gap:1rem}
+.mn-editor.open{display:flex}
+.mn-editor label{font-size:.8rem;color:var(--tl);font-weight:600;display:block;margin-bottom:.3rem}
+.mn-editor input,.mn-editor textarea{width:100%;padding:.75rem 1rem;border:1px solid var(--bd);border-radius:var(--r-sm);font:inherit;font-size:.95rem;outline:none;background:var(--bg)}
+.mn-editor input:focus,.mn-editor textarea:focus{border-color:var(--ac)}
+.mn-editor textarea{min-height:110px;resize:vertical;line-height:1.7}
+.mn-editor #mnContent{min-height:220px}
+.mn-row{display:grid;grid-template-columns:180px 1fr;gap:1rem}
+.mn-actions{display:flex;gap:.5rem;justify-content:flex-end}
+.mn-list{margin-top:2rem;display:flex;flex-direction:column;gap:.75rem}
+.mn-item{background:var(--wh);border-radius:var(--r-sm);box-shadow:var(--sw);overflow:hidden}
+.mn-sum{display:grid;grid-template-columns:120px 1fr auto;gap:1rem;align-items:center;padding:1.1rem 1.5rem;cursor:pointer}
+.mn-sum:hover{background:rgba(20,20,20,.03)}
+.mn-date{font-family:'DM Sans',sans-serif;font-weight:700;color:var(--ac);font-size:.9rem}
+.mn-title{font-weight:600}.mn-att{font-size:.8rem;color:var(--tl)}
+.mn-body{display:none;padding:0 1.5rem 1.5rem;border-top:1px solid var(--bd)}
+.mn-item.open .mn-body{display:block}
+.mn-body h5{font-size:.75rem;letter-spacing:.14em;color:var(--tl);margin:1.25rem 0 .4rem;font-family:'DM Sans',sans-serif}
+.mn-body pre{white-space:pre-wrap;font:inherit;color:var(--ts);line-height:1.8}
+.mn-body .mn-dec{background:rgba(158,42,43,.06);border-left:3px solid var(--ac);padding:.75rem 1rem;border-radius:0 var(--r-sm) var(--r-sm) 0}
+.mn-body .mn-actions{margin-top:1.25rem}
+.mn-empty{padding:3rem;text-align:center;color:var(--tl);border:2px dashed var(--bd);border-radius:var(--r)}
+@media(max-width:600px){.mn-row,.mn-sum{grid-template-columns:1fr;gap:.5rem}.admin-bar{padding:1rem}}
+
+.admin-bar{position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:.75rem}
+.tabs{display:flex;gap:.25rem;flex-wrap:wrap}
+.tabs button{background:transparent;border:none;color:rgba(255,255,255,.55);font:inherit;font-size:.85rem;font-weight:600;padding:.45rem .9rem;border-radius:var(--r-pill);cursor:pointer}
+.tabs button:hover{color:#fff}.tabs button.on{background:var(--ac);color:#fff}
+.panel{display:none}.panel.on{display:block}
+.panel>.section{padding:4rem 2rem}
+.tbl-wrap{overflow-x:auto;margin-top:1.5rem;background:var(--wh);border-radius:var(--r-sm);box-shadow:var(--sw)}
+.tbl{width:100%;border-collapse:collapse;font-size:.88rem;min-width:720px}
+.tbl th{text-align:left;font-size:.72rem;letter-spacing:.08em;color:var(--tl);font-weight:700;padding:.8rem 1rem;border-bottom:1px solid var(--bd);white-space:nowrap}
+.tbl td{padding:.75rem 1rem;border-bottom:1px solid var(--bd);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tfoot td{font-weight:700;background:var(--bg)}
+.tbl select{font:inherit;font-size:.82rem;padding:.25rem .4rem;border:1px solid var(--bd);border-radius:6px;background:var(--wh)}
+.lnk{background:none;border:none;color:var(--ac);font:inherit;font-size:.82rem;font-weight:600;cursor:pointer}
+.kanban{display:grid;grid-template-columns:repeat(5,minmax(170px,1fr));gap:.75rem;margin-top:1.5rem;overflow-x:auto}
+.kcol{background:rgba(20,20,20,.04);border-radius:var(--r-sm);padding:.75rem;min-height:120px}
+.kcol h4{font-size:.8rem;display:flex;justify-content:space-between;margin-bottom:.6rem;color:var(--ts)}
+.kcard{background:var(--wh);border-radius:8px;padding:.7rem .85rem;margin-bottom:.5rem;box-shadow:0 1px 4px rgba(0,0,0,.06);cursor:pointer;font-size:.85rem;line-height:1.5}
+.kcard:hover{outline:1.5px solid var(--ac)}
+.kcard b{display:block}.kcard small{color:var(--tl)}
+.pub{display:inline-block;font-size:.66rem;font-weight:700;padding:.05rem .45rem;border-radius:4px;background:var(--ac);color:#fff;margin-left:.3rem;vertical-align:middle}
+.sub-h{font-size:1.1rem;font-weight:700;margin-top:3rem}
+.owner-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;margin-top:1.5rem}
+.owner-card{background:var(--wh);border-radius:var(--r-sm);box-shadow:var(--sw);padding:1.25rem 1.5rem}
+.owner-card h4{font-size:1rem;margin-bottom:.5rem}
+.act{display:grid;grid-template-columns:20px 1fr auto;gap:.6rem;align-items:start;padding:.55rem 0;border-top:1px solid var(--bd);font-size:.88rem;line-height:1.55}
+.act input{margin-top:.3rem;accent-color:var(--ac)}
+.act.done span{text-decoration:line-through;color:var(--tl)}
+.act span{cursor:pointer}
+.dl{font-size:.75rem;font-weight:700;white-space:nowrap;color:var(--tl)}.dl.over{color:#C62828}.dl.soon{color:#B26A00}
+.chips{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:1.5rem}
+.chips button{padding:.35rem .9rem;border-radius:var(--r-pill);border:1px solid var(--bd);background:transparent;font:inherit;font-size:.8rem;cursor:pointer;color:var(--ts)}
+.chips button.on{background:var(--dk);color:#fff;border-color:var(--dk)}
+.dec-list{margin-top:1.5rem;border-left:2px solid var(--bd);padding-left:1.5rem;display:flex;flex-direction:column;gap:1rem}
+.dec{background:var(--wh);border-radius:var(--r-sm);box-shadow:var(--sw);padding:1rem 1.25rem;position:relative;cursor:pointer}
+.dec::before{content:'';position:absolute;left:calc(-1.5rem - 6px);top:1.3rem;width:10px;height:10px;border-radius:50%;background:var(--ac)}
+.dec .meta{font-size:.78rem;color:var(--tl);display:flex;gap:.6rem;align-items:center}
+.dec p{margin-top:.3rem;white-space:pre-wrap;font-weight:500}
+.dec .memo{font-size:.82rem;color:var(--tl);font-weight:400}
+.modal{position:fixed;inset:0;z-index:1500;background:rgba(0,0,0,.5);display:none;align-items:flex-start;justify-content:center;padding:4vh 1rem;overflow-y:auto}
+.modal.open{display:flex}
+.modal .mn-editor{display:flex;margin:0;width:100%;max-width:640px}
+.modal h3{font-size:1.15rem}
+.chk{display:flex;align-items:center;gap:.5rem;font-size:.9rem}.chk input{width:auto}
+.plan-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:1rem;margin-top:1.5rem}
+.plan{background:var(--wh);border-radius:var(--r);box-shadow:var(--sw);padding:1.5rem 1.75rem;border-top:3px solid var(--dk)}
+.plan h4{font-size:1.1rem;margin:.4rem 0 .75rem;display:flex;justify-content:space-between;gap:1rem}
+.plan pre{white-space:pre-wrap;font:inherit;font-size:.92rem;color:var(--ts);line-height:1.85}
+@media(max-width:600px){.plan-list{grid-template-columns:1fr}}
+@media(max-width:600px){.panel>.section{padding:2.5rem 1rem}.kanban{grid-template-columns:repeat(5,200px)}}
+</style></head><body>
+<div class="gate" id="gate"><div class="gate-box">
+  <h2>OTR SALON · ADMIN</h2>
+  <input type="password" id="gatePw" placeholder="비밀번호" onkeydown="if(event.key==='Enter')login()">
+  <button class="btn" style="width:100%" onclick="login()">입장하기</button>
+  <p id="gateMsg"></p>
+</div></div>
+<header class="admin-bar"><span>OFF THE RECORD SALON<small>ADMIN</small></span>
+<nav class="tabs" id="tabs">
+  <button data-tab="notes" class="on">회의록</button><button data-tab="speakers">연사</button><button data-tab="fees">사례비</button><button data-tab="actions">Next Action</button><button data-tab="decisions">결정 기록</button><button data-tab="plan">기획 자료</button>
+</nav><a href="index.html">← 사이트로</a></header>
+
+<div class="panel on" id="p-notes"><section class="section"><div class="container">
+  <div class="mn-head"><div><div class="eyebrow">Meeting Notes</div><h2 class="title" style="margin:0">회의록</h2></div><button class="mn-btn" onclick="edit('notes')">+ 새 회의록</button></div>
+  <div class="mn-list" id="v-notes"><div class="mn-empty">불러오는 중…</div></div>
+</div></section></div>
+
+<div class="panel" id="p-speakers"><section class="section"><div class="container">
+  <div class="mn-head"><div><div class="eyebrow">Speakers</div><h2 class="title" style="margin:0">연사 섭외 현황</h2></div><button class="mn-btn" onclick="edit('speakers')">+ 연사 추가</button></div>
+  <div class="kanban" id="v-kanban"></div>
+  <h3 class="sub-h">연사 리스트</h3>
+  <p class="note" style="margin-top:.3rem">'공개'에 체크한 연사만 홈페이지에 노출됩니다 (이름 · 소속 · 분야 · 회차 · 사진).</p>
+  <div class="tbl-wrap"><table class="tbl" id="v-speakers"></table></div>
+</div></section></div>
+
+<div class="panel" id="p-fees"><section class="section"><div class="container">
+  <div class="mn-head"><div><div class="eyebrow">Honorarium</div><h2 class="title" style="margin:0">사례비 내역</h2></div><button class="mn-btn" onclick="edit('fees')">+ 내역 추가</button></div>
+  <p class="note">현재 기준: <b id="feeRule">—</b> · 기준 변경은 결정 기록에 '사례비'로 남겨 주세요.</p>
+  <div class="tbl-wrap"><table class="tbl" id="v-fees"></table></div>
+</div></section></div>
+
+<div class="panel" id="p-actions"><section class="section"><div class="container">
+  <div class="mn-head"><div><div class="eyebrow">Next Action</div><h2 class="title" style="margin:0">담당자별 Next Action</h2></div><button class="mn-btn" onclick="edit('actions')">+ 할 일 추가</button></div>
+  <div class="owner-grid" id="v-actions"></div>
+</div></section></div>
+
+<div class="panel" id="p-decisions"><section class="section"><div class="container">
+  <div class="mn-head"><div><div class="eyebrow">Decision Log</div><h2 class="title" style="margin:0">결정 기록</h2></div><button class="mn-btn" onclick="edit('decisions')">+ 결정 추가</button></div>
+  <p class="note">결정이 바뀌면 기존 기록을 고치지 말고 새로 추가하세요. 이력이 그대로 남습니다.</p>
+  <div class="chips" id="decChips"></div>
+  <div class="dec-list" id="v-decisions"></div>
+</div></section></div>
+
+<div class="panel" id="p-plan"><section class="section"><div class="container">
+  <div class="mn-head"><div><div class="eyebrow">Planning</div><h2 class="title" style="margin:0">기획 자료</h2></div><button class="mn-btn" onclick="edit('plan')">+ 자료 추가</button></div>
+  <div class="plan-list" id="v-plan"></div>
+</div></section></div>
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="mn-editor" id="mForm"></div></div>
+<footer><p>© 2026 OFF THE RECORD SALON · REPIUM LAB · 내부 공유용</p></footer>
+<script>
+const SU='https://dvlrzbckneucpvlacdll.supabase.co';
+const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE';
+const OWNERS=['신다혜','조영주','염제명','위현민','TF 전체'];
+const SP_STATUS=['후보','컨택 중','확정','보류','거절'];
+const CATS=['TIME','PRICE','INVITATION','SPEAKER','사례비','운영','기타'];
+const SALONS=[{v:1,l:'Salon 01 (2026.11)'},{v:2,l:'Salon 02 (2027.03)'},{v:3,l:'Salon 03 (2027.06)'},{v:4,l:'Salon 04 (2027.09)'}];
+const T={
+  notes:{tbl:'otr_meeting_notes',name:'회의록',fields:[
+    {k:'meeting_date',l:'회의 날짜',t:'date',req:1,half:1},{k:'title',l:'제목',req:1,half:1,ph:'예) TF Kick-off Meeting'},
+    {k:'attendees',l:'참석자',ph:OWNERS.slice(0,4).join(', ')},{k:'content',l:'회의 내용',t:'area',big:1},{k:'decisions',l:'결정 사항 / Next Action',t:'area'}]},
+  speakers:{tbl:'otr_speakers',name:'연사',fields:[
+    {k:'name',l:'이름',req:1,half:1},{k:'role',l:'소속 / 현재 역할',half:1},{k:'field',l:'분야',half:1,ph:'예) Public Leadership'},
+    {k:'salon_no',l:'배정 회차',t:'sel',opts:SALONS,num:1,half:1},{k:'status',l:'섭외 상태',t:'sel',opts:SP_STATUS,half:1},{k:'owner',l:'담당',t:'sel',opts:OWNERS,half:1},
+    {k:'reason',l:'추천 이유',t:'area'},{k:'question',l:'이 사람에게 꼭 묻고 싶은 질문',t:'area'},
+    {k:'contact',l:'연락처 / 컨택 경로'},{k:'memo',l:'섭외 메모',t:'area'},{k:'photo_url',l:'사진 URL (홈페이지 노출용)'},
+    {k:'sort_order',l:'정렬 순서',t:'num',half:1},{k:'is_public',l:'홈페이지에 공개',t:'chk',half:1}]},
+  fees:{tbl:'otr_fees',name:'사례비 내역',fields:[
+    {k:'salon_no',l:'회차',t:'sel',opts:SALONS,num:1,half:1},{k:'speaker',l:'연사',list:'spNames',half:1},
+    {k:'fee',l:'사례비 (만원)',t:'num',half:1,def:30},{k:'gift',l:'Gift (만원)',t:'num',half:1,def:10},
+    {k:'status',l:'지급 상태',t:'sel',opts:['지급 예정','지급 완료','보류'],half:1},{k:'paid_date',l:'지급일',t:'date',half:1},{k:'memo',l:'메모',t:'area'}]},
+  actions:{tbl:'otr_actions',name:'Next Action',fields:[
+    {k:'owner',l:'담당자',t:'sel',opts:OWNERS,req:1,half:1},{k:'deadline',l:'Deadline',t:'date',half:1},
+    {k:'action',l:'할 일',t:'area',req:1},{k:'status',l:'상태',t:'sel',opts:['진행 중','완료','보류'],half:1},{k:'memo',l:'메모',t:'area'}]},
+  decisions:{tbl:'otr_decisions',name:'결정 기록',fields:[
+    {k:'decided_date',l:'결정일',t:'date',req:1,half:1},{k:'category',l:'구분',t:'sel',opts:CATS,req:1,half:1},
+    {k:'content',l:'결정 내용',t:'area',req:1},{k:'memo',l:'배경 / 메모',t:'area'}]},
+  plan:{tbl:'otr_plan_docs',name:'기획 자료',fields:[
+    {k:'title',l:'제목',req:1},{k:'category',l:'구분',t:'sel',opts:['개요',...CATS.filter(c=>c!=='기타'),'프로그램','기타'],half:1},{k:'sort_order',l:'정렬 순서',t:'num',half:1},
+    {k:'content',l:'내용',t:'area',big:1}]}
+};
+const D={};let PW='',cur=null,decCat='전체';
+const $=id=>document.getElementById(id);
+const esc=t=>(t==null?'':String(t)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const salonL=v=>v?'Salon 0'+v:'—';
+
+async function rpc(fn,body){
+  const r=await fetch(SU+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:JSON.stringify({pw:PW,...body})});
+  if(!r.ok)throw new Error((await r.json().catch(()=>({}))).message||r.status);
+  return r.status===204?null:r.json();
+}
+async function login(pw){
+  PW=pw||$('gatePw').value;$('gateMsg').textContent='';
+  try{
+    if(!await rpc('otr_auth'))throw new Error('비밀번호가 올바르지 않습니다.');
+    try{sessionStorage.setItem('otr_pw',PW)}catch(e){}
+    $('gate').style.display='none';loadAll();
+  }catch(e){PW='';try{sessionStorage.removeItem('otr_pw')}catch(_){}$('gateMsg').textContent=e.message;}
+}
+async function load(key){D[key]=await rpc('otr_list',{tbl:T[key].tbl});RENDER[key]();}
+async function loadAll(){
+  await Promise.all(Object.keys(T).map(k=>load(k).catch(e=>{
+    const el=$('v-'+k);if(el)el.innerHTML='<div class="mn-empty">데이터를 불러오지 못했습니다. ('+esc(e.message)+')</div>';
+  })));
+}
+
+/* 탭 */
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.id==='p-'+b.dataset.tab));
+  try{sessionStorage.setItem('otr_tab',b.dataset.tab)}catch(e){}
+  scrollTo(0,0);
+});
+try{const t=sessionStorage.getItem('otr_tab');if(t)document.querySelector(`#tabs [data-tab="${t}"]`)?.click();}catch(e){}
+
+/* 공통 편집 모달 */
+function field(f,v){
+  const id='f_'+f.k,lab=`<label>${f.l}${f.req?' *':''}</label>`;
+  if(v==null&&f.def!=null&&!cur.id)v=f.def;
+  if(f.t==='area')return `<div>${lab}<textarea id="${id}" ${f.big?'style="min-height:220px"':''}>${esc(v)}</textarea></div>`;
+  if(f.t==='sel')return `<div>${lab}<select id="${id}" style="width:100%;padding:.75rem 1rem;border:1px solid var(--bd);border-radius:var(--r-sm);font:inherit;background:var(--bg)"><option value="">선택</option>${f.opts.map(o=>{const ov=o.v??o,ol=o.l??o;return `<option value="${esc(ov)}" ${String(v)===String(ov)?'selected':''}>${esc(ol)}</option>`}).join('')}</select></div>`;
+  if(f.t==='chk')return `<div><label>&nbsp;</label><label class="chk"><input type="checkbox" id="${id}" ${v?'checked':''}> ${f.l}</label></div>`;
+  const type=f.t==='date'?'date':f.t==='num'?'number':'text';
+  return `<div>${lab}<input type="${type}" id="${id}" value="${esc(v)}" ${f.ph?`placeholder="${esc(f.ph)}"`:''} ${f.list?`list="${f.list}"`:''}></div>`;
+}
+function edit(key,id,preset){
+  const t=T[key],row=(D[key]||[]).find(r=>r.id===id)||{...preset};cur={key,id:id||null};
+  const dateF=t.fields.find(f=>f.t==='date'&&f.req);if(!id&&dateF&&!row[dateF.k])row[dateF.k]=today();
+  let html=`<h3>${t.name} ${id?'수정':'추가'}</h3>`,buf=[];
+  t.fields.forEach(f=>{const h=field(f,row[f.k]);if(f.half){buf.push(h);if(buf.length===2){html+=`<div class="mn-row" style="grid-template-columns:1fr 1fr">${buf.join('')}</div>`;buf=[];}}else{if(buf.length){html+=`<div class="mn-row" style="grid-template-columns:1fr 1fr">${buf.join('')}<div></div></div>`;buf=[];}html+=h;}});
+  if(buf.length)html+=`<div class="mn-row" style="grid-template-columns:1fr 1fr">${buf.join('')}<div></div></div>`;
+  html+=`<datalist id="spNames">${(D.speakers||[]).map(s=>`<option value="${esc(s.name)}">`).join('')}</datalist>`;
+  html+=`<div class="mn-actions">${id?`<button class="mn-btn danger" style="margin-right:auto" onclick="del()">삭제</button>`:''}<button class="mn-btn ghost" onclick="closeModal()">취소</button><button class="mn-btn" id="mSave" onclick="save()">저장</button></div>`;
+  $('mForm').innerHTML=html;$('modal').classList.add('open');
+}
+function closeModal(){$('modal').classList.remove('open');cur=null;}
+async function put(key,row){await rpc('otr_save',{tbl:T[key].tbl,row_data:row});await load(key);}
+async function save(){
+  const t=T[cur.key],row={};
+  for(const f of t.fields){
+    const el=$('f_'+f.k);let v=f.t==='chk'?el.checked:el.value.trim();
+    if(v===''){if(f.req)return alert(f.l+'을(를) 입력해 주세요.');v=null;}
+    else if(f.t==='num'||f.num)v=Number(v);
+    row[f.k]=v;
+  }
+  if(cur.id)row.id=cur.id;
+  $('mSave').disabled=true;
+  try{await put(cur.key,row);closeModal();}catch(e){alert('저장 실패: '+e.message);$('mSave').disabled=false;}
+}
+async function del(){
+  if(!confirm('삭제할까요? 되돌릴 수 없습니다.'))return;
+  const key=cur.key;
+  try{await rpc('otr_delete',{tbl:T[key].tbl,rid:cur.id});closeModal();await load(key);}catch(e){alert('삭제 실패: '+e.message);}
+}
+function feeStatus(id,v){const r=D.fees.find(x=>x.id===id);quick('fees',id,{status:v,paid_date:v==='지급 완료'&&!r.paid_date?today():r.paid_date});}
+async function quick(key,id,patch){
+  const row=D[key].find(r=>r.id===id);
+  try{await put(key,{...row,...patch});}catch(e){alert('저장 실패: '+e.message);}
+}
+
+/* 화면별 렌더 */
+const empty=m=>`<div class="mn-empty">${m}</div>`;
+const RENDER={
+  notes(){
+    const L=[...D.notes].sort((a,b)=>b.meeting_date.localeCompare(a.meeting_date));
+    $('v-notes').innerHTML=L.length?L.map(n=>`<div class="mn-item">
+      <div class="mn-sum" onclick="this.parentElement.classList.toggle('open')"><span class="mn-date">${n.meeting_date}</span><span class="mn-title">${esc(n.title)}</span><span class="mn-att">${esc(n.attendees)}</span></div>
+      <div class="mn-body">
+        ${n.content?`<h5>회의 내용</h5><pre>${esc(n.content)}</pre>`:''}
+        ${n.decisions?`<h5>결정 사항 / NEXT ACTION</h5><pre class="mn-dec">${esc(n.decisions)}</pre>`:''}
+        <div class="mn-actions"><button class="mn-btn ghost" onclick="edit('notes','${n.id}')">수정</button></div>
+      </div></div>`).join(''):empty('아직 회의록이 없습니다. 첫 회의록을 작성해 보세요.');
+  },
+  speakers(){
+    const L=[...D.speakers].sort((a,b)=>(a.salon_no||9)-(b.salon_no||9)||(a.sort_order||0)-(b.sort_order||0));
+    $('v-kanban').innerHTML=SP_STATUS.map(st=>{const c=L.filter(s=>(s.status||'후보')===st);
+      return `<div class="kcol"><h4>${st}<span>${c.length}</span></h4>${c.map(s=>`<div class="kcard" onclick="edit('speakers','${s.id}')"><b>${esc(s.name)}${s.is_public?'<span class="pub">공개</span>':''}</b><small>${esc(s.role||'')}</small><br><small>${salonL(s.salon_no)} · ${esc(s.owner||'담당 미정')}</small></div>`).join('')}</div>`}).join('');
+    $('v-speakers').innerHTML=`<thead><tr><th>공개</th><th>이름</th><th>소속 / 역할</th><th>분야</th><th>회차</th><th>상태</th><th>담당</th><th>꼭 묻고 싶은 질문</th><th></th></tr></thead><tbody>${
+      L.map(s=>`<tr><td><input type="checkbox" ${s.is_public?'checked':''} onchange="quick('speakers','${s.id}',{is_public:this.checked})"></td>
+      <td style="white-space:nowrap"><b>${esc(s.name)}</b></td><td>${esc(s.role)}</td><td>${esc(s.field)}</td><td>${salonL(s.salon_no)}</td>
+      <td><select onchange="quick('speakers','${s.id}',{status:this.value})">${SP_STATUS.map(o=>`<option ${o===(s.status||'후보')?'selected':''}>${o}</option>`).join('')}</select></td>
+      <td>${esc(s.owner)}</td><td style="max-width:260px">${esc(s.question)}</td><td><button class="lnk" onclick="edit('speakers','${s.id}')">수정</button></td></tr>`).join('')||'<tr><td colspan="9" style="text-align:center;color:var(--tl);padding:2rem">등록된 연사가 없습니다.</td></tr>'
+    }</tbody>`;
+    if(D.fees)RENDER.fees();
+  },
+  fees(){
+    const rule=(D.decisions||[]).filter(d=>d.category==='사례비').sort((a,b)=>b.decided_date.localeCompare(a.decided_date))[0];
+    $('feeRule').textContent=rule?`${rule.content} (${rule.decided_date})`:'결정 기록에 사례비 기준이 없습니다';
+    const L=[...D.fees].sort((a,b)=>(a.salon_no||9)-(b.salon_no||9)||b.created_at.localeCompare(a.created_at));
+    const sum=k=>L.reduce((t,r)=>t+(r[k]||0),0),paid=L.filter(r=>r.status==='지급 완료').reduce((t,r)=>t+(r.fee||0)+(r.gift||0),0);
+    $('v-fees').innerHTML=`<thead><tr><th>회차</th><th>연사</th><th>사례비</th><th>Gift</th><th>합계</th><th>상태</th><th>지급일</th><th>메모</th><th></th></tr></thead><tbody>${
+      L.map(r=>`<tr><td>${salonL(r.salon_no)}</td><td><b>${esc(r.speaker)}</b></td><td>${r.fee??'—'}만</td><td>${r.gift??'—'}만</td><td>${(r.fee||0)+(r.gift||0)}만</td>
+      <td><select onchange="feeStatus('${r.id}',this.value)">${['지급 예정','지급 완료','보류'].map(o=>`<option ${o===r.status?'selected':''}>${o}</option>`).join('')}</select></td>
+      <td>${r.paid_date||'—'}</td><td>${esc(r.memo)}</td><td><button class="lnk" onclick="edit('fees','${r.id}')">수정</button></td></tr>`).join('')||'<tr><td colspan="9" style="text-align:center;color:var(--tl);padding:2rem">기록된 사례비 내역이 없습니다.</td></tr>'
+    }</tbody>${L.length?`<tfoot><tr><td colspan="2">합계</td><td>${sum('fee')}만</td><td>${sum('gift')}만</td><td>${sum('fee')+sum('gift')}만</td><td colspan="4">지급 완료 ${paid}만</td></tr></tfoot>`:''}`;
+  },
+  actions(){
+    const t=today(),soon=new Date(Date.now()+3*864e5).toISOString().slice(0,10);
+    const owners=[...new Set([...OWNERS,...D.actions.map(a=>a.owner)])];
+    $('v-actions').innerHTML=owners.map(o=>{
+      const L=D.actions.filter(a=>a.owner===o).sort((a,b)=>(a.status==='완료')-(b.status==='완료')||(a.deadline||'9').localeCompare(b.deadline||'9'));
+      const open=L.filter(a=>a.status!=='완료').length;
+      return `<div class="owner-card"><h4>${esc(o)} <small style="color:var(--tl);font-weight:500">· 진행 ${open}건</small></h4>${L.map(a=>{
+        const done=a.status==='완료',cls=done||!a.deadline?'':a.deadline<t?'over':a.deadline<=soon?'soon':'';
+        return `<div class="act ${done?'done':''}"><input type="checkbox" ${done?'checked':''} onchange="quick('actions','${a.id}',{status:this.checked?'완료':'진행 중'})">
+        <span onclick="edit('actions','${a.id}')">${esc(a.action)}${a.status==='보류'?' <small style="color:var(--tl)">(보류)</small>':''}</span>
+        <em class="dl ${cls}" style="font-style:normal">${a.deadline?a.deadline.slice(5).replace('-','/')+(cls==='over'?' 지남':''):'__ / __'}</em></div>`}).join('')||'<p style="font-size:.85rem;color:var(--tl)">할 일 없음</p>'}
+        <button class="lnk" style="margin-top:.5rem" onclick="edit('actions',null,{owner:'${esc(o)}'})">+ 추가</button></div>`}).join('');
+  },
+  decisions(){
+    $('decChips').innerHTML=['전체',...CATS].map(c=>`<button class="${c===decCat?'on':''}" onclick="decCat='${c}';RENDER.decisions()">${c}</button>`).join('');
+    const L=D.decisions.filter(d=>decCat==='전체'||d.category===decCat).sort((a,b)=>b.decided_date.localeCompare(a.decided_date)||b.created_at.localeCompare(a.created_at));
+    $('v-decisions').innerHTML=L.map(d=>`<div class="dec" onclick="edit('decisions','${d.id}')"><div class="meta"><span>${d.decided_date}</span><span class="tag">${esc(d.category)}</span></div><p>${esc(d.content)}</p>${d.memo?`<p class="memo">${esc(d.memo)}</p>`:''}</div>`).join('')||empty('기록된 결정이 없습니다.');
+    if(D.fees)RENDER.fees();
+  },
+  plan(){
+    const L=[...D.plan].sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)||a.created_at.localeCompare(b.created_at));
+    $('v-plan').innerHTML=L.map(d=>`<div class="plan">${d.category?`<span class="tag">${esc(d.category)}</span>`:''}<h4>${esc(d.title)}<button class="lnk" onclick="edit('plan','${d.id}')">수정</button></h4><pre>${esc(d.content)}</pre></div>`).join('')||empty('기획 자료가 없습니다.');
+  }
+};
+try{const saved=sessionStorage.getItem('otr_pw');if(saved)login(saved);}catch(e){}
+</script>
+
+</body></html>
