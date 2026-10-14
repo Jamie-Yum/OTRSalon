@@ -580,12 +580,12 @@ form.addEventListener('submit',async e=>{
   submitBtn.disabled=true;submitBtn.classList.add('loading');submitBtn.querySelector('.t').textContent='접수 중…';
   const data=Object.fromEntries(new FormData(form).entries());
   try{
-    // TODO: 신청 데이터 저장소(Supabase 등) 연결. 현재는 프론트에서만 접수 처리.
-    await new Promise(r=>setTimeout(r,900));
+    const r=await fetch(SU+'/rest/v1/rpc/otr_apply',{method:'POST',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:JSON.stringify({name:data.name,phone:data.phone,role:data.role,inviter:data.inviter,pass:data.pass,question:data.question})});
+    if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.message||('HTTP '+r.status));}
     $('#dName').textContent=data.name;$('#dPass').textContent=data.pass;
     form.style.display='none';const done=$('#done');done.classList.add('show');done.focus({preventScroll:true});done.scrollIntoView({behavior:'smooth',block:'center'});
   }catch(err){
-    alertBox.textContent='접수 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.';alertBox.classList.add('show');
+    alertBox.textContent=(err&&err.message&&/[가-힣]/.test(err.message)?err.message:'접수 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.');alertBox.classList.add('show');
     submitBtn.disabled=false;submitBtn.classList.remove('loading');submitBtn.querySelector('.t').textContent='신청하기 →';
   }
 });

@@ -293,8 +293,14 @@ footer p{font-size:.76rem;color:rgba(255,255,255,.25);letter-spacing:.04em;text-
 </div></div>
 <header class="admin-bar"><span>OFF THE RECORD SALON<small>ADMIN</small></span>
 <nav class="tabs" id="tabs">
-  <button data-tab="notes" class="on">회의록</button><button data-tab="speakers">연사</button><button data-tab="fees">사례비</button><button data-tab="actions">Next Action</button><button data-tab="decisions">결정 기록</button><button data-tab="plan">기획 자료</button>
+  <button data-tab="notes" class="on">회의록</button><button data-tab="apps">신청</button><button data-tab="speakers">연사</button><button data-tab="fees">사례비</button><button data-tab="actions">Next Action</button><button data-tab="decisions">결정 기록</button><button data-tab="plan">기획 자료</button>
 </nav><a href="index.html">← 사이트로</a></header>
+
+<div class="panel" id="p-apps"><section class="section"><div class="container">
+  <div class="mn-head"><div><div class="eyebrow">Applications</div><h2 class="title" style="margin:0">참가 신청</h2></div><div class="chips" id="appChips"></div></div>
+  <p class="note">홈페이지 신청 양식으로 접수된 내역입니다. 사전 질문은 익명으로 큐레이션해 Speaker에게 전달합니다. <span id="appCount"></span></p>
+  <div class="tbl-wrap"><table class="tbl" id="v-apps"></table></div>
+</div></section></div>
 
 <div class="panel on" id="p-notes"><section class="section"><div class="container">
   <div class="mn-head"><div><div class="eyebrow">Meeting Notes</div><h2 class="title" style="margin:0">회의록</h2></div><button class="mn-btn" onclick="edit('notes')">+ 새 회의록</button></div>
@@ -384,7 +390,10 @@ async function login(pw){
   }catch(e){PW='';try{sessionStorage.removeItem('otr_pw')}catch(_){}$('gateMsg').textContent=e.message;}
 }
 async function load(key){D[key]=await rpc('otr_list',{tbl:T[key].tbl});RENDER[key]();}
+const APP_STATUS=['접수','확정','대기','취소'];let appFilter='전체';
+async function loadApps(){D.apps=await rpc('otr_app_list');RENDER.apps();}
 async function loadAll(){
+  loadApps().catch(e=>{$('v-apps').innerHTML='<tr><td style="padding:2rem;color:var(--tl)">신청 내역을 불러오지 못했습니다. ('+esc(e.message)+')</td></tr>';});
   await Promise.all(Object.keys(T).map(k=>load(k).catch(e=>{
     const el=$('v-'+k);if(el)el.innerHTML='<div class="mn-empty">데이터를 불러오지 못했습니다. ('+esc(e.message)+')</div>';
   })));
@@ -446,7 +455,31 @@ async function quick(key,id,patch){
 
 /* 화면별 렌더 */
 const empty=m=>`<div class="mn-empty">${m}</div>`;
+async function appUpdate(id,patch){try{await rpc('otr_app_update',{rid:id,...patch});await loadApps();}catch(e){alert('저장 실패: '+e.message);}}
+async function appMemo(id){const r=D.apps.find(x=>x.id===id);const m=prompt('메모',r.memo||'');if(m===null)return;appUpdate(id,{new_memo:m});}
+async function appDel(id){if(!confirm('이 신청을 삭제할까요? 되돌릴 수 없습니다.'))return;try{await rpc('otr_app_delete',{rid:id});await loadApps();}catch(e){alert('삭제 실패: '+e.message);}}
+function appCsv(){
+  const L=D.apps||[],h=['접수일','이름','연락처','소속/역할','초대자','Pass','상태','사전 질문','메모'];
+  const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+  const csv='\uFEFF'+[h,...L.map(r=>[r.created_at.slice(0,16).replace('T',' '),r.name,r.phone,r.role,r.inviter,r.pass,r.status,r.question,r.memo])].map(r=>r.map(q).join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='otr_applications_'+today()+'.csv';a.click();
+}
 const RENDER={
+  apps(){
+    const all=D.apps||[];
+    $('appChips').innerHTML=['전체',...APP_STATUS].map(c=>`<button class="${c===appFilter?'on':''}" onclick="appFilter='${c}';RENDER.apps()">${c}<small style="opacity:.6;margin-left:.3rem">${c==='전체'?all.length:all.filter(r=>r.status===c).length}</small></button>`).join('')+`<button onclick="appCsv()">CSV ↓</button>`;
+    const L=all.filter(r=>appFilter==='전체'||r.status===appFilter);
+    const cnt=all.reduce((o,r)=>{const k=r.pass.split(' (')[0];o[k]=(o[k]||0)+1;return o;},{});
+    $('appCount').textContent=all.length?`총 ${all.length}건 · `+Object.entries(cnt).map(([k,v])=>`${k} ${v}`).join(' · '):'';
+    $('v-apps').innerHTML=`<thead><tr><th>접수일</th><th>이름</th><th>연락처</th><th>소속 / 역할</th><th>초대자</th><th>Pass</th><th>상태</th><th>사전 질문</th><th>메모</th><th></th></tr></thead><tbody>${
+      L.map(r=>`<tr><td style="white-space:nowrap;color:var(--tl)">${r.created_at.slice(0,10)}<br><small>${r.created_at.slice(11,16)}</small></td>
+      <td style="white-space:nowrap"><b>${esc(r.name)}</b></td><td style="white-space:nowrap">${esc(r.phone)}</td><td>${esc(r.role)}</td><td>${esc(r.inviter)}</td><td style="white-space:nowrap">${esc(r.pass.split(' · ')[0])}</td>
+      <td><select onchange="appUpdate('${r.id}',{new_status:this.value})">${APP_STATUS.map(o=>`<option ${o===r.status?'selected':''}>${o}</option>`).join('')}</select></td>
+      <td style="min-width:260px;max-width:420px;white-space:pre-wrap;font-size:.84rem">${esc(r.question)}</td>
+      <td style="min-width:140px;font-size:.84rem;color:var(--ts)">${esc(r.memo||'')} <button class="lnk" onclick="appMemo('${r.id}')">${r.memo?'수정':'+ 메모'}</button></td>
+      <td><button class="lnk" style="color:var(--tl)" onclick="appDel('${r.id}')">삭제</button></td></tr>`).join('')||`<tr><td colspan="10" style="text-align:center;color:var(--tl);padding:2rem">${all.length?'해당 상태의 신청이 없습니다.':'아직 접수된 신청이 없습니다.'}</td></tr>`
+    }</tbody>`;
+  },
   notes(){
     const L=[...D.notes].sort((a,b)=>b.meeting_date.localeCompare(a.meeting_date));
     $('v-notes').innerHTML=L.length?L.map(n=>`<div class="mn-item">
