@@ -3,7 +3,7 @@
 <meta name="robots" content="noindex">
 <meta name="description" content="Where real questions meet real answers. 기록되지 않는 질문과 답이 오가는 공간.">
 <meta property="og:title" content="Off the Record Salon"><meta property="og:description" content="기록되지 않는 질문과 답이 오가는 공간">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=Allura&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
 <style>
 :root{--bg:#F4F3EF;--wh:#FFFFFF;--dk:#141414;--dk2:#1E1E1E;--ac:#9E2A2B;--ac2:#7A1F20;--ts:#3A3A3A;--tl:#7A7A7A;--bd:rgba(20,20,20,.12);--sw:0 2px 16px rgba(20,20,20,.07);--r:14px;--r-sm:10px;--r-pill:20px}
@@ -235,6 +235,23 @@ footer p{font-size:.76rem;color:rgba(255,255,255,.25);letter-spacing:.04em;text-
 @media(max-width:600px){.mn-row,.mn-sum{grid-template-columns:1fr;gap:.5rem}.admin-bar{padding:1rem}}
 
 .admin-bar{position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:.75rem}
+.site-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1.5rem}
+.site-card{background:var(--wh);border-radius:var(--r);box-shadow:var(--sw);padding:1.75rem}
+.site-card h3{font-size:1.05rem;font-weight:700}
+.site-form{display:flex;flex-direction:column;gap:1rem;margin-top:1.25rem}
+.site-form label{font-size:.8rem;color:var(--tl);font-weight:600;display:block;margin-bottom:.3rem}
+.site-form input[type=text],.site-form input:not([type]){width:100%;padding:.7rem 1rem;border:1px solid var(--bd);border-radius:var(--r-sm);font:inherit;font-size:.9rem;background:var(--bg)}
+.seg{display:inline-flex;border:1px solid var(--bd);border-radius:var(--r-pill);overflow:hidden}
+.seg button{background:transparent;border:none;font:inherit;font-size:.85rem;font-weight:600;padding:.5rem 1.1rem;cursor:pointer;color:var(--ts)}
+.seg button.on{background:var(--dk);color:#fff}
+.hprev{position:relative;aspect-ratio:16/9;background:#141414;border-radius:var(--r-sm);overflow:hidden;margin-top:1.25rem}
+.hprev-media{position:absolute;inset:0}
+.hprev-media img,.hprev-media video{width:100%;height:100%;object-fit:cover;object-position:var(--hero-pos,center)}
+.hprev-media::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(20,20,20,var(--hero-dim,.6)),rgba(20,20,20,calc(var(--hero-dim,.6)*.6)))}
+.hprev-text{position:absolute;left:1.25rem;bottom:1rem;color:#fff;line-height:1.1}
+.hprev-text small{display:block;font-size:.7rem;color:rgba(255,255,255,.65);margin-bottom:.5rem}
+.hprev-text b{font-family:'Allura','DM Sans',cursive;font-weight:400;font-size:2.6rem}.hprev-text b span{color:var(--ac)}
+@media(max-width:900px){.site-grid{grid-template-columns:1fr}}
 .tabs{display:flex;gap:.25rem;flex-wrap:wrap}
 .tabs button{background:transparent;border:none;color:rgba(255,255,255,.55);font:inherit;font-size:.85rem;font-weight:600;padding:.45rem .9rem;border-radius:var(--r-pill);cursor:pointer}
 .tabs button:hover{color:#fff}.tabs button.on{background:var(--ac);color:#fff}
@@ -293,13 +310,41 @@ footer p{font-size:.76rem;color:rgba(255,255,255,.25);letter-spacing:.04em;text-
 </div></div>
 <header class="admin-bar"><span>OFF THE RECORD SALON<small>ADMIN</small></span>
 <nav class="tabs" id="tabs">
-  <button data-tab="notes" class="on">회의록</button><button data-tab="apps">신청</button><button data-tab="speakers">연사</button><button data-tab="fees">사례비</button><button data-tab="actions">Next Action</button><button data-tab="decisions">결정 기록</button><button data-tab="plan">기획 자료</button>
+  <button data-tab="notes" class="on">회의록</button><button data-tab="apps">신청</button><button data-tab="site">홈페이지</button><button data-tab="speakers">연사</button><button data-tab="fees">사례비</button><button data-tab="actions">Next Action</button><button data-tab="decisions">결정 기록</button><button data-tab="plan">기획 자료</button>
 </nav><a href="index.html">← 사이트로</a></header>
 
 <div class="panel" id="p-apps"><section class="section"><div class="container">
   <div class="mn-head"><div><div class="eyebrow">Applications</div><h2 class="title" style="margin:0">참가 신청</h2></div><div class="chips" id="appChips"></div></div>
   <p class="note">홈페이지 신청 양식으로 접수된 내역입니다. 사전 질문은 익명으로 큐레이션해 Speaker에게 전달합니다. <span id="appCount"></span></p>
   <div class="tbl-wrap"><table class="tbl" id="v-apps"></table></div>
+</div></section></div>
+
+<div class="panel" id="p-site"><section class="section"><div class="container">
+  <div class="mn-head"><div><div class="eyebrow">Homepage</div><h2 class="title" style="margin:0">홈페이지 설정</h2></div></div>
+  <div class="site-grid">
+    <div class="site-card">
+      <h3>히어로 배경</h3>
+      <p class="note" style="margin-top:.25rem">첫 화면 워드마크 뒤에 깔리는 사진 또는 영상입니다. 파일을 Supabase Storage나 다른 공개 URL에 올린 뒤 주소를 붙여 넣으세요.</p>
+      <div class="site-form">
+        <div><label>배경 유형</label>
+          <div class="seg" id="hType"><button data-v="none" class="on">없음</button><button data-v="image">사진</button><button data-v="video">영상</button></div></div>
+        <div id="hImgRow"><label>사진 URL</label><input id="h_image" placeholder="https://… .jpg / .webp (가로 1920px 이상 권장)"></div>
+        <div id="hVidRow" style="display:none"><label>영상 URL</label><input id="h_video" placeholder="https://… .mp4 (소리 없이 자동 반복 재생, 10~20초 / 10MB 이하 권장)">
+          <label style="margin-top:.75rem">포스터 이미지 URL <small style="font-weight:400">(영상 로딩 전·재생 불가 시 표시, 선택)</small></label><input id="h_poster" placeholder="https://… .jpg"></div>
+        <div class="mn-row" style="grid-template-columns:1fr 1fr">
+          <div><label>어둡게 <b id="hDimV">60</b>%</label><input type="range" id="h_dim" min="0" max="95" step="5" value="60" style="width:100%"></div>
+          <div><label>초점 위치</label><select id="h_pos" style="width:100%;padding:.6rem 1rem;border:1px solid var(--bd);border-radius:var(--r-sm);font:inherit;background:var(--bg)">
+            <option value="center">가운데</option><option value="top">위</option><option value="bottom">아래</option><option value="left">왼쪽</option><option value="right">오른쪽</option><option value="center top">가운데 위</option><option value="center bottom">가운데 아래</option></select></div>
+        </div>
+        <div class="mn-actions" style="margin-top:.5rem"><span id="hMsg" style="margin-right:auto;font-size:.82rem;color:var(--tl)"></span><button class="mn-btn" id="hSave" onclick="saveHero()">저장</button></div>
+      </div>
+    </div>
+    <div class="site-card">
+      <h3>미리보기</h3>
+      <div class="hprev" id="hPrev"><div class="hprev-media" id="hPrevMedia"></div><div class="hprev-text"><small>기록되지 않는 질문과 답이 오가는 공간</small><b>Off the Record<br>Salon<span>.</span></b></div></div>
+      <p class="note" style="margin-top:.75rem">실제 화면 비율과 다를 수 있습니다. 저장 후 <a href="index.html" target="_blank" style="color:var(--ac)">홈페이지 새 창</a>에서 확인하세요.</p>
+    </div>
+  </div>
 </div></section></div>
 
 <div class="panel on" id="p-notes"><section class="section"><div class="container">
@@ -393,6 +438,7 @@ async function load(key){D[key]=await rpc('otr_list',{tbl:T[key].tbl});RENDER[ke
 const APP_STATUS=['접수','확정','대기','취소'];let appFilter='전체';
 async function loadApps(){D.apps=await rpc('otr_app_list');RENDER.apps();}
 async function loadAll(){
+  loadSite().catch(e=>{$('hMsg').textContent='설정을 불러오지 못했습니다. ('+e.message+')';});
   loadApps().catch(e=>{$('v-apps').innerHTML='<tr><td style="padding:2rem;color:var(--tl)">신청 내역을 불러오지 못했습니다. ('+esc(e.message)+')</td></tr>';});
   await Promise.all(Object.keys(T).map(k=>load(k).catch(e=>{
     const el=$('v-'+k);if(el)el.innerHTML='<div class="mn-empty">데이터를 불러오지 못했습니다. ('+esc(e.message)+')</div>';
@@ -463,6 +509,30 @@ function appCsv(){
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
   const csv='\uFEFF'+[h,...L.map(r=>[r.created_at.slice(0,16).replace('T',' '),r.name,r.phone,r.role,r.inviter,r.pass,r.status,r.question,r.memo])].map(r=>r.map(q).join(',')).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='otr_applications_'+today()+'.csv';a.click();
+}
+/* 홈페이지 설정 — 히어로 배경 */
+let HERO={type:'none',image:'',video:'',poster:'',dim:60,pos:'center'};
+function heroForm(){return {type:$('hType').querySelector('.on').dataset.v,image:$('h_image').value.trim(),video:$('h_video').value.trim(),poster:$('h_poster').value.trim(),dim:Number($('h_dim').value),pos:$('h_pos').value};}
+function heroFill(h){HERO={...HERO,...h};$('hType').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===HERO.type));$('h_image').value=HERO.image||'';$('h_video').value=HERO.video||'';$('h_poster').value=HERO.poster||'';$('h_dim').value=HERO.dim??60;$('h_pos').value=HERO.pos||'center';heroPrev();}
+function heroPrev(){
+  const h=heroForm();$('hDimV').textContent=h.dim;$('hImgRow').style.display=h.type==='image'?'':'none';$('hVidRow').style.display=h.type==='video'?'':'none';
+  const pv=$('hPrev');pv.style.setProperty('--hero-dim',h.dim/100);pv.style.setProperty('--hero-pos',h.pos);
+  const m=$('hPrevMedia');
+  if(h.type==='image'&&h.image)m.innerHTML=`<img src="${esc(h.image)}" alt="">`;
+  else if(h.type==='video'&&h.video)m.innerHTML=`<video src="${esc(h.video)}" ${h.poster?`poster="${esc(h.poster)}"`:''} autoplay muted loop playsinline></video>`;
+  else m.innerHTML='';
+}
+$('hType').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('hType').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));heroPrev();});
+['h_image','h_video','h_poster','h_dim','h_pos'].forEach(id=>$(id).addEventListener('input',heroPrev));
+async function loadSite(){const st=await rpc('otr_public_settings');if(st&&st.hero)heroFill(st.hero);}
+async function saveHero(){
+  const h=heroForm();
+  if(h.type==='image'&&!h.image)return alert('사진 URL을 입력해 주세요.');
+  if(h.type==='video'&&!h.video)return alert('영상 URL을 입력해 주세요.');
+  $('hSave').disabled=true;$('hMsg').textContent='저장 중…';
+  try{await rpc('otr_set_setting',{skey:'hero',sval:h});HERO=h;$('hMsg').textContent='저장되었습니다. 홈페이지에 바로 반영됩니다.';}
+  catch(e){$('hMsg').textContent='';alert('저장 실패: '+e.message);}
+  $('hSave').disabled=false;
 }
 const RENDER={
   apps(){

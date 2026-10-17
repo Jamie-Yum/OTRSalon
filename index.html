@@ -62,7 +62,12 @@ h1,h2,h3,h4{font-weight:700;line-height:var(--lh-tight);letter-spacing:-.02em}
 
 /* HERO */
 .hero{min-height:100vh;min-height:100svh;background:var(--dk);position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end}
-.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(158,42,43,.16),transparent 55%)}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(158,42,43,.16),transparent 55%);z-index:1}
+.hero-media{position:absolute;inset:0;z-index:0;opacity:0;transition:opacity 1.2s}
+.hero-media.on{opacity:1}
+.hero-media img,.hero-media video{width:100%;height:100%;object-fit:cover;object-position:var(--hero-pos,center)}
+.hero-media::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(20,20,20,var(--hero-dim,.6)) 0%,rgba(20,20,20,calc(var(--hero-dim,.6)*.55)) 55%,rgba(20,20,20,calc(var(--hero-dim,.6)*.75)) 100%)}
+.hero-bottom{z-index:2}
 .hero-top{position:relative;padding:8rem 3rem 0;max-width:640px}
 .hero-label{font-family:'DM Sans',sans-serif;font-size:var(--f-eyebrow);font-weight:700;letter-spacing:.3em;color:rgba(255,255,255,.55);display:flex;align-items:center;gap:.6rem;animation:fU .9s ease both}
 .hero-label::before{content:'';width:8px;height:8px;background:var(--ac)}
@@ -307,6 +312,7 @@ body.has-sticky{padding-bottom:72px}
 
 <!-- HERO -->
 <section class="hero" id="home">
+  <div class="hero-media" id="heroMedia" aria-hidden="true"></div>
   <div class="hero-bottom">
     <p class="hero-sub">기록되지 않는 질문과 답이 오가는 공간<small>오프더레코드 살롱</small></p>
     <h1 class="hero-wordmark">Off the Record<br>Salon<span>.</span></h1>
@@ -507,6 +513,20 @@ function renderSpeakers(list){
 renderSpeakers([]);
 fetch(SU+'/rest/v1/rpc/otr_public_speakers',{method:'POST',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:'{}'})
   .then(r=>r.ok?r.json():[]).then(l=>Array.isArray(l)&&l.length&&renderSpeakers(l)).catch(()=>{});
+
+/* ---- 히어로 배경 (관리자 설정) ---- */
+function applyHero(h){
+  if(!h||!h.type||h.type==='none')return;
+  const box=$('#heroMedia');const hero=$('#home');
+  hero.style.setProperty('--hero-dim',String(Math.min(Math.max(Number(h.dim??60),0),95)/100));
+  hero.style.setProperty('--hero-pos',h.pos||'center');
+  let el=null;
+  if(h.type==='video'&&h.video){el=document.createElement('video');el.src=h.video;if(h.poster)el.poster=h.poster;el.autoplay=true;el.muted=true;el.loop=true;el.playsInline=true;el.setAttribute('playsinline','');el.addEventListener('loadeddata',()=>box.classList.add('on'));el.addEventListener('error',()=>{if(h.poster){box.innerHTML='';const im=new Image();im.src=h.poster;im.onload=()=>box.classList.add('on');box.appendChild(im);}});}
+  else if(h.type==='image'&&h.image){el=new Image();el.src=h.image;el.alt='';el.onload=()=>box.classList.add('on');}
+  if(el){box.innerHTML='';box.appendChild(el);}
+}
+fetch(SU+'/rest/v1/rpc/otr_public_settings',{method:'POST',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:'{}'})
+  .then(r=>r.ok?r.json():{}).then(st=>st&&applyHero(st.hero)).catch(()=>{});
 
 /* ---- 로고 2초 길게 누르기 → 관리자 페이지 ---- */
 (function(){

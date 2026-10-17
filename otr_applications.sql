@@ -69,3 +69,30 @@ end $$;
 grant execute on function public.otr_app_list(text) to anon, authenticated;
 grant execute on function public.otr_app_update(text,uuid,text,text) to anon, authenticated;
 grant execute on function public.otr_app_delete(text,uuid) to anon, authenticated;
+
+-- ─────────────────────────────────────────────
+-- 사이트 설정 (히어로 배경 사진/영상 등)
+-- ─────────────────────────────────────────────
+create table if not exists public.otr_settings (
+  key        text primary key,
+  value      jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+alter table public.otr_settings enable row level security;
+
+-- 홈페이지: 공개 설정 읽기 (anon)
+create or replace function public.otr_public_settings() returns jsonb
+language sql security definer set search_path = public stable as $$
+  select coalesce(jsonb_object_agg(key, value), '{}'::jsonb) from otr_settings;
+$$;
+grant execute on function public.otr_public_settings() to anon, authenticated;
+
+-- 관리자: 설정 저장
+create or replace function public.otr_set_setting(pw text, skey text, sval jsonb) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  if not otr_auth(pw) then raise exception 'unauthorized'; end if;
+  insert into otr_settings(key,value,updated_at) values(skey,sval,now())
+  on conflict(key) do update set value=excluded.value, updated_at=now();
+end $$;
+grant execute on function public.otr_set_setting(text,text,jsonb) to anon, authenticated;
