@@ -148,7 +148,12 @@ h1,h2,h3,h4{font-weight:700;line-height:var(--lh-tight);letter-spacing:-.02em}
 .tl-flow i{font-style:normal;color:var(--ac);font-weight:700}
 
 /* PASS */
-.pass-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);margin-top:var(--block)}
+.pass-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:var(--gap);margin-top:var(--block);max-width:960px}
+.pass-card.soon{background:transparent;border:2px dashed var(--bd);box-shadow:none;cursor:default;color:var(--tl)}
+.pass-card.soon:hover{transform:none}
+.pass-card.soon .tag{background:transparent;color:var(--tl);border-color:var(--bd)}
+.pass-card.soon .pass-kr,.pass-card.soon .pass-price{color:var(--tl)}
+.pass-card.soon .pass-check{font-weight:500;letter-spacing:0;line-height:1.5}
 .pass-card{background:var(--wh);border-radius:var(--r);padding:2.5rem 2rem;box-shadow:var(--sw);position:relative;transition:transform .35s,box-shadow .35s;cursor:pointer;border:2px solid transparent;text-align:left;font:inherit;color:inherit;width:100%}
 .pass-card:hover{transform:translateY(-4px)}
 .pass-card:focus-visible{outline:3px solid var(--ac);outline-offset:3px}
@@ -280,11 +285,11 @@ body.has-sticky{padding-bottom:72px}
   .sch-row .tag{position:absolute;top:1.3rem;right:.25rem}
   .tl-step{grid-template-columns:1fr;gap:.75rem;padding:1.75rem 0}
   .tl-no b{font-size:1.8rem;display:inline;margin-left:.5rem}
-  .pass-card{padding:1.75rem 1.5rem;display:grid;grid-template-columns:1fr auto;grid-template-areas:"name price" "kr price" "per price" "chk chk";align-items:center;column-gap:1rem}
+  .pass-card{padding:1.75rem 1.5rem;display:grid;grid-template-columns:1fr auto;grid-template-areas:"tag price" "name price" "kr price" "per price" "chk chk";align-items:center;column-gap:1rem}
   .pass-card .pass-name{grid-area:name}.pass-card .pass-kr{grid-area:kr}.pass-card .pass-per{grid-area:per}.pass-card .pass-check{grid-area:chk;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--bd)}
   .pass-card.best .pass-check{border-top-color:rgba(255,255,255,.15)}
   .pass-card .pass-price{grid-area:price;margin:0;font-size:2.2rem;text-align:right}
-  .pass-card .tag{position:static;grid-area:name;justify-self:start;margin-bottom:.4rem}
+  .pass-card .tag{position:static;grid-area:tag;justify-self:start;margin-bottom:.5rem}
   .pass-card.best .pass-name{margin-top:.1rem}
   .pass-foot{flex-direction:column;align-items:stretch}.pass-foot .btn{width:100%}
   .form-foot .btn{width:100%}
@@ -395,14 +400,13 @@ body.has-sticky{padding-bottom:72px}
 <section class="section" id="pass"><div class="container">
   <div class="eyebrow reveal">Pass</div>
   <h2 class="title reveal">참가 Pass</h2>
-  <p class="desc reveal">한 번의 Salon부터 전체 Cycle까지. Pass를 선택하면 아래 신청 양식에 바로 반영됩니다.</p>
+  <p class="desc reveal">Salon 01 모집은 네 번의 Salon을 모두 함께하는 Full Cycle Pass로 진행합니다. 1회권은 회차별로 별도 오픈됩니다.</p>
   <div class="pass-grid reveal" id="passGrid" role="radiogroup" aria-label="Pass 선택">
-    <button type="button" class="pass-card" data-pass="Single (1회권) · 9만원" role="radio" aria-checked="false"><div class="pass-name">Single</div><div class="pass-kr">1회권</div><div class="pass-price">9<small>만원</small></div><div class="pass-per">회당 9만원</div><div class="pass-check"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></i><span>선택</span></div></button>
-    <button type="button" class="pass-card" data-pass="2 Salons (2회권) · 15만원" role="radio" aria-checked="false"><div class="pass-name">2 Salons</div><div class="pass-kr">2회권</div><div class="pass-price">15<small>만원</small></div><div class="pass-per">회당 7.5만원</div><div class="pass-check"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></i><span>선택</span></div></button>
-    <button type="button" class="pass-card best" data-pass="Full Cycle (4회권) · 25만원" role="radio" aria-checked="false"><span class="tag">한정 수량</span><div class="pass-name">Full Cycle</div><div class="pass-kr">4회권 · 4 Salons</div><div class="pass-price">25<small>만원</small></div><div class="pass-per">회당 6.25만원</div><div class="pass-check"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></i><span>선택</span></div></button>
+    <button type="button" class="pass-card best" data-pass="Full Cycle (4회권) · 25만원" role="radio" aria-checked="false"><span class="tag">한정 수량</span><div class="pass-name">Full Cycle</div><div class="pass-kr">4회권 · 4 Salons</div><div class="pass-price">25<small>만원</small></div><div class="pass-per">회당 6.25만원 · 1회권 대비 11만원 절약</div><div class="pass-check"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></i><span>선택</span></div></button>
+    <div class="pass-card soon" aria-disabled="true"><span class="tag">추후 오픈</span><div class="pass-name">Single</div><div class="pass-kr">1회권</div><div class="pass-price">9<small>만원</small></div><div class="pass-per">회차별로 별도 오픈 예정</div><div class="pass-check"><span>Full Cycle 마감 후 잔여석에 한해 열립니다</span></div></div>
   </div>
   <div class="pass-foot reveal">
-    <p id="passFootMsg">Pass를 선택해 주세요. 신청 양식에서도 바꿀 수 있습니다.</p>
+    <p id="passFootMsg">Full Cycle Pass는 한정 수량으로 선착순 마감됩니다.</p>
     <a href="#apply" class="btn" id="passCta">신청 양식으로 →</a>
   </div>
 </div></section>
@@ -431,7 +435,8 @@ body.has-sticky{padding-bottom:72px}
       <div class="field"><label for="f-inviter">초대해 주신 분 <em>*</em></label><input id="f-inviter" name="inviter" required placeholder="초대자 이름"><p class="field-err">초대해 주신 분의 이름을 입력해 주세요.</p></div>
     </div>
     <div class="field"><label for="f-pass">Pass 선택 <em>*</em></label>
-      <select id="f-pass" name="pass" required><option value="">선택해 주세요</option><option>Single (1회권) · 9만원</option><option>2 Salons (2회권) · 15만원</option><option>Full Cycle (4회권) · 25만원</option></select>
+      <select id="f-pass" name="pass" required><option value="">선택해 주세요</option><option selected>Full Cycle (4회권) · 25만원</option></select>
+      <p class="form-hint">1회권은 회차별로 별도 오픈됩니다.</p>
       <p class="field-err">Pass를 선택해 주세요.</p></div>
     <div class="field">
       <div class="q-head"><label for="f-q">사전 질문 <em>*</em></label><button type="button" class="q-toggle" id="qToggle" aria-expanded="false">예시 보기</button></div>
@@ -477,7 +482,7 @@ body.has-sticky{padding-bottom:72px}
     <div class="faq-item"><button type="button" class="faq-q" aria-expanded="false">'Off the Record'는 어떤 의미인가요?</button><div class="faq-a">Salon에서 오간 이야기는 외부에 기록하거나 공개하지 않습니다. Speaker와 참가자 모두 솔직하게 이야기할 수 있도록 하기 위한 원칙입니다.</div></div>
     <div class="faq-item"><button type="button" class="faq-q" aria-expanded="false">누구나 참가할 수 있나요?</button><div class="faq-a">초대를 받은 분만 참가할 수 있습니다. 회차당 18명 내외의 소수 정원으로 운영됩니다.</div></div>
     <div class="faq-item"><button type="button" class="faq-q" aria-expanded="false">사전 질문은 꼭 써야 하나요?</button><div class="faq-a">네. Off the Record Salon은 참가자의 질문에서 시작하는 Question-driven Salon입니다. 사전 질문은 Speaker의 이야기와 당일 대화 구성에 반영됩니다.</div></div>
-    <div class="faq-item"><button type="button" class="faq-q" aria-expanded="false">Pass는 나중에 바꿀 수 있나요?</button><div class="faq-a">참가 확정 전까지는 안내 연락 시 변경할 수 있습니다. Full Cycle은 한정 수량으로 선착순 마감됩니다.</div></div>
+    <div class="faq-item"><button type="button" class="faq-q" aria-expanded="false">1회권은 없나요?</button><div class="faq-a">Salon 01 모집은 네 번을 모두 함께하는 Full Cycle Pass(한정 수량)로 진행합니다. 1회권은 Full Cycle 마감 후 잔여석에 한해 회차별로 별도 오픈됩니다.</div></div>
   </div>
 </div></section>
 
@@ -543,16 +548,17 @@ fetch(SU+'/rest/v1/rpc/otr_public_settings',{method:'POST',headers:{apikey:SK,Au
 })();
 
 /* ---- Pass 선택 ↔ 폼 동기화 ---- */
-const passSel=$('#f-pass'),passCards=$$('.pass-card'),passFootMsg=$('#passFootMsg'),passCta=$('#passCta'),stickyTxt=$('#stickyTxt');
+const passSel=$('#f-pass'),passCards=$$('.pass-card[data-pass]'),passFootMsg=$('#passFootMsg'),passCta=$('#passCta'),stickyTxt=$('#stickyTxt');
 function setPass(v,from){
   passCards.forEach(c=>{const on=c.dataset.pass===v;c.classList.toggle('selected',on);c.setAttribute('aria-checked',on);c.querySelector('.pass-check span').textContent=on?'선택됨':'선택';});
   if(passSel.value!==v)passSel.value=v;
   if(v){const short=v.split(' · ')[0];passFootMsg.innerHTML=`<b>${esc(v)}</b> 선택됨 · 신청 양식에 반영되었습니다.`;passCta.textContent='선택한 Pass로 신청하기 →';stickyTxt.textContent=short+' 선택됨';}
-  else{passFootMsg.textContent='Pass를 선택해 주세요. 신청 양식에서도 바꿀 수 있습니다.';passCta.textContent='신청 양식으로 →';stickyTxt.textContent='초대받은 분만 신청할 수 있습니다';}
+  else{passFootMsg.textContent='Full Cycle Pass는 한정 수량으로 선착순 마감됩니다.';passCta.textContent='신청 양식으로 →';stickyTxt.textContent='초대받은 분만 신청할 수 있습니다';}
   if(from==='card')clearErr(passSel);
 }
 passCards.forEach(c=>c.addEventListener('click',()=>setPass(c.classList.contains('selected')?'':c.dataset.pass,'card')));
 passSel.addEventListener('change',()=>setPass(passSel.value,'select'));
+setPass(passSel.value,'select');
 
 /* ---- 모바일 하단 고정 CTA ---- */
 const sticky=$('#stickyCta');let heroOut=false,applyIn=false;
