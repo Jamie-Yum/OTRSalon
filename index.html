@@ -61,13 +61,13 @@ h1,h2,h3,h4{font-weight:700;line-height:var(--lh-tight);letter-spacing:-.02em}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* HERO */
-.hero{min-height:100vh;min-height:100svh;background:var(--dk);position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between}
+.hero{min-height:100vh;min-height:100svh;background:var(--dk);position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end}
 .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 80% 20%,rgba(158,42,43,.16),transparent 55%)}
 .hero-top{position:relative;padding:8rem 3rem 0;max-width:640px}
 .hero-label{font-family:'DM Sans',sans-serif;font-size:var(--f-eyebrow);font-weight:700;letter-spacing:.3em;color:rgba(255,255,255,.55);display:flex;align-items:center;gap:.6rem;animation:fU .9s ease both}
 .hero-label::before{content:'';width:8px;height:8px;background:var(--ac)}
 .hero-copy{font-family:'DM Sans',sans-serif;font-style:italic;font-weight:400;font-size:clamp(1.2rem,2.4vw,1.6rem);color:#fff;margin-top:1.5rem;animation:fU .9s ease .2s both;line-height:1.4}
-.hero-sub{color:rgba(255,255,255,.6);font-size:var(--f-body);margin-top:.5rem;animation:fU .9s ease .3s both}
+.hero-sub{color:rgba(255,255,255,.65);font-size:var(--f-lead);margin-bottom:1.5rem;animation:fU .9s ease .3s both}
 .hero-actions{display:flex;align-items:center;gap:1.25rem;margin-top:2.25rem;flex-wrap:wrap;animation:fU .9s ease .4s both}
 .hero-cta{display:inline-flex;color:rgba(255,255,255,.8);font-size:var(--f-small);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.3);padding-bottom:.2rem;font-family:'DM Sans','Pretendard',sans-serif;letter-spacing:.04em;transition:all .25s}
 .hero-cta:hover{color:#fff;border-color:#fff}
@@ -306,17 +306,8 @@ body.has-sticky{padding-bottom:72px}
 
 <!-- HERO -->
 <section class="hero" id="home">
-  <div class="hero-top">
-    <div class="hero-label">INVITATION-ONLY SALON</div>
-    <p class="hero-copy">Where real questions meet real answers.</p>
-    <p class="hero-sub">기록되지 않는 질문과 답이 오가는 공간</p>
-    <div class="hero-actions">
-      <a href="#apply" class="btn ghost">참가 신청 →</a>
-      <a href="#about" class="hero-cta">Salon 자세히 알아보기</a>
-    </div>
-  </div>
   <div class="hero-bottom">
-    <a href="#schedule" class="hero-badge"><i><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></i><span>SALON 01 · NOVEMBER 2026</span></a>
+    <p class="hero-sub">기록되지 않는 질문과 답이 오가는 공간</p>
     <h1 class="hero-wordmark">Off the Record<br>Salon<span>.</span></h1>
     <div class="hero-meta"><span>4 Speakers. 4 Conversations. 1 Cycle.</span><span>2026.11 · 2027.03 · 2027.06 · 2027.09</span></div>
   </div>
