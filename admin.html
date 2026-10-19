@@ -352,7 +352,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 </div></div>
 <header class="admin-bar"><span><b class="lg">OTR Salon</b><small>ADMIN</small></span>
 <nav class="tabs" id="tabs">
-  <button data-tab="notes" class="on">회의록</button><button data-tab="apps">신청</button><button data-tab="site">홈페이지</button><button data-tab="speakers">연사</button><button data-tab="fees">사례비</button><button data-tab="actions">Next Action</button><button data-tab="decisions">결정 기록</button><button data-tab="plan">기획 자료</button>
+  <button data-tab="notes" class="on">회의록</button><button data-tab="apps">신청</button><button data-tab="site">홈페이지</button><button data-tab="schedule">일정</button><button data-tab="speakers">연사</button><button data-tab="fees">사례비</button><button data-tab="actions">Next Action</button><button data-tab="decisions">결정 기록</button><button data-tab="plan">기획 자료</button>
 </nav><a href="index.html">← 사이트로</a></header>
 
 <div class="panel" id="p-apps"><section class="section"><div class="container">
@@ -420,6 +420,12 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
   <div class="dec-list" id="v-decisions"></div>
 </div></section></div>
 
+<div class="panel" id="p-schedule"><section class="section"><div class="container">
+  <div class="mn-head"><div><div class="eyebrow">Schedule</div><h2 class="title" style="margin:0">일정</h2></div><button class="mn-btn" onclick="edit('schedule')">+ 회차 추가</button></div>
+  <p class="note">여기서 바꾼 내용이 홈페이지 일정 섹션에 바로 반영됩니다. 담당 Host·내부 메모는 홈페이지에 노출되지 않습니다. 날짜가 지난 회차는 홈페이지에서 자동으로 '종료'로 표시됩니다.</p>
+  <div class="tbl-wrap"><table class="tbl" id="v-schedule"></table></div>
+</div></section></div>
+
 <div class="panel" id="p-plan"><section class="section"><div class="container">
   <div class="mn-head"><div><div class="eyebrow">Planning</div><h2 class="title" style="margin:0">기획 자료</h2></div><button class="mn-btn" onclick="edit('plan')">+ 자료 추가</button></div>
   <div class="plan-list" id="v-plan"></div>
@@ -432,6 +438,7 @@ const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6I
 const OWNERS=['신다혜','조영주','염제명','위현민','TF 전체'];
 const SP_STATUS=['후보','컨택 중','확정','보류','거절'];
 const CATS=['TIME','PRICE','INVITATION','SPEAKER','사례비','운영','기타'];
+const SCH_STATUS=['모집 중','예정','마감','종료'];
 const SALONS=[{v:1,l:'Salon 01 (2026.11)'},{v:2,l:'Salon 02 (2027.03)'},{v:3,l:'Salon 03 (2027.06)'},{v:4,l:'Salon 04 (2027.09)'}];
 const T={
   notes:{tbl:'otr_meeting_notes',name:'회의록',fields:[
@@ -453,6 +460,13 @@ const T={
   decisions:{tbl:'otr_decisions',name:'결정 기록',fields:[
     {k:'decided_date',l:'결정일',t:'date',req:1,half:1},{k:'category',l:'구분',t:'sel',opts:CATS,req:1,half:1},
     {k:'content',l:'결정 내용',t:'area',req:1},{k:'memo',l:'배경 / 메모',t:'area'}]},
+  schedule:{tbl:'otr_schedule',name:'일정',fields:[
+    {k:'salon_no',l:'회차',t:'sel',opts:[1,2,3,4,5,6].map(n=>({v:n,l:'Salon 0'+n})),num:1,req:1,half:1},{k:'status',l:'상태',t:'sel',opts:SCH_STATUS,half:1},
+    {k:'year',l:'연도',t:'num',half:1,ph:'2026'},{k:'month',l:'월',t:'num',half:1,ph:'11'},
+    {k:'event_date',l:'확정 날짜 (정해지면 입력)',t:'date',half:1},{k:'time_text',l:'시간',half:1,ph:'예) 07:30–09:00'},
+    {k:'place',l:'장소',ph:'예) 서울 성수동 ○○'},{k:'host',l:'담당 Host (내부용)',list:'spNames'},
+    {k:'public_note',l:'홈페이지 안내 문구',ph:'예) 세부 일정 추후 공지 — 날짜를 입력하면 날짜·시간·장소가 대신 표시됩니다'},
+    {k:'memo',l:'내부 메모',t:'area'}]},
   plan:{tbl:'otr_plan_docs',name:'기획 자료',fields:[
     {k:'title',l:'제목',req:1},{k:'category',l:'구분',t:'sel',opts:['개요',...CATS.filter(c=>c!=='기타'),'프로그램','기타'],half:1},{k:'sort_order',l:'정렬 순서',t:'num',half:1},
     {k:'content',l:'내용',t:'area',big:1}]}
@@ -643,6 +657,16 @@ const RENDER={
     const L=D.decisions.filter(d=>decCat==='전체'||d.category===decCat).sort((a,b)=>b.decided_date.localeCompare(a.decided_date)||b.created_at.localeCompare(a.created_at));
     $('v-decisions').innerHTML=L.map(d=>`<div class="dec" onclick="edit('decisions','${d.id}')"><div class="meta"><span>${d.decided_date}</span><span class="tag">${esc(d.category)}</span></div><p>${esc(d.content)}</p>${d.memo?`<p class="memo">${esc(d.memo)}</p>`:''}</div>`).join('')||empty('기록된 결정이 없습니다.');
     if(D.fees)RENDER.fees();
+  },
+  schedule(){
+    const W='일월화수목금토',t=today();
+    const L=[...D.schedule].sort((a,b)=>a.salon_no-b.salon_no);
+    $('v-schedule').innerHTML=`<thead><tr><th>회차</th><th>연·월</th><th>날짜</th><th>시간</th><th>장소</th><th>담당 Host</th><th>상태</th><th>홈페이지 안내</th><th></th></tr></thead><tbody>${
+      L.map(r=>{const past=r.event_date&&r.event_date<t;const d=r.event_date?new Date(r.event_date+'T00:00'):null;
+      return `<tr><td><b>Salon 0${r.salon_no}</b></td><td>${r.year||'—'}.${r.month||'—'}</td><td>${d?`${d.getMonth()+1}/${d.getDate()} (${W[d.getDay()]})`:'<span style="color:var(--tl)">미정</span>'}</td><td>${esc(r.time_text)||'—'}</td><td>${esc(r.place)||'—'}</td><td>${esc(r.host)||'—'}</td>
+      <td><select onchange="quick('schedule','${r.id}',{status:this.value})">${SCH_STATUS.map(o=>`<option ${o===r.status?'selected':''}>${o}</option>`).join('')}</select>${past&&r.status!=='종료'?'<br><small style="color:var(--tl)">홈페이지엔 종료로 표시</small>':''}</td>
+      <td style="max-width:220px;color:var(--tl)">${esc(r.public_note)}</td><td><button class="lnk" onclick="edit('schedule','${r.id}')">수정</button></td></tr>`}).join('')||'<tr><td colspan="9" style="text-align:center;color:var(--tl);padding:2rem">등록된 일정이 없습니다.</td></tr>'
+    }</tbody>`;
   },
   plan(){
     const L=[...D.plan].sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)||a.created_at.localeCompare(b.created_at));
