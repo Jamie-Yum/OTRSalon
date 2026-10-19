@@ -680,7 +680,7 @@ const SU='https://dvlrzbckneucpvlacdll.supabase.co';
 const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE';
 const esc=t=>(t==null?'':String(t)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function renderSpeakers(list){
-  const cards=list.slice(0,4).map((s,i)=>`<div class="sp-card"><div class="sp-ph">${s.photo_url?`<img src="${esc(s.photo_url)}" alt="">`:esc(s.name.slice(0,1))}</div><div class="sp-body"><div class="sp-no">0${s.salon_no||i+1}</div><h4>${esc(s.name)}</h4><p class="sp-role">${esc(s.role)}</p><div class="sp-field">${esc(s.field)}</div></div></div>`);
+  const cards=list.slice(0,4).map((s,i)=>`<div class="sp-card"><div class="sp-ph">${s.photo_url?`<img src="${esc(s.photo_url)}" alt="">`:''}</div><div class="sp-body"><div class="sp-no">0${s.salon_no||i+1}</div><h4>${esc(s.name)}</h4><p class="sp-role">${esc(s.role)}</p><div class="sp-field">${esc(s.field)}</div></div></div>`);
   for(let i=cards.length;i<4;i++)cards.push(`<div class="sp-card tbc"><div class="sp-ph">0${i+1}</div><div class="sp-body"><div class="sp-no">0${i+1}</div><h4>Coming soon</h4><p class="sp-role">곧 공개됩니다</p><div class="sp-field">To be announced</div></div></div>`);
   $('#spGrid').innerHTML=cards.join('');
 }
