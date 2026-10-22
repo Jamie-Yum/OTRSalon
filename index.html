@@ -1,9 +1,9 @@
 <!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%23141414%27/%3E%3Ctext x=%2732%27 y=%2745%27 text-anchor=%27middle%27 font-family=%27Georgia,serif%27 font-style=%27italic%27 font-size=%2738%27 fill=%27%23C9B37E%27%3EO%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%23141414%27/%3E%3Cline x1=%2730%27 y1=%2722%27 x2=%2744%27 y2=%278%27 stroke=%27%23C9B37E%27 stroke-width=%271.6%27/%3E%3Ctext x=%2721%27 y=%2734%27 text-anchor=%27middle%27 font-family=%27Georgia,serif%27 font-size=%2722%27 fill=%27%23EDE6D6%27%3EO%3C/text%3E%3Ctext x=%2732%27 y=%2745%27 text-anchor=%27middle%27 font-family=%27Georgia,serif%27 font-size=%2722%27 fill=%27%23EDE6D6%27%3ER%3C/text%3E%3Ctext x=%2742%27 y=%2756%27 text-anchor=%27middle%27 font-family=%27Georgia,serif%27 font-size=%2722%27 fill=%27%23EDE6D6%27%3ES%3C/text%3E%3C/svg%3E">
 <title>Off the Record Salon</title>
 <meta name="description" content="Where real questions meet real answers. 기록되지 않는 질문과 답이 오가는 공간.">
 <meta property="og:title" content="Off the Record Salon"><meta property="og:description" content="기록되지 않는 질문과 답이 오가는 공간">
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Anton&family=Allura&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Anton&family=Allura&family=Jost:wght@300;400&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
 <style>
 :root{
@@ -489,10 +489,30 @@ body::after{display:none}
 .sp-card.tbc .tag{color:var(--dk);border-color:rgba(20,20,20,.3)}
 .sp-card.done{opacity:.5}
 @media(max-width:600px){.sp-card{aspect-ratio:auto;min-height:290px}.lu-top{padding:1rem 1rem 0}.lu-top b{font-size:2.1rem}.sp-body .lu-when{font-size:.72rem}}
+
+/* ===== BI 로고 (레퍼런스: 가는 자간 대문자 + 골드 사선) ===== */
+.bi{display:inline-flex;flex-direction:column;align-items:center;text-align:center;color:var(--cr,#EDE6D6);font-family:'Jost','Pretendard',sans-serif;text-transform:uppercase}
+.bi-sl{width:2.4em;height:2.4em;margin:0 0 .5em 1.6em;overflow:visible}
+.bi-sl line{stroke:#C9B37E;stroke-width:1.2;vector-effect:non-scaling-stroke}
+.bi-name{font-weight:300;letter-spacing:.2em;line-height:1.18;margin:0;font-size:1em}
+.bi-name span{display:block;padding-left:.2em;white-space:nowrap}
+.bi-sub{font-weight:400;letter-spacing:.62em;padding-left:.62em;font-size:max(.26em,.66rem);margin-top:1.3em;opacity:.9}
+
+.hero{justify-content:center;align-items:center;text-align:center}
+.hero-bottom.hero-center{display:flex;flex-direction:column;align-items:center;padding:6rem 1.5rem 4rem}
+.hero-bi{font-size:clamp(1.7rem,5.2vw,4.3rem);animation:fU .9s ease .1s both}
+.hero-center .hero-sub{margin:2.6rem 0 0;font-size:var(--f-body);letter-spacing:.02em}
+.hero-center .hero-sub small{margin-top:.5rem}
+.nav-logo{flex-direction:row;align-items:center}
+.nav-bi{display:flex;align-items:center;gap:.9rem;color:var(--cr,#EDE6D6);font-family:'Jost','Pretendard',sans-serif;text-transform:uppercase}
+.nav-bi .nb-name{font-weight:400;font-size:.74rem;letter-spacing:.2em;line-height:1.4;text-align:center}
+.nav-bi .bi-sl{width:1.7rem;height:1.7rem;margin:0}
+.nav-bi .nb-sub{font-size:.6rem;letter-spacing:.45em;font-weight:400;opacity:.85}
+@media(max-width:600px){.nav-bi .nb-sub{display:none}.nav-bi .bi-sl{width:1.3rem;height:1.3rem}.hero-bi{font-size:clamp(1.45rem,7vw,2.2rem)}}
 </style></head><body>
 
 <nav class="nav" id="nav">
-  <a href="#home" class="nav-logo"><span class="nav-logo-text">Off the Record Salon</span></a>
+  <a href="#home" class="nav-logo" aria-label="Off the Record Salon"><span class="nav-bi"><span class="nb-name">Off the Record<br>Salon</span><svg class="bi-sl" viewBox="0 0 60 60" aria-hidden="true"><line x1="3" y1="57" x2="57" y2="3"/></svg><span class="nb-sub">Repium Lab</span></span></a>
   <ul class="nav-links" id="navLinks">
     <li><a href="#about">About</a></li>
     <li><a href="#lineup">Line-up</a></li>
@@ -509,9 +529,9 @@ body::after{display:none}
 <!-- HERO -->
 <section class="hero" id="home">
   <div class="hero-media" id="heroMedia" aria-hidden="true"></div>
-  <div class="hero-bottom">
+  <div class="hero-bottom hero-center">
+    <div class="bi hero-bi"><svg class="bi-sl" viewBox="0 0 60 60" aria-hidden="true"><line x1="3" y1="57" x2="57" y2="3"/></svg><h1 class="bi-name"><span>Off the Record</span><span>Salon</span></h1><div class="bi-sub">Repium Lab</div></div>
     <p class="hero-sub">기록되지 않는 질문과 답이 오가는 공간<small>오프레코드 살롱</small></p>
-    <h1 class="hero-wordmark"><span class="gold-txt">Off the Record</span><br>Salon</h1>
   </div>
 </section>
 
