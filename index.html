@@ -474,14 +474,27 @@ body::after{display:none}
 .nav-cta,.sticky-cta .btn,.sticky-cta .btn.ac,.closing .btn,#submitBtn,#passCta{background:var(--gold);border-color:var(--gold);color:#141414;box-shadow:none}
 .nav-cta:hover,.sticky-cta .btn:hover,.closing .btn:hover,#submitBtn:hover,#passCta:hover{background:var(--gold2);border-color:var(--gold2);color:#141414;box-shadow:none}
 #submitBtn .spin{border-color:rgba(20,20,20,.25);border-top-color:#141414}
+
+/* ===== LINE-UP 카드 (Host + 일정) ===== */
+.sp-card{justify-content:space-between}
+.lu-top{position:relative;z-index:1;padding:1.4rem 1.5rem 0;color:var(--cr)}
+.lu-top small{display:block;font:600 .7rem 'Inter Tight',sans-serif;letter-spacing:.14em;opacity:.7}
+.lu-top b{display:block;margin-top:.35rem;font-family:var(--num);font-weight:400;font-size:2.8rem;line-height:1;letter-spacing:.01em}
+.lu-top b i{font-style:normal;font-family:Pretendard,sans-serif;font-weight:800;font-size:.6em;margin-left:.06em}
+.sp-body .lu-when{margin-top:.9rem;padding-top:.8rem;border-top:1px solid rgba(237,230,214,.18);font-size:var(--f-caption);color:rgba(237,230,214,.75);line-height:1.5}
+.sp-card .tag{margin-top:.75rem;color:var(--cr);border-color:rgba(237,230,214,.35)}
+.sp-card.tbc .lu-top{color:var(--dk)}
+.sp-card.tbc .lu-when{border-top-color:var(--bd);color:var(--tl)}
+.sp-card.tbc .tag{color:var(--dk);border-color:rgba(20,20,20,.3)}
+.sp-card.done{opacity:.5}
+@media(max-width:600px){.sp-card{aspect-ratio:auto;min-height:290px}.lu-top{padding:1rem 1rem 0}.lu-top b{font-size:2.1rem}.sp-body .lu-when{font-size:.72rem}}
 </style></head><body>
 
 <nav class="nav" id="nav">
   <a href="#home" class="nav-logo"><span class="nav-logo-text">Off the Record Salon</span></a>
   <ul class="nav-links" id="navLinks">
     <li><a href="#about">About</a></li>
-    <li><a href="#speakers">Host</a></li>
-    <li><a href="#schedule">Schedule</a></li>
+    <li><a href="#lineup">Line-up</a></li>
     <li><a href="#program">Program</a></li>
     <li><a href="#pass">Pass</a></li>
     <li><a href="#apply">Apply</a></li>
@@ -536,28 +549,13 @@ body::after{display:none}
   </div>
 </div></section>
 
-<!-- SPEAKERS -->
-<section class="section speakers" id="speakers"><div class="container">
-  <div class="eyebrow reveal">Host</div>
-  <h2 class="title reveal">네 명의 Host,<br><span>네 번의 대화</span></h2>
-  <p class="desc reveal">각 분야에서 실제 의사결정을 해 온 네 명의 Host가 참가자의 질문에 답합니다.</p>
-  <div class="sp-grid reveal" id="spGrid">
-    <!-- 관리자 페이지에서 '공개' 체크한 연사로 채워짐 -->
-  </div>
-  <p class="note">* Host 라인업과 회차별 배정은 확정 후 업데이트됩니다.</p>
-</div></section>
-
-<!-- SCHEDULE -->
-<section class="section" id="schedule"><div class="container">
-  <div class="eyebrow reveal">Schedule</div>
+<!-- LINE-UP (Host + 일정) -->
+<section class="section speakers" id="lineup"><div class="container">
+  <div class="eyebrow reveal">Line-up</div>
   <h2 class="title reveal">4 Salons,<br><span>1 Season</span></h2>
-  <p class="desc reveal">네 번의 Salon, 네 명의 Host. 세부 일정은 회차별로 안내드립니다.</p>
-  <div class="sch-list reveal" id="schList">
-    <div class="sch-row"><div class="sch-date"><small>SALON 01 · 2026</small>11<i>월</i></div><div class="sch-event">Salon 01<p>세부 일정 추후 공지</p></div><span class="tag">모집 중</span></div>
-    <div class="sch-row"><div class="sch-date"><small>SALON 02 · 2027</small>3<i>월</i></div><div class="sch-event">Salon 02<p>시간대 추후 공지</p></div><span class="tag">예정</span></div>
-    <div class="sch-row"><div class="sch-date"><small>SALON 03 · 2027</small>6<i>월</i></div><div class="sch-event">Salon 03<p>시간대 추후 공지</p></div><span class="tag">예정</span></div>
-    <div class="sch-row"><div class="sch-date"><small>SALON 04 · 2027</small>9<i>월</i></div><div class="sch-event">Salon 04<p>시간대 추후 공지</p></div><span class="tag">예정</span></div>
-  </div>
+  <p class="desc reveal">각 분야에서 실제 의사결정을 해 온 Host가 회차마다 한 명씩, 참가자의 질문에 답합니다.</p>
+  <div class="sp-grid reveal" id="spGrid"><!-- 관리자 연사(공개)·일정 탭으로 채워짐 --></div>
+  <p class="note">* Host 라인업과 세부 일정은 확정되는 대로 업데이트됩니다.</p>
 </div></section>
 
 <!-- PROGRAM -->
@@ -687,28 +685,26 @@ $$('.faq-q').forEach(q=>q.addEventListener('click',()=>{const o=q.parentElement.
 const SU='https://dvlrzbckneucpvlacdll.supabase.co';
 const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE';
 const esc=t=>(t==null?'':String(t)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function renderSpeakers(list){
-  const cards=list.slice(0,4).map((s,i)=>`<div class="sp-card"><div class="sp-ph">${s.photo_url?`<img src="${esc(s.photo_url)}" alt="">`:''}</div><div class="sp-body"><div class="sp-no">0${s.salon_no||i+1}</div><h4>${esc(s.name)}</h4><p class="sp-role">${esc(s.role)}</p><div class="sp-field">${esc(s.field)}</div></div></div>`);
-  for(let i=cards.length;i<4;i++)cards.push(`<div class="sp-card tbc"><div class="sp-ph">0${i+1}</div><div class="sp-body"><div class="sp-no">0${i+1}</div><h4>Coming soon</h4><p class="sp-role">곧 공개됩니다</p><div class="sp-field">To be announced</div></div></div>`);
-  $('#spGrid').innerHTML=cards.join('');
-}
-renderSpeakers([]);
-fetch(SU+'/rest/v1/rpc/otr_public_speakers',{method:'POST',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:'{}'})
-  .then(r=>r.ok?r.json():[]).then(l=>Array.isArray(l)&&l.length&&renderSpeakers(l)).catch(()=>{});
-
-/* ---- 일정 (관리자 일정 탭) ---- */
-function renderSchedule(list){
+let SP=[],SC=[{salon_no:1,year:2026,month:11,status:'모집 중',public_note:'세부 일정 추후 공지'},{salon_no:2,year:2027,month:3,status:'예정',public_note:'시간대 추후 공지'},{salon_no:3,year:2027,month:6,status:'예정',public_note:'시간대 추후 공지'},{salon_no:4,year:2027,month:9,status:'예정',public_note:'시간대 추후 공지'}];
+function renderLineup(){
   const W='일월화수목금토',today=new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
-  $('#schList').innerHTML=list.map(r=>{
+  $('#spGrid').innerHTML=[...SC].sort((a,b)=>a.salon_no-b.salon_no).map(r=>{
+    const h=SP.find(x=>x.salon_no===r.salon_no);
     const d=r.event_date?new Date(r.event_date+'T00:00'):null;
     const y=d?d.getFullYear():r.year,m=d?d.getMonth()+1:r.month;
     const st=(r.event_date&&r.event_date<today)?'종료':(r.status||'예정');
-    const info=d?[`${m}월 ${d.getDate()}일 (${W[d.getDay()]})`,r.time_text,r.place].filter(Boolean).map(esc).join(' · '):esc(r.public_note||'일정 추후 공지');
-    return `<div class="sch-row${st==='종료'?' done':''}"><div class="sch-date"><small>SALON 0${r.salon_no}${y?' · '+y:''}</small>${m?m+'<i>월</i>':'TBA'}</div><div class="sch-event">Salon 0${r.salon_no}<p>${info}</p></div><span class="tag">${esc(st)}</span></div>`;
+    const when=d?[`${m}/${d.getDate()} (${W[d.getDay()]})`,r.time_text,r.place].filter(Boolean).map(esc).join(' · '):esc(r.public_note||'일정 추후 공지');
+    return `<div class="sp-card${h?'':' tbc'}${st==='종료'?' done':''}">
+      <div class="sp-ph">${h&&h.photo_url?`<img src="${esc(h.photo_url)}" alt="">`:''}</div>
+      <div class="lu-top"><small>SALON 0${r.salon_no}${y?' · '+y:''}</small><b>${m?m+'<i>월</i>':'TBA'}</b></div>
+      <div class="sp-body">${h?`<h4>${esc(h.name)}</h4><p class="sp-role">${esc(h.role)}</p>${h.field?`<div class="sp-field">${esc(h.field)}</div>`:''}`:'<h4>Coming soon</h4><p class="sp-role">Host 곧 공개</p>'}
+        <div class="lu-when">${when}</div><span class="tag">${esc(st)}</span></div></div>`;
   }).join('');
 }
-fetch(SU+'/rest/v1/rpc/otr_public_schedule',{method:'POST',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:'{}'})
-  .then(r=>r.ok?r.json():null).then(l=>Array.isArray(l)&&l.length&&renderSchedule(l)).catch(()=>{});
+renderLineup();
+const rpcGet=fn=>fetch(SU+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:'{}'}).then(r=>r.ok?r.json():null);
+rpcGet('otr_public_speakers').then(l=>{if(Array.isArray(l)&&l.length){SP=l;renderLineup();}}).catch(()=>{});
+rpcGet('otr_public_schedule').then(l=>{if(Array.isArray(l)&&l.length){SC=l;renderLineup();}}).catch(()=>{});
 
 /* ---- 히어로 배경 (관리자 설정) ---- */
 function applyHero(h){
