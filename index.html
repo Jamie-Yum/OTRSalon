@@ -510,6 +510,20 @@ body::after{display:none}
 .hero-wordmark{font-family:'Josefin Sans','Pretendard',sans-serif;font-weight:500}
 .hero-wordmark .gold-txt,.nav-logo-text{white-space:nowrap}
 @media(max-width:600px){.hero-wordmark{font-size:clamp(1.5rem,8.2vw,3rem)}}
+
+/* ABOUT 소개 글 · WHO */
+.about-lead+.about-lead{margin-top:1.1rem}
+.about .title{font-size:clamp(1.9rem,3.5vw,3rem)}
+.who{background:var(--bg)}
+.who-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:var(--block)}
+.who-card{background:var(--wh);border-radius:var(--r-sm);padding:1.75rem 1.5rem 1.9rem;border:1px solid rgba(20,20,20,.08);box-shadow:0 1px 2px rgba(20,20,20,.06),0 6px 18px rgba(20,20,20,.05)}
+.who-card b{display:block;font-family:var(--num);font-weight:400;font-size:2.2rem;line-height:1;color:var(--dk)}
+.who-card h4{margin-top:1.1rem;font-size:var(--f-h3);font-weight:600}
+.who-card p{margin-top:.4rem;font-size:var(--f-small);color:var(--ts);line-height:1.7}
+.who-not{margin-top:1.75rem;font-size:var(--f-small);color:var(--tl);display:flex;align-items:center;gap:.6rem}
+.who-not::before{content:'';width:18px;height:1px;background:var(--tl)}
+@media(max-width:900px){.who-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.who-card{padding:1.25rem 1.1rem 1.4rem}.who-card b{font-size:1.7rem}}
 </style></head><body>
 
 <nav class="nav" id="nav">
@@ -540,16 +554,30 @@ body::after{display:none}
 <section class="section about" id="about"><div class="container about-grid">
   <div class="eyebrow reveal" style="grid-column:1/-1;margin-bottom:0">Deep Inquiry</div>
   <div class="about-left reveal">
-    <h2 class="title">깊은 질의와<span>현장의 경험이</span>만나는 자리</h2>
+    <h2 class="title">더 나은 곳으로 가기 위해,<span>우리는 묻고, 듣고, 나눕니다.</span></h2>
   </div>
   <div class="reveal">
-    <p class="about-lead">공개적인 자리에서는 묻고 답하기 어려운 질문이 있습니다.<br>오프레코드 살롱은 그 질문들이 오갈 수 있는 작은 자리입니다.</p>
+    <p class="about-lead">Off&nbsp;the&nbsp;Record Salon은 서로 다른 분야에서 중요한 결정을 내리는 리더들이 한자리에 모여, 자신의 질문을 꺼내고 서로의 경험에서 새로운 관점을 얻는 프라이빗 리더십 살롱입니다.</p>
+    <p class="about-lead">공개적인 자리에서는 꺼내기 어려운 질문과 이야기가 있습니다. 우리는 기록되지 않는 진솔한 대화가 더 나은 선택과 더 넓은 시야로 이어진다고 믿습니다.</p>
   </div>
   <div class="about-items reveal">
     <div><h4>Hosted by</h4><p><b>리피움</b> — 해내는 사람들의 모임. Since 2014.<br>오랜 시간 쌓아 온 솔직함과 신뢰를 바탕으로 이 자리를 엽니다.</p></div>
     <div><h4>Audience</h4><p>각 분야에서 인사이트를 원하는 리더 18명 내외가 초대로 함께합니다.</p></div>
     <div><h4>Principle</h4><p>Salon에서 오간 이야기는 외부에 기록하거나 공개하지 않습니다. Host와 참가자 모두 솔직할 수 있도록 지키는 원칙입니다.</p></div>
   </div>
+</div></section>
+
+<!-- WHO -->
+<section class="section who" id="who"><div class="container">
+  <div class="eyebrow reveal">Who we invite</div>
+  <h2 class="title reveal">이런 분을<br><span>초대합니다</span></h2>
+  <div class="who-grid reveal">
+    <div class="who-card"><b>01</b><h4>결정하는 사람</h4><p>자신의 분야에서 실제로 중요한 결정을 내리고 있는 분</p></div>
+    <div class="who-card"><b>02</b><h4>솔직하게 나누는 사람</h4><p>성공뿐 아니라 고민과 실패도 꺼내 놓을 수 있는 분</p></div>
+    <div class="who-card"><b>03</b><h4>잘 듣는 사람</h4><p>다른 분야의 이야기를 존중하며 들을 수 있는 분</p></div>
+    <div class="who-card"><b>04</b><h4>배우려는 사람</h4><p>내 분야 밖의 경험에서 새로운 관점을 얻고 싶은 분</p></div>
+  </div>
+  <p class="who-not reveal">영업·홍보·네트워킹을 목적으로 하는 자리가 아닙니다.</p>
 </div></section>
 
 <!-- CONCEPT -->
