@@ -498,21 +498,16 @@ body::after{display:none}
 .bi-name span{display:block;padding-left:.2em;white-space:nowrap}
 .bi-sub{font-weight:400;letter-spacing:.62em;padding-left:.62em;font-size:max(.26em,.66rem);margin-top:1.3em;opacity:.9}
 
-.hero{justify-content:center;align-items:center;text-align:center}
-.hero-bottom.hero-center{display:flex;flex-direction:column;align-items:center;padding:6rem 1.5rem 4rem}
-.hero-bi{font-size:clamp(1.7rem,5.2vw,4.3rem);animation:fU .9s ease .1s both}
-.hero-center .hero-sub{margin:2.6rem 0 0;font-size:var(--f-body);letter-spacing:.02em}
-.hero-center .hero-sub small{margin-top:.5rem}
-.nav-logo{flex-direction:row;align-items:center}
-.nav-bi{display:flex;align-items:center;gap:.9rem;color:var(--cr,#EDE6D6);font-family:'Jost','Pretendard',sans-serif;text-transform:uppercase}
-.nav-bi .nb-name{font-weight:400;font-size:.74rem;letter-spacing:.2em;line-height:1.4;text-align:center}
-.nav-bi .bi-sl{width:1.7rem;height:1.7rem;margin:0}
-.nav-bi .nb-sub{font-size:.6rem;letter-spacing:.45em;font-weight:400;opacity:.85}
-@media(max-width:600px){.nav-bi .nb-sub{display:none}.nav-bi .bi-sl{width:1.3rem;height:1.3rem}.hero-bi{font-size:clamp(1.45rem,7vw,2.2rem)}}
+
+/* 로고·메인 글씨: 이전 구성 + BI 글꼴 */
+.nav-logo-text{font-family:'Jost','Pretendard',sans-serif;font-weight:400;font-size:.86rem;letter-spacing:.22em;text-transform:uppercase;color:var(--cr)}
+.hero-wordmark{font-family:'Jost','Pretendard',sans-serif;font-weight:300;text-transform:uppercase;letter-spacing:.14em;line-height:1.12;font-size:clamp(2.4rem,7.6vw,7rem)}
+.hero-wordmark .gold-txt{padding:0;margin:0}
+@media(max-width:600px){.hero-wordmark{font-size:clamp(1.9rem,9.5vw,3rem);letter-spacing:.1em}.nav-logo-text{font-size:.72rem;letter-spacing:.16em}}
 </style></head><body>
 
 <nav class="nav" id="nav">
-  <a href="#home" class="nav-logo" aria-label="Off the Record Salon"><span class="nav-bi"><span class="nb-name">Off the Record<br>Salon</span><svg class="bi-sl" viewBox="0 0 60 60" aria-hidden="true"><line x1="3" y1="57" x2="57" y2="3"/></svg><span class="nb-sub">Repium Lab</span></span></a>
+  <a href="#home" class="nav-logo"><span class="nav-logo-text">Off the Record Salon</span></a>
   <ul class="nav-links" id="navLinks">
     <li><a href="#about">About</a></li>
     <li><a href="#lineup">Line-up</a></li>
@@ -529,9 +524,9 @@ body::after{display:none}
 <!-- HERO -->
 <section class="hero" id="home">
   <div class="hero-media" id="heroMedia" aria-hidden="true"></div>
-  <div class="hero-bottom hero-center">
-    <div class="bi hero-bi"><svg class="bi-sl" viewBox="0 0 60 60" aria-hidden="true"><line x1="3" y1="57" x2="57" y2="3"/></svg><h1 class="bi-name"><span>Off the Record</span><span>Salon</span></h1><div class="bi-sub">Repium Lab</div></div>
+  <div class="hero-bottom">
     <p class="hero-sub">기록되지 않는 질문과 답이 오가는 공간<small>오프레코드 살롱</small></p>
+    <h1 class="hero-wordmark"><span class="gold-txt">Off the Record</span><br>Salon</h1>
   </div>
 </section>
 
