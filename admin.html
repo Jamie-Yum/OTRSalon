@@ -475,7 +475,7 @@ const OWNERS=['신다혜','조영주','염제명','위현민','TF 전체'];
 const SP_STATUS=['후보','컨택 중','확정','보류','거절'];
 const CATS=['TIME','PRICE','INVITATION','SPEAKER','사례비','운영','기타'];
 const SCH_STATUS=['모집 중','예정','마감','종료'];
-const SALONS=[{v:1,l:'Salon 01 (2026.11)'},{v:2,l:'Salon 02 (2027.03)'},{v:3,l:'Salon 03 (2027.06)'},{v:4,l:'Salon 04 (2027.09)'}];
+const SALONS=[{v:1,l:'Session 01 (2026.11)'},{v:2,l:'Session 02 (2027.03)'},{v:3,l:'Session 03 (2027.06)'},{v:4,l:'Session 04 (2027.09)'}];
 const T={
   notes:{tbl:'otr_meeting_notes',name:'회의록',fields:[
     {k:'meeting_date',l:'회의 날짜',t:'date',req:1,half:1},{k:'title',l:'제목',req:1,half:1,ph:'예) TF Kick-off Meeting'},
@@ -497,7 +497,7 @@ const T={
     {k:'decided_date',l:'결정일',t:'date',req:1,half:1},{k:'category',l:'구분',t:'sel',opts:CATS,req:1,half:1},
     {k:'content',l:'결정 내용',t:'area',req:1},{k:'memo',l:'배경 / 메모',t:'area'}]},
   schedule:{tbl:'otr_schedule',name:'일정',fields:[
-    {k:'salon_no',l:'회차',t:'sel',opts:[1,2,3,4,5,6].map(n=>({v:n,l:'Salon 0'+n})),num:1,req:1,half:1},{k:'status',l:'상태',t:'sel',opts:SCH_STATUS,half:1},
+    {k:'salon_no',l:'회차',t:'sel',opts:[1,2,3,4,5,6].map(n=>({v:n,l:'Session 0'+n})),num:1,req:1,half:1},{k:'status',l:'상태',t:'sel',opts:SCH_STATUS,half:1},
     {k:'year',l:'연도',t:'num',half:1,ph:'2026'},{k:'month',l:'월',t:'num',half:1,ph:'11'},
     {k:'event_date',l:'확정 날짜 (정해지면 입력)',t:'date',half:1},{k:'time_text',l:'시간',half:1,ph:'예) 07:30–09:00'},
     {k:'place',l:'장소',ph:'예) 서울 성수동 ○○'},{k:'host',l:'담당 Host (내부용)',list:'spNames'},
@@ -511,7 +511,7 @@ const D={};let PW='',cur=null,decCat='전체';
 const $=id=>document.getElementById(id);
 const esc=t=>(t==null?'':String(t)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const today=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
-const salonL=v=>v?'Salon 0'+v:'—';
+const salonL=v=>v?'Session 0'+v:'—';
 
 async function rpc(fn,body){
   const r=await fetch(SU+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:JSON.stringify({pw:PW,...body})});
@@ -699,7 +699,7 @@ const RENDER={
     const L=[...D.schedule].sort((a,b)=>a.salon_no-b.salon_no);
     $('v-schedule').innerHTML=`<thead><tr><th>회차</th><th>연·월</th><th>날짜</th><th>시간</th><th>장소</th><th>담당 Host</th><th>상태</th><th>홈페이지 안내</th><th></th></tr></thead><tbody>${
       L.map(r=>{const past=r.event_date&&r.event_date<t;const d=r.event_date?new Date(r.event_date+'T00:00'):null;
-      return `<tr><td><b>Salon 0${r.salon_no}</b></td><td>${r.year||'—'}.${r.month||'—'}</td><td>${d?`${d.getMonth()+1}/${d.getDate()} (${W[d.getDay()]})`:'<span style="color:var(--tl)">미정</span>'}</td><td>${esc(r.time_text)||'—'}</td><td>${esc(r.place)||'—'}</td><td>${esc(r.host)||'—'}</td>
+      return `<tr><td><b>Session 0${r.salon_no}</b></td><td>${r.year||'—'}.${r.month||'—'}</td><td>${d?`${d.getMonth()+1}/${d.getDate()} (${W[d.getDay()]})`:'<span style="color:var(--tl)">미정</span>'}</td><td>${esc(r.time_text)||'—'}</td><td>${esc(r.place)||'—'}</td><td>${esc(r.host)||'—'}</td>
       <td><select onchange="quick('schedule','${r.id}',{status:this.value})">${SCH_STATUS.map(o=>`<option ${o===r.status?'selected':''}>${o}</option>`).join('')}</select>${past&&r.status!=='종료'?'<br><small style="color:var(--tl)">홈페이지엔 종료로 표시</small>':''}</td>
       <td style="max-width:220px;color:var(--tl)">${esc(r.public_note)}</td><td><button class="lnk" onclick="edit('schedule','${r.id}')">수정</button></td></tr>`}).join('')||'<tr><td colspan="9" style="text-align:center;color:var(--tl);padding:2rem">등록된 일정이 없습니다.</td></tr>'
     }</tbody>`;
