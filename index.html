@@ -528,22 +528,11 @@ body::after{display:none}
 /* 표기: OFF the RECORD SALON (대소문자 그대로) */
 .nav-logo-text,.hero-wordmark,.lg,.hprev-text b,.sub-h.brand{text-transform:none!important}
 
-/* 단어 간격 좁히기 */
-.hero-wordmark{word-spacing:-.2em}
-.nav-logo-text{word-spacing:-.24em}
-.sub-h.brand{word-spacing:-.2em}
 
-/* 글자·단어 간격 더 좁히기 */
-.hero-wordmark{letter-spacing:.08em!important;word-spacing:-.24em}
-.nav-logo-text{letter-spacing:.14em!important;word-spacing:-.3em}
-.sub-h.brand{letter-spacing:.1em;word-spacing:-.26em}
-@media(max-width:600px){.hero-wordmark{letter-spacing:.06em!important}.nav-logo-text{letter-spacing:.1em!important}}
 
-/* 글자 간격 최소화 */
-.hero-wordmark{letter-spacing:.03em!important;word-spacing:-.14em}
-.nav-logo-text{letter-spacing:.07em!important;word-spacing:-.2em}
-.sub-h.brand{letter-spacing:.05em;word-spacing:-.18em}
-@media(max-width:600px){.hero-wordmark{letter-spacing:.02em!important}.nav-logo-text{letter-spacing:.05em!important}}
+
+/* 로고 간격 (최종): 글자 .05em · 단어 .1em */
+.hero-wordmark,.nav-logo-text,.sub-h.brand{letter-spacing:.05em!important;word-spacing:.1em!important}
 </style></head><body>
 
 <nav class="nav" id="nav">
