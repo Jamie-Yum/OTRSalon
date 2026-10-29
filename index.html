@@ -752,7 +752,7 @@ $$('.faq-q').forEach(q=>q.addEventListener('click',()=>{const o=q.parentElement.
 const SU='https://dvlrzbckneucpvlacdll.supabase.co';
 const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE';
 const esc=t=>(t==null?'':String(t)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let SP=[],SC=[{salon_no:1,year:2026,month:11,status:'모집 중',public_note:'세부 일정 추후 공지'},{salon_no:2,year:2027,month:3,status:'예정',public_note:'시간대 추후 공지'},{salon_no:3,year:2027,month:6,status:'예정',public_note:'시간대 추후 공지'},{salon_no:4,year:2027,month:9,status:'예정',public_note:'시간대 추후 공지'}];
+let SP=[],SC=[{salon_no:1,year:2026,month:11,status:'모집 중',public_note:'세부 일정 추후 공지'},{salon_no:2,year:2027,month:2,status:'예정',public_note:'시간대 추후 공지'},{salon_no:3,year:2027,month:5,status:'예정',public_note:'시간대 추후 공지'},{salon_no:4,year:2027,month:8,status:'예정',public_note:'시간대 추후 공지'}];
 function renderLineup(){
   const W='일월화수목금토',today=new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
   $('#spGrid').innerHTML=[...SC].sort((a,b)=>a.salon_no-b.salon_no).map(r=>{
