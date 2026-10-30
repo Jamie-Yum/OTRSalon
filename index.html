@@ -649,7 +649,7 @@ body::after{display:none}
   </div>
   <div class="pass-foot reveal">
     <p id="passFootMsg">1 Season Pass는 한정 수량으로 선착순 마감됩니다.</p>
-    <a href="#apply" class="btn" id="passCta">신청 양식으로 →</a>
+    <a href="#apply" class="btn" id="passCta">참가 신청 →</a>
   </div>
 </div></section>
 
@@ -806,8 +806,8 @@ const passSel=$('#f-pass'),passCards=$$('.pass-card[data-pass]'),passFootMsg=$('
 function setPass(v,from){
   passCards.forEach(c=>{const on=c.dataset.pass===v;c.classList.toggle('selected',on);c.setAttribute('aria-checked',on);c.querySelector('.pass-check span').textContent=on?'선택됨':'선택';});
   if(passSel.value!==v)passSel.value=v;
-  if(v){const short=v.split(' · ')[0];passFootMsg.innerHTML=`<b>${esc(v)}</b> 선택됨 · 신청 양식에 반영되었습니다.`;passCta.textContent='선택한 Pass로 신청하기 →';stickyTxt.textContent=short+' 선택됨';}
-  else{passFootMsg.textContent='1 Season Pass는 한정 수량으로 선착순 마감됩니다.';passCta.textContent='신청 양식으로 →';stickyTxt.textContent='초대받은 분만 신청할 수 있습니다';}
+  if(v){const short=v.split(' · ')[0];passFootMsg.innerHTML=`<b>${esc(v)}</b> 선택됨 · 신청 양식에 반영되었습니다.`;passCta.textContent='참가 신청 →';stickyTxt.textContent=short+' 선택됨';}
+  else{passFootMsg.textContent='1 Season Pass는 한정 수량으로 선착순 마감됩니다.';passCta.textContent='참가 신청 →';stickyTxt.textContent='초대받은 분만 신청할 수 있습니다';}
   if(from==='card')clearErr(passSel);
 }
 passCards.forEach(c=>c.addEventListener('click',()=>setPass(c.classList.contains('selected')?'':c.dataset.pass,'card')));
