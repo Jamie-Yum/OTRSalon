@@ -765,7 +765,7 @@ function renderLineup(){
       <div class="sp-ph">${h&&h.photo_url?`<img src="${esc(h.photo_url)}" alt="">`:''}</div>
       <div class="lu-top"><small>SESSION 0${r.salon_no}${y?' · '+y:''}</small><b>${m?m+'<i>월</i>':'TBA'}</b></div>
       <div class="sp-body">${h?`<h4>${esc(h.name)}</h4><p class="sp-role">${esc(h.role)}</p>${h.field?`<div class="sp-field">${esc(h.field)}</div>`:''}`:'<h4>Coming soon</h4><p class="sp-role">Speaker 곧 공개</p>'}
-        <div class="lu-when">${when}</div><span class="tag">${esc(st)}</span></div></div>`;
+        <div class="lu-when">${when}</div></div></div>`;
   }).join('');
 }
 renderLineup();
