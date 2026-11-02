@@ -633,7 +633,7 @@ const RENDER={
     const L=all.filter(r=>appFilter==='전체'||r.status===appFilter);
     const cnt=all.reduce((o,r)=>{const k=r.pass.split(' (')[0];o[k]=(o[k]||0)+1;return o;},{});
     $('appCount').textContent=all.length?`총 ${all.length}건 · `+Object.entries(cnt).map(([k,v])=>`${k} ${v}`).join(' · '):'';
-    $('v-apps').innerHTML=`<thead><tr><th>접수일</th><th>이름</th><th>연락처</th><th>소속 / 역할</th><th>초대자</th><th>Pass</th><th>상태</th><th>사전 질문</th><th>메모</th><th></th></tr></thead><tbody>${
+    $('v-apps').innerHTML=`<thead><tr><th>접수일</th><th>이름</th><th>연락처</th><th>소속 / 역할</th><th>초대자</th><th>Pass</th><th>상태</th><th>자기소개</th><th>메모</th><th></th></tr></thead><tbody>${
       L.map(r=>`<tr><td style="white-space:nowrap;color:var(--tl)">${r.created_at.slice(0,10)}<br><small>${r.created_at.slice(11,16)}</small></td>
       <td style="white-space:nowrap"><b>${esc(r.name)}</b></td><td style="white-space:nowrap">${esc(r.phone)}</td><td>${esc(r.role)}</td><td>${esc(r.inviter)}</td><td style="white-space:nowrap">${esc(r.pass.split(' · ')[0])}</td>
       <td><select onchange="appUpdate('${r.id}',{new_status:this.value})">${APP_STATUS.map(o=>`<option ${o===r.status?'selected':''}>${o}</option>`).join('')}</select></td>
