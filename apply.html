@@ -541,6 +541,21 @@ body::after{display:none}
 
 /* 섹션 표시: 원형 알파벳 제거 */
 .eyebrow::before{content:none!important;display:none!important}
+
+/* 신청 페이지: 행사 안내 */
+.ov{margin-top:2.25rem;padding:1.75rem 1.75rem 1.9rem;border:1px solid rgba(237,230,214,.16);border-radius:var(--r-sm);background:rgba(237,230,214,.04)}
+.ov-h{font:600 .74rem 'Inter Tight','Pretendard',sans-serif;letter-spacing:.16em;color:var(--gold,#C9B37E);margin:0 0 1rem}
+.ov-list{display:grid;gap:.7rem;margin:0}
+.ov-list div{display:grid;grid-template-columns:64px 1fr;gap:.75rem;font-size:var(--f-small);line-height:1.6}
+.ov-list dt{color:rgba(237,230,214,.5);font-weight:600}
+.ov-list dd{margin:0;color:rgba(237,230,214,.88)}
+.ov-sch{list-style:none;margin:0;padding:0;display:grid;gap:.1rem}
+.ov-sch li{display:grid;grid-template-columns:96px 1fr;gap:.75rem;padding:.65rem 0;border-top:1px solid rgba(237,230,214,.1);font-size:var(--f-small);line-height:1.5;color:rgba(237,230,214,.88)}
+.ov-sch li:first-child{border-top:0}
+.ov-sch b{font-family:'Inter Tight',sans-serif;font-weight:600;color:var(--cr)}
+.ov-sch small{display:block;color:rgba(237,230,214,.5);font-size:.78rem}
+.ov-sch .tba{color:rgba(237,230,214,.45)}
+@media(max-width:600px){.ov{padding:1.25rem 1.1rem}.ov-list div{grid-template-columns:52px 1fr}.ov-sch li{grid-template-columns:80px 1fr}}
 </style><style>
 .apply-page{min-height:100vh;min-height:100svh;padding-top:calc(68px + 4rem)}
 .nav{background:rgba(20,20,20,.92)}
@@ -569,6 +584,18 @@ body::after{display:none}
     <div class="eyebrow">Application</div>
     <h2 class="title">참가 신청</h2>
     <p class="desc">초대받은 분만 신청할 수 있습니다.<br>참가가 확정되면 세션마다 연사 소개와 함께 사전 질문을 따로 받습니다.</p>
+    <div class="ov">
+      <h3 class="ov-h">행사 안내</h3>
+      <dl class="ov-list">
+        <div><dt>모임</dt><dd>오프레코드 살롱 · 성장을 꿈꾸는 이들이 모여 질문하고 대화하는 리더십 모임</dd></div>
+        <div><dt>형식</dt><dd>세션마다 연사 1명과 초대받은 게스트 18명 내외 · 토요일 아침</dd></div>
+        <div><dt>원칙</dt><dd>세션에서 오간 이야기는 외부에 기록하거나 공개하지 않습니다</dd></div>
+        <div><dt>참가권</dt><dd>1 Season Pass · 4회 전체 참여 · 25만원 (회당 6.25만원)</dd></div>
+        <div><dt>주최</dt><dd>리피움 — 해내는 사람들의 모임, Since 2014</dd></div>
+      </dl>
+      <h3 class="ov-h" style="margin-top:2rem">세션 일정</h3>
+      <ul class="ov-sch" id="ovSch"><li>일정을 불러오는 중…</li></ul>
+    </div>
     <div class="apply-steps">
       <div><b>01</b><span>신청서 접수</span></div>
       <div><b>02</b><span>초대 확인 후 참가 확정 및 결제 안내 연락</span></div>
@@ -661,5 +688,21 @@ form.addEventListener('submit',async e=>{
     submitBtn.disabled=false;submitBtn.classList.remove('loading');submitBtn.querySelector('.t').textContent='신청하기 →';
   }
 });
+
+/* ---- 행사 안내: 세션 일정 + 연사 ---- */
+(function(){
+  const W='일월화수목금토';
+  const get=fn=>fetch(SU+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:'{}'}).then(r=>r.ok?r.json():[]).catch(()=>[]);
+  Promise.all([get('otr_public_schedule'),get('otr_public_speakers')]).then(([sc,sp])=>{
+    const box=document.getElementById('ovSch');
+    if(!Array.isArray(sc)||!sc.length){box.innerHTML='<li class="tba">일정은 추후 안내드립니다.</li>';return;}
+    box.innerHTML=sc.sort((a,b)=>a.salon_no-b.salon_no).map(r=>{
+      const d=r.event_date?new Date(r.event_date+'T00:00'):null;
+      const date=d?`${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} (${W[d.getDay()]})`:`${r.year||''}.${r.month||''}`;
+      const h=(sp||[]).find(x=>x.salon_no===r.salon_no);
+      return `<li><span><b>Session 0${r.salon_no}</b><small>${esc(date)}</small></span><span>${h?`${esc(h.name)} <small>${esc(h.role||'')}</small>`:'<span class="tba">연사 곧 공개</span>'}</span></li>`;
+    }).join('');
+  });
+})();
 </script>
 </body></html>
