@@ -550,6 +550,13 @@ body::after{display:none}
 /* 모든 섹션 제목 강조부: 진한 금색 (어두운 섹션은 샴페인 골드) */
 .title span,.title .accent,.about .title span{color:#A8843F!important}
 .program .title span,.apply .title span{color:#C9B37E!important}
+
+/* 왼쪽 줄 맞춤: 메뉴·히어로를 본문 폭(1200px)에 맞춤 */
+.nav{padding-left:max(2rem,calc((100% - 1200px)/2));padding-right:max(2rem,calc((100% - 1200px)/2))}
+.hero-bottom{padding-left:max(2rem,calc((100% - 1200px)/2))!important;padding-right:max(2rem,calc((100% - 1200px)/2))!important}
+.hero-wordmark{margin-left:-.05em}
+@media(max-width:900px){.nav{padding-left:1.25rem;padding-right:1.25rem}.hero-bottom{padding-left:1.25rem!important;padding-right:1.25rem!important}}
+@media(max-width:600px){.section{padding-left:1.25rem;padding-right:1.25rem}}
 </style></head><body>
 
 <nav class="nav" id="nav">
