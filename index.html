@@ -550,10 +550,10 @@ body::after{display:none}
     <li><a href="#lineup">Line-up</a></li>
     <li><a href="#program">Program</a></li>
     <li><a href="#pass">Pass</a></li>
-    <li><a href="#apply">Apply</a></li>
+    <li><a href="apply.html">Apply</a></li>
   </ul>
   <div style="display:flex;align-items:center">
-    <a href="#apply" class="nav-cta">참가 신청 →</a>
+    <a href="apply.html" class="nav-cta">참가 신청 →</a>
     <button class="mobile-toggle" id="navToggle" aria-label="메뉴" aria-expanded="false"><span></span><span></span><span></span></button>
   </div>
 </nav>
@@ -649,70 +649,24 @@ body::after{display:none}
   </div>
   <div class="pass-foot reveal">
     <p id="passFootMsg">1 Season Pass는 한정 수량으로 선착순 마감됩니다.</p>
-    <a href="#apply" class="btn" id="passCta">참가 신청 →</a>
+    <a href="apply.html" class="btn" id="passCta">참가 신청 →</a>
   </div>
 </div></section>
 
-<!-- APPLY -->
+<!-- APPLY (신청은 apply.html) -->
 <section class="section apply" id="apply"><div class="container apply-grid">
   <div class="reveal">
     <div class="eyebrow">Application</div>
     <h2 class="title">참가 신청</h2>
     <p class="desc">초대받은 분만 신청할 수 있습니다.<br>이 자리에서 꼭 묻고 싶은 질문을 함께 남겨 주세요. 사전 질문은 연사의 이야기와 당일 대화에 반영됩니다.</p>
-    <div class="apply-steps">
+  </div>
+  <div class="reveal">
+    <div class="apply-steps" style="margin-top:0">
       <div><b>01</b><span>신청서와 사전 질문 접수</span></div>
       <div><b>02</b><span>초대 확인 후 참가 확정 및 결제 안내 연락</span></div>
       <div><b>03</b><span>Session 일주일 전 세부 일정 안내</span></div>
     </div>
-  </div>
-  <div class="reveal">
-  <form class="form" id="applyForm" novalidate>
-    <div class="form-alert" id="formAlert" role="alert"></div>
-    <div class="form-row">
-      <div class="field"><label for="f-name">이름 <em>*</em></label><input id="f-name" name="name" required autocomplete="name" placeholder="홍길동"><p class="field-err">이름을 입력해 주세요.</p></div>
-      <div class="field"><label for="f-phone">연락처 <em>*</em></label><input id="f-phone" name="phone" type="tel" inputmode="tel" required autocomplete="tel" placeholder="010-0000-0000"><p class="field-err">연락 가능한 휴대폰 번호를 입력해 주세요.</p></div>
-    </div>
-    <div class="form-row">
-      <div class="field"><label for="f-role">소속 / 현재 역할 <em>*</em></label><input id="f-role" name="role" required autocomplete="organization-title" placeholder="회사명 · 직책"><p class="field-err">소속과 역할을 입력해 주세요.</p></div>
-      <div class="field"><label for="f-inviter">초대해 주신 분 <em>*</em></label><input id="f-inviter" name="inviter" required placeholder="초대자 이름"><p class="field-err">초대해 주신 분의 이름을 입력해 주세요.</p></div>
-    </div>
-    <div class="field"><label for="f-pass">Pass 선택 <em>*</em></label>
-      <select id="f-pass" name="pass" required><option value="">선택해 주세요</option><option selected>1 Season (4회권) · 25만원</option></select>
-      <p class="form-hint">1회권은 회차별로 별도 오픈됩니다.</p>
-      <p class="field-err">Pass를 선택해 주세요.</p></div>
-    <div class="field">
-      <div class="q-head"><label for="f-q">사전 질문 <em>*</em></label><button type="button" class="q-toggle" id="qToggle" aria-expanded="false">예시 보기</button></div>
-      <div class="q-ex" id="qEx">
-        <p>이런 질문들이 좋은 출발점이 됩니다. 클릭하면 입력란에 들어갑니다.</p>
-        <ul>
-          <li>핵심 인재가 떠나겠다고 했을 때, 붙잡아야 하는 순간과 보내야 하는 순간을 어떻게 구분하셨나요?</li>
-          <li>확신이 없는 상태에서 큰 결정을 내려야 했을 때, 실제로 무엇에 기대어 결정하셨나요?</li>
-          <li>지금 돌아보면 너무 늦게 알아차린 신호가 있었다면 무엇이었나요?</li>
-        </ul>
-      </div>
-      <textarea id="f-q" name="question" required minlength="10" placeholder="공개적인 자리에서는 묻기 어려웠던 질문, 지금 가장 깊이 고민하고 있는 것을 자유롭게 적어 주세요."></textarea>
-      <p class="form-hint">질문은 익명으로 큐레이션되며, 외부에 기록·공개되지 않습니다.</p>
-      <p class="field-err">질문을 10자 이상 적어 주세요.</p>
-    </div>
-    <div class="form-foot">
-      <button class="btn light" type="submit" id="submitBtn"><span class="spin"></span><span class="t">신청하기 →</span></button>
-      <span class="form-note">제출 후 안내 연락을 드립니다.</span>
-    </div>
-  </form>
-  <div class="done" id="done" tabindex="-1">
-    <div class="done-ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-    <h3>신청이 접수되었습니다</h3>
-    <p>보내 주신 질문은 익명으로 큐레이션되어 연사에게 전달됩니다.</p>
-    <div class="done-sum">
-      <div><span>Name</span><b id="dName"></b></div>
-      <div><span>Pass</span><b id="dPass"></b></div>
-      <div><span>Session</span><b>Session 01 · November 2026</b></div>
-    </div>
-    <div class="done-next">
-      <div><b>01</b><span>초대 확인 후 2~3일 내 연락드립니다.</span></div>
-      <div><b>02</b><span>참가 확정 시 결제 안내와 세부 일정을 보내드립니다.</span></div>
-    </div>
-  </div>
+    <a href="apply.html" class="btn" id="applyGo" style="margin-top:2.25rem">신청서 작성하기 →</a>
   </div>
 </div></section>
 
@@ -731,11 +685,11 @@ body::after{display:none}
 <section class="closing">
   <h2 class="reveal">깊은 질의와 현장의 경험이 만나는 자리,<br><span>OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span>에서 만나요.</h2>
   <p class="reveal">SEE YOU AT SESSION 01 · NOVEMBER 2026</p>
-  <a href="#apply" class="btn light reveal">참가 신청하기 →</a>
+  <a href="apply.html" class="btn light reveal">참가 신청하기 →</a>
 </section>
 <footer><div class="ft"><p>© 2026 OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON · Hosted by 리피움</p><a href="admin.html" class="admin-btn" title="관리자">관리</a></div></footer>
 
-<div class="sticky-cta" id="stickyCta"><div class="in"><div class="txt"><small>SESSION 01 · NOV 2026</small><span id="stickyTxt">초대받은 분만 신청할 수 있습니다</span></div><a href="#apply" class="btn ac">참가 신청 →</a></div></div>
+<div class="sticky-cta" id="stickyCta"><div class="in"><div class="txt"><small>SESSION 01 · NOV 2026</small><span id="stickyTxt">초대받은 분만 신청할 수 있습니다</span></div><a href="apply.html" class="btn ac">참가 신청 →</a></div></div>
 <div class="lp" id="lp"><svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" stroke="rgba(255,255,255,.2)"/><circle id="lpRing" cx="40" cy="40" r="34" stroke="#fff" stroke-dasharray="213.6" stroke-dashoffset="213.6" transform="rotate(-90 40 40)"/></svg></div>
 
 <script>
@@ -801,18 +755,17 @@ fetch(SU+'/rest/v1/rpc/otr_public_settings',{method:'POST',headers:{apikey:SK,Au
   logo.addEventListener('contextmenu',e=>e.preventDefault());
 })();
 
-/* ---- Pass 선택 ↔ 폼 동기화 ---- */
-const passSel=$('#f-pass'),passCards=$$('.pass-card[data-pass]'),passFootMsg=$('#passFootMsg'),passCta=$('#passCta'),stickyTxt=$('#stickyTxt');
-function setPass(v,from){
+/* ---- Pass 선택 → 신청 페이지 링크에 반영 ---- */
+const passCards=$$('.pass-card[data-pass]'),passFootMsg=$('#passFootMsg'),stickyTxt=$('#stickyTxt');
+function setPass(v){
   passCards.forEach(c=>{const on=c.dataset.pass===v;c.classList.toggle('selected',on);c.setAttribute('aria-checked',on);c.querySelector('.pass-check span').textContent=on?'선택됨':'선택';});
-  if(passSel.value!==v)passSel.value=v;
-  if(v){const short=v.split(' · ')[0];passFootMsg.innerHTML=`<b>${esc(v)}</b> 선택됨 · 신청 양식에 반영되었습니다.`;passCta.textContent='참가 신청 →';stickyTxt.textContent=short+' 선택됨';}
-  else{passFootMsg.textContent='1 Season Pass는 한정 수량으로 선착순 마감됩니다.';passCta.textContent='참가 신청 →';stickyTxt.textContent='초대받은 분만 신청할 수 있습니다';}
-  if(from==='card')clearErr(passSel);
+  const href='apply.html'+(v?'?pass='+encodeURIComponent(v):'');
+  $$('a[href^="apply.html"]').forEach(a=>a.href=href);
+  if(v){passFootMsg.innerHTML=`<b>${esc(v)}</b> 선택됨 · 신청서에 반영됩니다.`;stickyTxt.textContent=v.split(' · ')[0]+' 선택됨';}
+  else{passFootMsg.textContent='1 Season Pass는 한정 수량으로 선착순 마감됩니다.';stickyTxt.textContent='초대받은 분만 신청할 수 있습니다';}
 }
-passCards.forEach(c=>c.addEventListener('click',()=>setPass(c.classList.contains('selected')?'':c.dataset.pass,'card')));
-passSel.addEventListener('change',()=>setPass(passSel.value,'select'));
-setPass(passSel.value,'select');
+passCards.forEach(c=>c.addEventListener('click',()=>setPass(c.classList.contains('selected')?'':c.dataset.pass)));
+setPass(passCards[0]?passCards[0].dataset.pass:'');
 
 /* ---- 모바일 하단 고정 CTA ---- */
 const sticky=$('#stickyCta');let heroOut=false,applyIn=false;
@@ -821,44 +774,5 @@ new IntersectionObserver(es=>{heroOut=!es[0].isIntersecting;updSticky();},{thres
 new IntersectionObserver(es=>{applyIn=es[0].isIntersecting;updSticky();},{threshold:.1}).observe($('#apply'));
 addEventListener('resize',updSticky);
 
-/* ---- 신청 폼 ---- */
-const form=$('#applyForm'),alertBox=$('#formAlert'),submitBtn=$('#submitBtn'),qToggle=$('#qToggle'),qEx=$('#qEx'),qArea=$('#f-q');
-qToggle.addEventListener('click',()=>{const o=qEx.classList.toggle('open');qToggle.setAttribute('aria-expanded',o);qToggle.textContent=o?'예시 닫기':'예시 보기';});
-$$('#qEx li').forEach(li=>li.addEventListener('click',()=>{qArea.value=(qArea.value.trim()?qArea.value.trim()+'\n\n':'')+li.textContent;qArea.focus();clearErr(qArea);}));
-function field(el){return el.closest('.field');}
-function setErr(el,msg){const f=field(el);f.classList.add('err');if(msg)f.querySelector('.field-err').textContent=msg;}
-function clearErr(el){field(el).classList.remove('err');}
-const phoneOk=v=>/^0\d{1,2}-?\d{3,4}-?\d{4}$/.test(v.replace(/\s/g,''));
-function validate(){
-  let first=null;
-  form.querySelectorAll('[required]').forEach(el=>{
-    const v=el.value.trim();let bad=!v;
-    if(!bad&&el.name==='phone')bad=!phoneOk(v);
-    if(!bad&&el.name==='question')bad=v.length<10;
-    if(bad){setErr(el);first=first||el;}else clearErr(el);
-  });
-  return first;
-}
-form.querySelectorAll('input,select,textarea').forEach(el=>{
-  el.addEventListener('input',()=>{if(field(el).classList.contains('err')&&el.value.trim())clearErr(el);});
-  el.addEventListener('blur',()=>{if(el.required&&!el.value.trim())setErr(el);});
-});
-$('#f-phone').addEventListener('input',e=>{const d=e.target.value.replace(/\D/g,'').slice(0,11);e.target.value=d.length>7?d.replace(/(\d{3})(\d{3,4})(\d{4})/,'$1-$2-$3'):d.length>3?d.replace(/(\d{3})(\d+)/,'$1-$2'):d;});
-form.addEventListener('submit',async e=>{
-  e.preventDefault();alertBox.classList.remove('show');
-  const bad=validate();
-  if(bad){alertBox.textContent='입력하지 않았거나 확인이 필요한 항목이 있습니다.';alertBox.classList.add('show');bad.focus({preventScroll:true});bad.scrollIntoView({behavior:'smooth',block:'center'});return;}
-  submitBtn.disabled=true;submitBtn.classList.add('loading');submitBtn.querySelector('.t').textContent='접수 중…';
-  const data=Object.fromEntries(new FormData(form).entries());
-  try{
-    const r=await fetch(SU+'/rest/v1/rpc/otr_apply',{method:'POST',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:JSON.stringify({name:data.name,phone:data.phone,role:data.role,inviter:data.inviter,pass:data.pass,question:data.question})});
-    if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.message||('HTTP '+r.status));}
-    $('#dName').textContent=data.name;$('#dPass').textContent=data.pass;
-    form.style.display='none';const done=$('#done');done.classList.add('show');done.focus({preventScroll:true});done.scrollIntoView({behavior:'smooth',block:'center'});
-  }catch(err){
-    alertBox.textContent=(err&&err.message&&/[가-힣]/.test(err.message)?err.message:'접수 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.');alertBox.classList.add('show');
-    submitBtn.disabled=false;submitBtn.classList.remove('loading');submitBtn.querySelector('.t').textContent='신청하기 →';
-  }
-});
 </script>
 </body></html>
