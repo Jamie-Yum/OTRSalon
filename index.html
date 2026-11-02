@@ -759,8 +759,6 @@ fetch(SU+'/rest/v1/rpc/otr_public_settings',{method:'POST',headers:{apikey:SK,Au
 const passCards=$$('.pass-card[data-pass]'),passFootMsg=$('#passFootMsg'),stickyTxt=$('#stickyTxt');
 function setPass(v){
   passCards.forEach(c=>{const on=c.dataset.pass===v;c.classList.toggle('selected',on);c.setAttribute('aria-checked',on);c.querySelector('.pass-check span').textContent=on?'선택됨':'선택';});
-  const href='apply.html'+(v?'?pass='+encodeURIComponent(v):'');
-  $$('a[href^="apply.html"]').forEach(a=>a.href=href);
   if(v){passFootMsg.innerHTML=`<b>${esc(v)}</b> 선택됨 · 신청서에 반영됩니다.`;stickyTxt.textContent=v.split(' · ')[0]+' 선택됨';}
   else{passFootMsg.textContent='1 Season Pass는 한정 수량으로 선착순 마감됩니다.';stickyTxt.textContent='초대받은 분만 신청할 수 있습니다';}
 }

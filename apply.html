@@ -625,8 +625,6 @@ $$('.faq-q').forEach(q=>q.addEventListener('click',()=>{const o=q.parentElement.
 const SU='https://dvlrzbckneucpvlacdll.supabase.co';
 const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE';
 const esc=t=>(t==null?'':String(t)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-/* ---- Pass: 홈에서 고른 값 반영 ---- */
-(function(){const v=new URLSearchParams(location.search).get('pass');const sel=document.getElementById('f-pass');if(v&&[...sel.options].some(o=>o.value===v||o.text===v))sel.value=v;})();
 /* ---- 신청 폼 ---- */
 const form=$('#applyForm'),alertBox=$('#formAlert'),submitBtn=$('#submitBtn');
 function field(el){return el.closest('.field');}
