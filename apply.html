@@ -568,11 +568,11 @@ body::after{display:none}
   <div>
     <div class="eyebrow">Application</div>
     <h2 class="title">참가 신청</h2>
-    <p class="desc">초대받은 분만 신청할 수 있습니다.<br>이 자리에서 꼭 묻고 싶은 질문을 함께 남겨 주세요. 사전 질문은 연사의 이야기와 당일 대화에 반영됩니다.</p>
+    <p class="desc">초대받은 분만 신청할 수 있습니다.<br>참가가 확정되면 세션마다 연사 소개와 함께 사전 질문을 따로 받습니다.</p>
     <div class="apply-steps">
-      <div><b>01</b><span>신청서와 사전 질문 접수</span></div>
+      <div><b>01</b><span>신청서 접수</span></div>
       <div><b>02</b><span>초대 확인 후 참가 확정 및 결제 안내 연락</span></div>
-      <div><b>03</b><span>Session 일주일 전 세부 일정 안내</span></div>
+      <div><b>03</b><span>세션 전 연사 소개 · 사전 질문 · 세부 일정 안내</span></div>
     </div>
   </div>
   <div>
@@ -590,20 +590,6 @@ body::after{display:none}
       <select id="f-pass" name="pass" required><option value="">선택해 주세요</option><option selected>1 Season (4회권) · 25만원</option></select>
       <p class="form-hint">1회권은 회차별로 별도 오픈됩니다.</p>
       <p class="field-err">Pass를 선택해 주세요.</p></div>
-    <div class="field">
-      <div class="q-head"><label for="f-q">사전 질문 <em>*</em></label><button type="button" class="q-toggle" id="qToggle" aria-expanded="false">예시 보기</button></div>
-      <div class="q-ex" id="qEx">
-        <p>이런 질문들이 좋은 출발점이 됩니다. 클릭하면 입력란에 들어갑니다.</p>
-        <ul>
-          <li>핵심 인재가 떠나겠다고 했을 때, 붙잡아야 하는 순간과 보내야 하는 순간을 어떻게 구분하셨나요?</li>
-          <li>확신이 없는 상태에서 큰 결정을 내려야 했을 때, 실제로 무엇에 기대어 결정하셨나요?</li>
-          <li>지금 돌아보면 너무 늦게 알아차린 신호가 있었다면 무엇이었나요?</li>
-        </ul>
-      </div>
-      <textarea id="f-q" name="question" required minlength="10" placeholder="공개적인 자리에서는 묻기 어려웠던 질문, 지금 가장 깊이 고민하고 있는 것을 자유롭게 적어 주세요."></textarea>
-      <p class="form-hint">질문은 익명으로 큐레이션되며, 외부에 기록·공개되지 않습니다.</p>
-      <p class="field-err">질문을 10자 이상 적어 주세요.</p>
-    </div>
     <div class="form-foot">
       <button class="btn light" type="submit" id="submitBtn"><span class="spin"></span><span class="t">신청하기 →</span></button>
       <span class="form-note">제출 후 안내 연락을 드립니다.</span>
@@ -612,7 +598,7 @@ body::after{display:none}
   <div class="done" id="done" tabindex="-1">
     <div class="done-ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
     <h3>신청이 접수되었습니다</h3>
-    <p>보내 주신 질문은 익명으로 큐레이션되어 연사에게 전달됩니다.</p>
+    <p>초대 확인 후 안내 연락을 드립니다.</p>
     <div class="done-sum">
       <div><span>Name</span><b id="dName"></b></div>
       <div><span>Pass</span><b id="dPass"></b></div>
@@ -642,9 +628,7 @@ const esc=t=>(t==null?'':String(t)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt
 /* ---- Pass: 홈에서 고른 값 반영 ---- */
 (function(){const v=new URLSearchParams(location.search).get('pass');const sel=document.getElementById('f-pass');if(v&&[...sel.options].some(o=>o.value===v||o.text===v))sel.value=v;})();
 /* ---- 신청 폼 ---- */
-const form=$('#applyForm'),alertBox=$('#formAlert'),submitBtn=$('#submitBtn'),qToggle=$('#qToggle'),qEx=$('#qEx'),qArea=$('#f-q');
-qToggle.addEventListener('click',()=>{const o=qEx.classList.toggle('open');qToggle.setAttribute('aria-expanded',o);qToggle.textContent=o?'예시 닫기':'예시 보기';});
-$$('#qEx li').forEach(li=>li.addEventListener('click',()=>{qArea.value=(qArea.value.trim()?qArea.value.trim()+'\n\n':'')+li.textContent;qArea.focus();clearErr(qArea);}));
+const form=$('#applyForm'),alertBox=$('#formAlert'),submitBtn=$('#submitBtn');
 function field(el){return el.closest('.field');}
 function setErr(el,msg){const f=field(el);f.classList.add('err');if(msg)f.querySelector('.field-err').textContent=msg;}
 function clearErr(el){field(el).classList.remove('err');}
@@ -654,7 +638,6 @@ function validate(){
   form.querySelectorAll('[required]').forEach(el=>{
     const v=el.value.trim();let bad=!v;
     if(!bad&&el.name==='phone')bad=!phoneOk(v);
-    if(!bad&&el.name==='question')bad=v.length<10;
     if(bad){setErr(el);first=first||el;}else clearErr(el);
   });
   return first;
@@ -671,7 +654,7 @@ form.addEventListener('submit',async e=>{
   submitBtn.disabled=true;submitBtn.classList.add('loading');submitBtn.querySelector('.t').textContent='접수 중…';
   const data=Object.fromEntries(new FormData(form).entries());
   try{
-    const r=await fetch(SU+'/rest/v1/rpc/otr_apply',{method:'POST',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:JSON.stringify({name:data.name,phone:data.phone,role:data.role,inviter:data.inviter,pass:data.pass,question:data.question})});
+    const r=await fetch(SU+'/rest/v1/rpc/otr_apply',{method:'POST',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:JSON.stringify({name:data.name,phone:data.phone,role:data.role,inviter:data.inviter,pass:data.pass,question:'(사전 질문은 세션 전 별도 수집)'})});
     if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.message||('HTTP '+r.status));}
     $('#dName').textContent=data.name;$('#dPass').textContent=data.pass;
     form.style.display='none';const done=$('#done');done.classList.add('show');done.focus({preventScroll:true});done.scrollIntoView({behavior:'smooth',block:'center'});
