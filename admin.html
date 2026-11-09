@@ -391,6 +391,18 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .app-intro h6{font:600 .72rem 'Inter Tight','Pretendard',sans-serif;letter-spacing:.06em;color:var(--tl);margin:0 0 .3rem}
 .app-intro p{margin:0;white-space:pre-wrap;line-height:1.65;font-size:.88rem;color:var(--ts)}
 .lg{display:inline-block;white-space:nowrap!important}
+
+/* 신청자 선택·복사 */
+.sel-bar{display:none;align-items:center;gap:.6rem;flex-wrap:wrap;margin:1rem 0 -.25rem;padding:.75rem 1rem;border-radius:var(--r-sm);background:#141414;color:var(--cr)}
+.sel-bar.on{display:flex}
+.sel-bar b{margin-right:.4rem;font-weight:600}
+.sel-bar .mn-btn{padding:.45rem 1rem;font-size:.82rem}
+.sel-bar .mn-btn:not(.ghost){background:var(--cr);color:#141414}
+.sel-bar .mn-btn.ghost{color:var(--cr);border-color:rgba(237,230,214,.3)}
+.sel-bar .lnk{color:rgba(237,230,214,.6)!important}
+#selMsg{color:#C9B37E;font-size:.82rem}
+#v-apps input[type=checkbox]{width:16px;height:16px;accent-color:#141414;cursor:pointer}
+#v-apps tr.sel td{background:rgba(201,179,126,.12)}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
   <h2><span class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span><small>ADMIN</small></h2>
@@ -406,6 +418,12 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 <div class="panel" id="p-apps"><section class="section"><div class="container">
   <div class="mn-head"><div><div class="eyebrow">Applications</div><h2 class="title" style="margin:0">참가 신청</h2></div><div class="chips" id="appChips"></div></div>
   <p class="note">홈페이지 신청서로 접수된 내역입니다. 자기소개는 '자세히'를 누르면 전체를 볼 수 있습니다. <span id="appCount"></span></p>
+  <div class="sel-bar" id="selBar"><b id="selN">0명 선택</b>
+    <button class="mn-btn" onclick="appCopy('phone')">연락처 복사</button>
+    <button class="mn-btn ghost" onclick="appCopy('namephone')">이름 + 연락처 복사</button>
+    <button class="mn-btn ghost" onclick="appCopy('sheet')">표로 복사 (엑셀용)</button>
+    <button class="lnk" style="color:var(--tl)" onclick="appSel.clear();RENDER.apps()">선택 해제</button>
+    <span id="selMsg"></span></div>
   <div class="tbl-wrap"><table class="tbl" id="v-apps"></table></div>
 </div></section></div>
 
@@ -539,7 +557,18 @@ async function login(pw){
   }catch(e){PW='';try{sessionStorage.removeItem('otr_pw')}catch(_){}$('gateMsg').textContent=e.message;}
 }
 async function load(key){D[key]=await rpc('otr_list',{tbl:T[key].tbl});RENDER[key]();}
-const APP_STATUS=['접수','확정','대기','취소'];let appFilter='전체';
+const APP_STATUS=['접수','확정','대기','취소'];let appFilter='전체';const appSel=new Set();
+function appToggle(id,on){on?appSel.add(id):appSel.delete(id);appSelUpd();}
+function appToggleAll(on){(window._appRows||[]).forEach(r=>on?appSel.add(r.id):appSel.delete(r.id));RENDER.apps();}
+function appSelUpd(){const n=appSel.size;$('selN').textContent=n+'명 선택';$('selBar').classList.toggle('on',n>0);
+  const rows=window._appRows||[];const all=$('selAll');if(all){const k=rows.filter(r=>appSel.has(r.id)).length;all.checked=rows.length>0&&k===rows.length;all.indeterminate=k>0&&k<rows.length;}}
+async function appCopy(kind){
+  const L=(D.apps||[]).filter(r=>appSel.has(r.id));if(!L.length)return;
+  const t=kind==='phone'?L.map(r=>r.phone).join('\n'):kind==='namephone'?L.map(r=>`${r.name} ${r.phone}`).join('\n')
+    :['이름\t연락처\t소속/역할\t초대자\t상태',...L.map(r=>[r.name,r.phone,r.role,r.inviter,r.status].join('\t'))].join('\n');
+  try{await navigator.clipboard.writeText(t);}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();}
+  $('selMsg').textContent=`${L.length}명 복사됨`;setTimeout(()=>$('selMsg').textContent='',2000);
+}
 async function loadApps(){D.apps=await rpc('otr_app_list');RENDER.apps();}
 async function loadAll(){
   loadSite().catch(e=>{$('hMsg').textContent='설정을 불러오지 못했습니다. ('+e.message+')';});
@@ -647,17 +676,18 @@ const RENDER={
     $('appCount').textContent=all.length?`총 ${all.length}건 · `+Object.entries(cnt).map(([k,v])=>`${k} ${v}`).join(' · '):'';
     const intro=q=>{const m={};(q||'').split(/\n\s*\n/).forEach(b=>{const x=b.match(/^\[(.+?)\]\s*([\s\S]*)$/);if(x)m[x[1]]=x[2].trim();});return m;};
     const one=t=>`<span class="ellip" title="${esc(t)}">${esc(t)}</span>`;
-    $('v-apps').innerHTML=`<thead><tr><th>접수일</th><th>이름</th><th>연락처</th><th>소속 / 역할</th><th>초대자</th><th>상태</th><th>요즘 관심사</th><th>주요 커리어</th><th>메모</th><th></th></tr></thead><tbody>${
+    $('v-apps').innerHTML=`<thead><tr><th style="width:34px"><input type="checkbox" id="selAll" onchange="appToggleAll(this.checked)" title="전체 선택"></th><th>접수일</th><th>이름</th><th>연락처</th><th>소속 / 역할</th><th>초대자</th><th>상태</th><th>요즘 관심사</th><th>주요 커리어</th><th>메모</th><th></th></tr></thead><tbody>${
       L.map(r=>{const m=intro(r.question);const has=Object.keys(m).length;
-      return `<tr class="app-row"><td class="nw" style="color:var(--tl)">${r.created_at.slice(5,10).replace('-','/')} ${r.created_at.slice(11,16)}</td>
+      return `<tr class="app-row${appSel.has(r.id)?' sel':''}"><td><input type="checkbox" ${appSel.has(r.id)?'checked':''} onchange="appToggle('${r.id}',this.checked);this.closest('tr').classList.toggle('sel',this.checked)"></td><td class="nw" style="color:var(--tl)">${r.created_at.slice(5,10).replace('-','/')} ${r.created_at.slice(11,16)}</td>
       <td class="nw"><b>${esc(r.name)}</b></td><td class="nw">${esc(r.phone)}</td><td>${one(r.role)}</td><td class="nw">${esc(r.inviter)}</td>
       <td><select onchange="appUpdate('${r.id}',{new_status:this.value})">${APP_STATUS.map(o=>`<option ${o===r.status?'selected':''}>${o}</option>`).join('')}</select></td>
       <td>${one(has?(m['요즘 관심사']||''):r.question)}</td><td>${one(m['주요 커리어']||m['커리어']||'')}</td>
       <td>${r.memo?one(r.memo):''} <button class="lnk" onclick="appMemo('${r.id}')">${r.memo?'수정':'+ 메모'}</button></td>
       <td class="nw"><button class="lnk" onclick="this.closest('tr').nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='자세히'?'접기':'자세히'">자세히</button> <button class="lnk" style="color:var(--tl)" onclick="appDel('${r.id}')">삭제</button></td></tr>
-      <tr class="app-detail"><td colspan="10"><div class="app-intro">${has?Object.entries(m).map(([k,v])=>`<div><h6>${esc(k)}</h6><p>${esc(v)}</p></div>`).join(''):`<div><h6>내용</h6><p>${esc(r.question)}</p></div>`}
-        <div><h6>Pass · 소속</h6><p>${esc(r.pass)}<br>${esc(r.role)}</p></div>${r.memo?`<div><h6>메모</h6><p>${esc(r.memo)}</p></div>`:''}</div></td></tr>`;}).join('')||`<tr><td colspan="10" style="text-align:center;color:var(--tl);padding:2rem">${all.length?'해당 상태의 신청이 없습니다.':'아직 접수된 신청이 없습니다.'}</td></tr>`
+      <tr class="app-detail"><td colspan="11"><div class="app-intro">${has?Object.entries(m).map(([k,v])=>`<div><h6>${esc(k)}</h6><p>${esc(v)}</p></div>`).join(''):`<div><h6>내용</h6><p>${esc(r.question)}</p></div>`}
+        <div><h6>Pass · 소속</h6><p>${esc(r.pass)}<br>${esc(r.role)}</p></div>${r.memo?`<div><h6>메모</h6><p>${esc(r.memo)}</p></div>`:''}</div></td></tr>`;}).join('')||`<tr><td colspan="11" style="text-align:center;color:var(--tl);padding:2rem">${all.length?'해당 상태의 신청이 없습니다.':'아직 접수된 신청이 없습니다.'}</td></tr>`
     }</tbody>`;
+    window._appRows=L;appSelUpd();
   },
   notes(){
     const L=[...D.notes].sort((a,b)=>b.meeting_date.localeCompare(a.meeting_date));
