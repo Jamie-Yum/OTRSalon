@@ -379,6 +379,18 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 
 /* THE: 옆 단어의 2/3 크기 */
 .the{font-size:.66em}
+
+/* 신청 목록: 한 화면에 보기 */
+#v-apps td{padding:.55rem .75rem;vertical-align:middle;font-size:.86rem}
+#v-apps .nw{white-space:nowrap}
+#v-apps .ellip{display:inline-block;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}
+#v-apps .app-detail{display:none}
+#v-apps .app-detail.open{display:table-row}
+#v-apps .app-detail td{background:rgba(20,20,20,.03);padding:1rem 1.25rem 1.25rem}
+.app-intro{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem 1.5rem}
+.app-intro h6{font:600 .72rem 'Inter Tight','Pretendard',sans-serif;letter-spacing:.06em;color:var(--tl);margin:0 0 .3rem}
+.app-intro p{margin:0;white-space:pre-wrap;line-height:1.65;font-size:.88rem;color:var(--ts)}
+.lg{display:inline-block;white-space:nowrap!important}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
   <h2><span class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span><small>ADMIN</small></h2>
@@ -393,7 +405,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 
 <div class="panel" id="p-apps"><section class="section"><div class="container">
   <div class="mn-head"><div><div class="eyebrow">Applications</div><h2 class="title" style="margin:0">참가 신청</h2></div><div class="chips" id="appChips"></div></div>
-  <p class="note">홈페이지 신청 양식으로 접수된 내역입니다. 사전 질문은 익명으로 큐레이션해 Speaker에게 전달합니다. <span id="appCount"></span></p>
+  <p class="note">홈페이지 신청서로 접수된 내역입니다. 자기소개는 '자세히'를 누르면 전체를 볼 수 있습니다. <span id="appCount"></span></p>
   <div class="tbl-wrap"><table class="tbl" id="v-apps"></table></div>
 </div></section></div>
 
@@ -633,13 +645,18 @@ const RENDER={
     const L=all.filter(r=>appFilter==='전체'||r.status===appFilter);
     const cnt=all.reduce((o,r)=>{const k=r.pass.split(' (')[0];o[k]=(o[k]||0)+1;return o;},{});
     $('appCount').textContent=all.length?`총 ${all.length}건 · `+Object.entries(cnt).map(([k,v])=>`${k} ${v}`).join(' · '):'';
-    $('v-apps').innerHTML=`<thead><tr><th>접수일</th><th>이름</th><th>연락처</th><th>소속 / 역할</th><th>초대자</th><th>Pass</th><th>상태</th><th>자기소개</th><th>메모</th><th></th></tr></thead><tbody>${
-      L.map(r=>`<tr><td style="white-space:nowrap;color:var(--tl)">${r.created_at.slice(0,10)}<br><small>${r.created_at.slice(11,16)}</small></td>
-      <td style="white-space:nowrap"><b>${esc(r.name)}</b></td><td style="white-space:nowrap">${esc(r.phone)}</td><td>${esc(r.role)}</td><td>${esc(r.inviter)}</td><td style="white-space:nowrap">${esc(r.pass.split(' · ')[0])}</td>
+    const intro=q=>{const m={};(q||'').split(/\n\s*\n/).forEach(b=>{const x=b.match(/^\[(.+?)\]\s*([\s\S]*)$/);if(x)m[x[1]]=x[2].trim();});return m;};
+    const one=t=>`<span class="ellip" title="${esc(t)}">${esc(t)}</span>`;
+    $('v-apps').innerHTML=`<thead><tr><th>접수일</th><th>이름</th><th>연락처</th><th>소속 / 역할</th><th>초대자</th><th>상태</th><th>요즘 관심사</th><th>주요 커리어</th><th>메모</th><th></th></tr></thead><tbody>${
+      L.map(r=>{const m=intro(r.question);const has=Object.keys(m).length;
+      return `<tr class="app-row"><td class="nw" style="color:var(--tl)">${r.created_at.slice(5,10).replace('-','/')} ${r.created_at.slice(11,16)}</td>
+      <td class="nw"><b>${esc(r.name)}</b></td><td class="nw">${esc(r.phone)}</td><td>${one(r.role)}</td><td class="nw">${esc(r.inviter)}</td>
       <td><select onchange="appUpdate('${r.id}',{new_status:this.value})">${APP_STATUS.map(o=>`<option ${o===r.status?'selected':''}>${o}</option>`).join('')}</select></td>
-      <td style="min-width:260px;max-width:420px;white-space:pre-wrap;font-size:.84rem">${esc(r.question)}</td>
-      <td style="min-width:140px;font-size:.84rem;color:var(--ts)">${esc(r.memo||'')} <button class="lnk" onclick="appMemo('${r.id}')">${r.memo?'수정':'+ 메모'}</button></td>
-      <td><button class="lnk" style="color:var(--tl)" onclick="appDel('${r.id}')">삭제</button></td></tr>`).join('')||`<tr><td colspan="10" style="text-align:center;color:var(--tl);padding:2rem">${all.length?'해당 상태의 신청이 없습니다.':'아직 접수된 신청이 없습니다.'}</td></tr>`
+      <td>${one(has?(m['요즘 관심사']||''):r.question)}</td><td>${one(m['주요 커리어']||m['커리어']||'')}</td>
+      <td>${r.memo?one(r.memo):''} <button class="lnk" onclick="appMemo('${r.id}')">${r.memo?'수정':'+ 메모'}</button></td>
+      <td class="nw"><button class="lnk" onclick="this.closest('tr').nextElementSibling.classList.toggle('open');this.textContent=this.textContent==='자세히'?'접기':'자세히'">자세히</button> <button class="lnk" style="color:var(--tl)" onclick="appDel('${r.id}')">삭제</button></td></tr>
+      <tr class="app-detail"><td colspan="10"><div class="app-intro">${has?Object.entries(m).map(([k,v])=>`<div><h6>${esc(k)}</h6><p>${esc(v)}</p></div>`).join(''):`<div><h6>내용</h6><p>${esc(r.question)}</p></div>`}
+        <div><h6>Pass · 소속</h6><p>${esc(r.pass)}<br>${esc(r.role)}</p></div>${r.memo?`<div><h6>메모</h6><p>${esc(r.memo)}</p></div>`:''}</div></td></tr>`;}).join('')||`<tr><td colspan="10" style="text-align:center;color:var(--tl);padding:2rem">${all.length?'해당 상태의 신청이 없습니다.':'아직 접수된 신청이 없습니다.'}</td></tr>`
     }</tbody>`;
   },
   notes(){
