@@ -403,6 +403,11 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 #selMsg{color:#C9B37E;font-size:.82rem}
 #v-apps input[type=checkbox]{width:16px;height:16px;accent-color:#141414;cursor:pointer}
 #v-apps tr.sel td{background:rgba(201,179,126,.12)}
+
+.admin-bar .bar-r{display:flex;gap:1rem;align-items:center}
+.inv{display:inline-block;padding:.12rem .55rem;border-radius:999px;font-size:.8rem;font-weight:600;line-height:1.5}
+.admin-bar>span:first-child{flex:none;white-space:nowrap}
+.admin-bar .lg .the,.gate-box .the,.hprev-text .the{display:inline!important}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
   <h2><span class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span><small>ADMIN</small></h2>
@@ -413,7 +418,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 <header class="admin-bar"><span><b class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</b><small>ADMIN</small></span>
 <nav class="tabs" id="tabs">
   <button data-tab="notes" class="on">회의록</button><button data-tab="apps">신청</button><button data-tab="site">홈페이지</button><button data-tab="schedule">일정</button><button data-tab="speakers">연사</button><button data-tab="fees">사례비</button><button data-tab="actions">Next Action</button><button data-tab="decisions">결정 기록</button><button data-tab="plan">기획 자료</button>
-</nav><a href="index.html">← 사이트로</a></header>
+</nav><span class="bar-r"><a href="index.html">← 사이트로</a><a href="#" onclick="logout();return false">로그아웃</a></span></header>
 
 <div class="panel" id="p-apps"><section class="section"><div class="container">
   <div class="mn-head"><div><div class="eyebrow">Applications</div><h2 class="title" style="margin:0">참가 신청</h2></div><div class="chips" id="appChips"></div></div>
@@ -552,12 +557,15 @@ async function login(pw){
   PW=pw||$('gatePw').value;$('gateMsg').textContent='';
   try{
     if(!await rpc('otr_auth'))throw new Error('비밀번호가 올바르지 않습니다.');
-    try{sessionStorage.setItem('otr_pw',PW)}catch(e){}
+    try{localStorage.setItem('otr_pw',PW)}catch(e){}
     $('gate').style.display='none';loadAll();
-  }catch(e){PW='';try{sessionStorage.removeItem('otr_pw')}catch(_){}$('gateMsg').textContent=e.message;}
+  }catch(e){PW='';try{localStorage.removeItem('otr_pw')}catch(_){}$('gateMsg').textContent=e.message;}
 }
 async function load(key){D[key]=await rpc('otr_list',{tbl:T[key].tbl});RENDER[key]();}
-const APP_STATUS=['접수','확정','대기','취소'];let appFilter='전체';const appSel=new Set();
+const APP_STATUS=['접수','확정','대기','취소'];
+const INV_COLORS=[['#F3E3C3','#7A5A1E'],['#DCE8F5','#25507E'],['#E2F0DD','#2F6A2A'],['#F6DDE0','#8A2E3B'],['#E8E0F5','#53378A'],['#DDF0EE','#1E6B63'],['#F5E6D8','#8A4A1E'],['#E6E6E6','#3A3A3A'],['#F3F0CC','#6B6214'],['#DDE3F5','#2E3E8A']];
+const invMap={};
+function invTag(n){n=(n||'').trim();if(!n)return'';if(!(n in invMap)){const used=Object.keys(invMap).length;invMap[n]=used%INV_COLORS.length;}const[c,f]=INV_COLORS[invMap[n]];return `<span class="inv" style="background:${c};color:${f}">${esc(n)}</span>`;}let appFilter='전체';const appSel=new Set();
 function appToggle(id,on){on?appSel.add(id):appSel.delete(id);appSelUpd();}
 function appToggleAll(on){(window._appRows||[]).forEach(r=>on?appSel.add(r.id):appSel.delete(r.id));RENDER.apps();}
 function appSelUpd(){const n=appSel.size;$('selN').textContent=n+'명 선택';$('selBar').classList.toggle('on',n>0);
@@ -671,15 +679,16 @@ const RENDER={
   apps(){
     const all=D.apps||[];
     $('appChips').innerHTML=['전체',...APP_STATUS].map(c=>`<button class="${c===appFilter?'on':''}" onclick="appFilter='${c}';RENDER.apps()">${c}<small style="opacity:.6;margin-left:.3rem">${c==='전체'?all.length:all.filter(r=>r.status===c).length}</small></button>`).join('')+`<button onclick="appCsv()">CSV ↓</button>`;
+    [...new Set(all.map(r=>(r.inviter||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ko')).forEach(n=>invTag(n));
     const L=all.filter(r=>appFilter==='전체'||r.status===appFilter);
     const cnt=all.reduce((o,r)=>{const k=r.pass.split(' (')[0];o[k]=(o[k]||0)+1;return o;},{});
     $('appCount').textContent=all.length?`총 ${all.length}건 · `+Object.entries(cnt).map(([k,v])=>`${k} ${v}`).join(' · '):'';
     const intro=q=>{const m={};(q||'').split(/\n\s*\n/).forEach(b=>{const x=b.match(/^\[(.+?)\]\s*([\s\S]*)$/);if(x)m[x[1]]=x[2].trim();});return m;};
     const one=t=>`<span class="ellip" title="${esc(t)}">${esc(t)}</span>`;
-    $('v-apps').innerHTML=`<thead><tr><th style="width:34px"><input type="checkbox" id="selAll" onchange="appToggleAll(this.checked)" title="전체 선택"></th><th>접수일</th><th>이름</th><th>연락처</th><th>소속 / 역할</th><th>초대자</th><th>상태</th><th>요즘 관심사</th><th>주요 커리어</th><th>메모</th><th></th></tr></thead><tbody>${
+    $('v-apps').innerHTML=`<thead><tr><th style="width:34px"><input type="checkbox" id="selAll" onchange="appToggleAll(this.checked)" title="전체 선택"></th><th>접수일</th><th>이름</th><th>소속 / 역할</th><th>연락처</th><th>초대자</th><th>상태</th><th>요즘 관심사</th><th>주요 커리어</th><th>메모</th><th></th></tr></thead><tbody>${
       L.map(r=>{const m=intro(r.question);const has=Object.keys(m).length;
       return `<tr class="app-row${appSel.has(r.id)?' sel':''}"><td><input type="checkbox" ${appSel.has(r.id)?'checked':''} onchange="appToggle('${r.id}',this.checked);this.closest('tr').classList.toggle('sel',this.checked)"></td><td class="nw" style="color:var(--tl)">${r.created_at.slice(5,10).replace('-','/')} ${r.created_at.slice(11,16)}</td>
-      <td class="nw"><b>${esc(r.name)}</b></td><td class="nw">${esc(r.phone)}</td><td>${one(r.role)}</td><td class="nw">${esc(r.inviter)}</td>
+      <td class="nw"><b>${esc(r.name)}</b></td><td>${one(r.role)}</td><td class="nw">${esc(r.phone)}</td><td class="nw">${invTag(r.inviter)}</td>
       <td><select onchange="appUpdate('${r.id}',{new_status:this.value})">${APP_STATUS.map(o=>`<option ${o===r.status?'selected':''}>${o}</option>`).join('')}</select></td>
       <td>${one(has?(m['요즘 관심사']||''):r.question)}</td><td>${one(m['주요 커리어']||m['커리어']||'')}</td>
       <td>${r.memo?one(r.memo):''} <button class="lnk" onclick="appMemo('${r.id}')">${r.memo?'수정':'+ 메모'}</button></td>
@@ -756,7 +765,8 @@ const RENDER={
     $('v-plan').innerHTML=L.map(d=>`<div class="plan">${d.category?`<span class="tag">${esc(d.category)}</span>`:''}<h4>${esc(d.title)}<button class="lnk" onclick="edit('plan','${d.id}')">수정</button></h4><pre>${esc(d.content)}</pre></div>`).join('')||empty('기획 자료가 없습니다.');
   }
 };
-try{const saved=sessionStorage.getItem('otr_pw');if(saved)login(saved);}catch(e){}
+function logout(){try{localStorage.removeItem('otr_pw')}catch(e){}location.reload();}
+try{const saved=localStorage.getItem('otr_pw')||sessionStorage.getItem('otr_pw');if(saved)login(saved);}catch(e){}
 </script>
 
 </body></html>
