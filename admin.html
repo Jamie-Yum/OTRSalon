@@ -428,6 +428,22 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 #v-apps .ic svg{pointer-events:none}
 #v-apps .act-cell .ic,#v-apps .memo-cell .ic{position:relative}
 #v-apps .act-cell .ic::after,#v-apps .memo-cell .ic::after{content:"";position:absolute;inset:-5px}
+
+/* 신청 목록: 가로 스크롤 없이 한 화면 */
+#v-apps{min-width:0;table-layout:auto}
+#v-apps td,#v-apps th{padding:.5rem .55rem}
+#v-apps .ellip{max-width:150px}
+#v-apps .ic{width:28px;height:28px;border:0;background:transparent;color:var(--tl)}
+#v-apps .ic:hover{background:rgba(20,20,20,.07);color:#141414}
+#v-apps .ic.has{background:transparent;color:#A8843F}
+#v-apps .ic.has:hover{background:#F3E3C3}
+#v-apps .ic.del:hover{background:#FBEDED;border:0}
+#v-apps .ic svg{width:17px;height:17px}
+#v-apps .act-cell{gap:.1rem;justify-content:flex-end}
+#v-apps .act-cell .ic::after{inset:-4px}
+#v-apps select{padding:.2rem .3rem}
+@media(max-width:1180px){#v-apps tr.app-row td:nth-child(9),#v-apps thead th:nth-child(9){display:none}#v-apps .ellip{max-width:120px}}
+@media(max-width:860px){#v-apps tr.app-row td:nth-child(2),#v-apps thead th:nth-child(2){display:none}}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
   <h2><span class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span><small>ADMIN</small></h2>
@@ -714,16 +730,15 @@ const RENDER={
     $('appCount').textContent=all.length?`총 ${all.length}건 · `+Object.entries(cnt).map(([k,v])=>`${k} ${v}`).join(' · '):'';
     const intro=q=>{const m={};(q||'').split(/\n\s*\n/).forEach(b=>{const x=b.match(/^\[(.+?)\]\s*([\s\S]*)$/);if(x)m[x[1]]=x[2].trim();});return m;};
     const one=t=>`<span class="ellip" title="${esc(t)}">${esc(t)}</span>`;
-    $('v-apps').innerHTML=`<thead><tr><th style="width:34px"><input type="checkbox" id="selAll" onchange="appToggleAll(this.checked)" title="전체 선택"></th><th>접수일</th>${sortTh('name','이름')}<th>소속 / 역할</th><th>연락처</th>${sortTh('inviter','초대자')}${sortTh('status','상태')}<th>요즘 관심사</th><th>주요 커리어</th><th>메모</th><th style="text-align:center">보기 · 삭제</th></tr></thead><tbody>${
+    $('v-apps').innerHTML=`<thead><tr><th style="width:34px"><input type="checkbox" id="selAll" onchange="appToggleAll(this.checked)" title="전체 선택"></th><th>접수일</th>${sortTh('name','이름')}<th>소속 / 역할</th><th>연락처</th>${sortTh('inviter','초대자')}${sortTh('status','상태')}<th>요즘 관심사</th><th>주요 커리어</th><th></th></tr></thead><tbody>${
       L.map(r=>{const m=intro(r.question);const has=Object.keys(m).length;
       return `<tr class="app-row${appSel.has(r.id)?' sel':''}"><td><input type="checkbox" ${appSel.has(r.id)?'checked':''} onchange="appToggle('${r.id}',this.checked);this.closest('tr').classList.toggle('sel',this.checked)"></td><td class="nw" style="color:var(--tl)">${r.created_at.slice(5,10).replace('-','/')} ${r.created_at.slice(11,16)}</td>
       <td class="nw"><b>${esc(r.name)}</b></td><td>${one(r.role)}</td><td class="nw">${esc(r.phone)}</td><td class="nw">${invTag(r.inviter)}</td>
       <td><select onchange="appUpdate('${r.id}',{new_status:this.value})">${APP_STATUS.map(o=>`<option ${o===r.status?'selected':''}>${o}</option>`).join('')}</select></td>
       <td>${one(has?(m['요즘 관심사']||''):r.question)}</td><td>${one(m['주요 커리어']||m['커리어']||'')}</td>
-      <td><div class="memo-cell">${r.memo?`<span class="memo-txt" title="${esc(r.memo)}">${esc(r.memo)}</span>`:''}<button class="ic${r.memo?' has':''}" title="${r.memo?'메모 수정':'메모 추가'}" onclick="appMemo('${r.id}')">${IC.memo}</button></div></td>
-      <td class="nw"><div class="act-cell"><button class="ic" title="자세히 보기" onclick="const d=this.closest('tr').nextElementSibling;d.classList.toggle('open');this.classList.toggle('open',d.classList.contains('open'))">${IC.more}</button><button class="ic del" title="삭제" onclick="appDel('${r.id}')">${IC.del}</button></div></td></tr>
-      <tr class="app-detail"><td colspan="11"><div class="app-intro">${has?Object.entries(m).map(([k,v])=>`<div><h6>${esc(k)}</h6><p>${esc(v)}</p></div>`).join(''):`<div><h6>내용</h6><p>${esc(r.question)}</p></div>`}
-        <div><h6>Pass · 소속</h6><p>${esc(r.pass)}<br>${esc(r.role)}</p></div>${r.memo?`<div><h6>메모</h6><p>${esc(r.memo)}</p></div>`:''}</div></td></tr>`;}).join('')||`<tr><td colspan="11" style="text-align:center;color:var(--tl);padding:2rem">${all.length?'해당 상태의 신청이 없습니다.':'아직 접수된 신청이 없습니다.'}</td></tr>`
+            <td class="nw"><div class="act-cell"><button class="ic${r.memo?' has':''}" title="${r.memo?'메모: '+esc(r.memo):'메모 추가'}" onclick="appMemo('${r.id}')">${IC.memo}</button><button class="ic" title="자세히 보기" onclick="const d=this.closest('tr').nextElementSibling;d.classList.toggle('open');this.classList.toggle('open',d.classList.contains('open'))">${IC.more}</button><button class="ic del" title="삭제" onclick="appDel('${r.id}')">${IC.del}</button></div></td></tr>
+      <tr class="app-detail"><td colspan="10"><div class="app-intro">${has?Object.entries(m).map(([k,v])=>`<div><h6>${esc(k)}</h6><p>${esc(v)}</p></div>`).join(''):`<div><h6>내용</h6><p>${esc(r.question)}</p></div>`}
+        <div><h6>Pass · 소속</h6><p>${esc(r.pass)}<br>${esc(r.role)}</p></div>${r.memo?`<div><h6>메모</h6><p>${esc(r.memo)}</p></div>`:''}</div></td></tr>`;}).join('')||`<tr><td colspan="10" style="text-align:center;color:var(--tl);padding:2rem">${all.length?'해당 상태의 신청이 없습니다.':'아직 접수된 신청이 없습니다.'}</td></tr>`
     }</tbody>`;
     window._appRows=L;appSelUpd();
   },
