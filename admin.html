@@ -942,6 +942,7 @@ function svQHtml(q,i){
     <span class="sv-tool"><button type="button" onclick="svBold(this.parentElement.nextElementSibling)"><b>B</b> 굵게</button></span><textarea class="sv-q-desc" rows="2" placeholder="설명 (선택)" oninput="svDraft.questions[${i}].desc=this.value">${esc(q.desc||'')}</textarea>
     ${hasOpt?`<label class="sv-small">보기 <small>(한 줄에 하나씩)</small><textarea rows="${Math.max(3,(q.options||[]).length+1)}" oninput="svDraft.questions[${i}].options=this.value.split('\\n').map(x=>x.trim()).filter(Boolean)">${esc((q.options||[]).join('\n'))}</textarea></label>`:''}
     ${!isSec?`<div class="sv-q-opts"><label class="chk"><input type="checkbox" ${q.required?'checked':''} onchange="svDraft.questions[${i}].required=this.checked"> 필수</label>
+      ${q.type==='radio'?`<label class="chk"><input type="checkbox" ${q.scale?'checked':''} onchange="svDraft.questions[${i}].scale=this.checked"> 가로선 단계로 표시 (예: 1~4단계)</label>`:''}
       ${q.type==='checkbox'?`<label>최대 선택 <input type="number" min="0" value="${q.max||''}" placeholder="제한 없음" oninput="svDraft.questions[${i}].max=Number(this.value)||null"></label>`:''}
       ${q.type==='checkbox'?`<label class="chk"><input type="checkbox" ${q.requireAll?'checked':''} onchange="svDraft.questions[${i}].requireAll=this.checked"> 모든 보기 체크해야 제출 (동의 문항용)</label>`:''}
       ${q.type==='short'||q.type==='long'?`<label>글자 수 제한 <input type="number" min="0" value="${q.limit||''}" placeholder="제한 없음" oninput="svDraft.questions[${i}].limit=Number(this.value)||null"></label>`:''}
