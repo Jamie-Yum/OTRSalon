@@ -507,6 +507,10 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .sv-toast{position:fixed;left:50%;bottom:2rem;transform:translate(-50%,20px);background:#141414;color:var(--cr);padding:.7rem 1.3rem;border-radius:999px;font-size:.88rem;opacity:0;pointer-events:none;transition:all .25s;z-index:3000}
 .sv-toast.on{opacity:1;transform:translate(-50%,0)}
 @media(max-width:700px){.sv-row{grid-template-columns:1fr}.sv-bar{grid-template-columns:1fr 1fr 30px}}
+.sv-tool{display:flex;gap:.3rem}
+.sv-tool button{padding:.25rem .65rem;border:1px solid var(--bd);border-radius:6px;background:#fff;font:inherit;font-size:.78rem;font-weight:500;cursor:pointer;color:var(--ts)}
+.sv-tool button:hover{border-color:#141414;color:#141414}
+.sv-tool button b{font-weight:800}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
   <h2><span class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span><small>ADMIN</small></h2>
@@ -915,7 +919,7 @@ function svRenderEdit(box){
     <div style="display:flex;gap:.5rem">${s.id?`<button class="mn-btn danger" onclick="svDelete()">삭제</button>`:''}<button class="mn-btn" onclick="svSave()">저장</button></div></div>
   <div class="sv-form">
     <label>설문 제목 *<input id="sv_title" value="${esc(s.title)}" placeholder="예) 사전 질문 설문지 (1회차 : 강남구 대표)"></label>
-    <label>안내문 <small>(마감일, 좋은 질문 쓰는 법 등. 줄바꿈 그대로 보입니다)</small><textarea id="sv_intro" rows="8">${esc(s.intro||'')}</textarea></label>
+    <label>안내문 <small>(줄바꿈 그대로 보입니다 · 글자를 고르고 <b>B</b>를 누르면 굵게)</small><span class="sv-tool"><button type="button" onclick="svBold($('sv_intro'))"><b>B</b> 굵게</button></span><textarea id="sv_intro" rows="8">${esc(s.intro||'')}</textarea></label>
     <div class="sv-row">
       <label>연결 세션<select id="sv_salon"><option value="">없음</option>${[1,2,3,4].map(n=>`<option value="${n}" ${s.salon_no==n?'selected':''}>Session 0${n}</option>`).join('')}</select></label>
       <label>마감 일시<input type="datetime-local" id="sv_deadline" value="${dl}"></label>
@@ -935,7 +939,7 @@ function svQHtml(q,i){
     <div class="sv-q-head"><span class="sv-type">${SQ_TYPES[q.type]}</span>
       <span class="sv-q-btns"><button class="ic" title="위로" ${i===0?'disabled':''} onclick="svMoveQ(${i},-1)">↑</button><button class="ic" title="아래로" ${i===n-1?'disabled':''} onclick="svMoveQ(${i},1)">↓</button><button class="ic del" title="문항 삭제" onclick="svDelQ(${i})">✕</button></span></div>
     <input class="sv-q-title" placeholder="${isSec?'예) PART 1. 리딩북 확인':'질문을 입력하세요'}" value="${esc(q.title)}" oninput="svDraft.questions[${i}].title=this.value">
-    <textarea class="sv-q-desc" rows="2" placeholder="설명 (선택)" oninput="svDraft.questions[${i}].desc=this.value">${esc(q.desc||'')}</textarea>
+    <span class="sv-tool"><button type="button" onclick="svBold(this.parentElement.nextElementSibling)"><b>B</b> 굵게</button></span><textarea class="sv-q-desc" rows="2" placeholder="설명 (선택)" oninput="svDraft.questions[${i}].desc=this.value">${esc(q.desc||'')}</textarea>
     ${hasOpt?`<label class="sv-small">보기 <small>(한 줄에 하나씩)</small><textarea rows="${Math.max(3,(q.options||[]).length+1)}" oninput="svDraft.questions[${i}].options=this.value.split('\\n').map(x=>x.trim()).filter(Boolean)">${esc((q.options||[]).join('\n'))}</textarea></label>`:''}
     ${!isSec?`<div class="sv-q-opts"><label class="chk"><input type="checkbox" ${q.required?'checked':''} onchange="svDraft.questions[${i}].required=this.checked"> 필수</label>
       ${q.type==='checkbox'?`<label>최대 선택 <input type="number" min="0" value="${q.max||''}" placeholder="제한 없음" oninput="svDraft.questions[${i}].max=Number(this.value)||null"></label>`:''}
@@ -1005,6 +1009,17 @@ function svCsv(sid){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(s.title||'설문')+'_응답.csv';a.click();
 }
 async function svDelResp(rid){if(!confirm('이 응답을 삭제할까요? 되돌릴 수 없습니다.'))return;try{await rpc('otr_delete',{tbl:'otr_survey_responses',rid});await loadSurveys();}catch(e){alert('삭제 실패: '+e.message);}}
+
+/* 설문 편집: 선택한 글자를 **굵게** 감싸기 (이미 굵으면 해제) */
+function svBold(ta){
+  if(!ta)return;const s=ta.selectionStart,e=ta.selectionEnd,v=ta.value;
+  if(s===e){alert('굵게 할 글자를 먼저 드래그해서 선택해 주세요.');ta.focus();return;}
+  const sel=v.slice(s,e);let out,ns,ne;
+  if(v.slice(s-2,s)==='**'&&v.slice(e,e+2)==='**'){out=v.slice(0,s-2)+sel+v.slice(e+2);ns=s-2;ne=e-2;}
+  else if(/^\*\*[\s\S]*\*\*$/.test(sel)){out=v.slice(0,s)+sel.slice(2,-2)+v.slice(e);ns=s;ne=e-4;}
+  else{out=v.slice(0,s)+'**'+sel+'**'+v.slice(e);ns=s+2;ne=e+2;}
+  ta.value=out;ta.focus();ta.setSelectionRange(ns,ne);ta.dispatchEvent(new Event('input',{bubbles:true}));
+}
 </script>
 
 </body></html>

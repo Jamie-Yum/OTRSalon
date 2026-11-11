@@ -52,6 +52,7 @@ body{font-family:Pretendard,sans-serif;background:var(--bg);color:var(--dk);line
 .msg p{color:var(--ts)}
 .done-ic{width:56px;height:56px;border-radius:50%;background:var(--dk);color:var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 1.2rem;font-size:1.6rem}
 @media(max-width:600px){.hd{padding:1.6rem 1.3rem}.q,.intro{padding:1.2rem 1.15rem}}
+.intro b,.d b,.sec p b{font-weight:700;color:var(--dk)}
 </style></head><body>
 <div class="top"><a href="index.html">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</a></div>
 <main class="wrap" id="app"><div class="msg"><p>설문을 불러오는 중…</p></div></main>
@@ -60,6 +61,7 @@ const SU='https://dvlrzbckneucpvlacdll.supabase.co';
 const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE';
 const esc=t=>(t==null?'':String(t)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const app=document.getElementById('app');
+const md=t=>esc(t).replace(/\*\*([\s\S]+?)\*\*/g,'<b>$1</b>');
 const rpc=(fn,body)=>fetch(SU+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(async r=>{const j=await r.json().catch(()=>null);if(!r.ok)throw new Error((j&&j.message)||'오류가 발생했습니다.');return j;});
 const msg=(h,p,ic)=>{app.innerHTML=`<div class="msg">${ic?`<div class="done-ic">${ic}</div>`:''}<h2>${h}</h2><p>${p||''}</p></div>`;scrollTo(0,0);};
 const W='일월화수목금토';
@@ -76,12 +78,12 @@ async function init(){
 }
 function render(){
   let h=`<div class="hd">${S.salon_no?`<div class="ses">SESSION 0${S.salon_no}</div>`:''}<h1>${esc(S.title)}</h1>${S.deadline?`<div class="dl">제출 마감 · ${fmtDl(S.deadline)}</div>`:''}</div>`;
-  if(S.intro)h+=`<div class="intro">${esc(S.intro)}</div>`;
+  if(S.intro)h+=`<div class="intro">${md(S.intro)}</div>`;
   h+='<form id="f" novalidate>';
   if(S.ask_name)h+=`<div class="nm"><label for="nm">이름 <small>선택 입력 · 비워 두면 익명으로 제출됩니다</small></label><input id="nm" maxlength="50"></div>`;
   (S.questions||[]).forEach(q=>{
-    if(q.type==='section'){h+=`<div class="sec"><h2>${esc(q.title)}</h2>${q.desc?`<p>${esc(q.desc)}</p>`:''}</div>`;return;}
-    h+=`<div class="q" data-id="${q.id}"><h3>${esc(q.title)}${q.required?'<em>*</em>':''}</h3>${q.desc?`<div class="d">${esc(q.desc)}</div>`:''}`;
+    if(q.type==='section'){h+=`<div class="sec"><h2>${esc(q.title)}</h2>${q.desc?`<p>${md(q.desc)}</p>`:''}</div>`;return;}
+    h+=`<div class="q" data-id="${q.id}"><h3>${esc(q.title)}${q.required?'<em>*</em>':''}</h3>${q.desc?`<div class="d">${md(q.desc)}</div>`:''}`;
     if(q.type==='radio'||q.type==='checkbox'){
       const t=q.type==='radio'?'radio':'checkbox';
       if(q.type==='checkbox'&&q.max)h+=`<div class="d">최대 ${q.max}개까지 고를 수 있습니다.</div>`;
