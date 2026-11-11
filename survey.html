@@ -66,6 +66,14 @@ body{font-family:Pretendard,sans-serif;background:var(--bg);color:var(--dk);line
 .opts.two{grid-template-columns:1fr 1fr}
 .opts.two .opt{align-items:center;padding:.65rem .75rem;font-size:.9rem}
 .opts.two .opt input{margin-top:0}
+/* 첨부 PDF */
+.att{display:flex;align-items:center;gap:1rem;background:var(--dk);color:var(--cr);border-radius:14px;padding:1.1rem 1.3rem;margin-bottom:1rem;text-decoration:none;transition:transform .15s}
+.att:hover{transform:translateY(-1px)}
+.att-ic{flex:none;width:46px;height:46px;border-radius:10px;border:1.5px solid var(--gold);color:var(--gold);display:flex;align-items:center;justify-content:center;font:700 .74rem 'Inter Tight',sans-serif;letter-spacing:.08em}
+.att-t{flex:1;display:flex;flex-direction:column;gap:.15rem;min-width:0}
+.att-t small{font-size:.78rem;color:var(--gold)}
+.att-t b{font-size:1rem;font-weight:600}
+.att-go{flex:none;font-size:.85rem;color:var(--gold);font-weight:600}
 </style></head><body>
 <div class="top"><a href="index.html">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</a></div>
 <main class="wrap" id="app"><div class="msg"><p>설문을 불러오는 중…</p></div></main>
@@ -91,6 +99,7 @@ async function init(){
 }
 function render(){
   let h=`<div class="hd">${S.salon_no?`<div class="ses">SESSION 0${S.salon_no}</div>`:''}<h1>${esc(S.title)}</h1>${S.deadline?`<div class="dl">제출 마감 · ${fmtDl(S.deadline)}</div>`:''}</div>`;
+  const A=S.attach||{};if(A.url)h+=`<a class="att" href="${esc(A.url)}" target="_blank" rel="noopener"><span class="att-ic">PDF</span><span class="att-t"><small>설문 전에 먼저 읽어 주세요</small><b>${esc(A.title||'리딩북')}</b></span><span class="att-go">열기 →</span></a>`;
   if(S.intro)h+=`<div class="intro">${md(S.intro)}</div>`;
   h+='<form id="f" novalidate>';
   if(S.ask_name)h+=`<div class="nm"><label for="nm">이름 <small>선택 입력 · 비워 두면 익명으로 제출됩니다</small></label><input id="nm" maxlength="50"></div>`;

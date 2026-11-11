@@ -35,11 +35,13 @@ begin
 end $$;
 
 -- 공개: 설문 1개 읽기 (응답 데이터는 노출하지 않음)
+alter table otr_surveys add column if not exists attach jsonb;
+
 create or replace function otr_public_survey(sid uuid) returns jsonb
 language sql security definer set search_path = public as $$
   select jsonb_build_object('id', id, 'title', title, 'intro', intro, 'salon_no', salon_no,
     'deadline', deadline, 'is_open', is_open and (deadline is null or deadline > now()),
-    'ask_name', ask_name, 'questions', questions)
+    'ask_name', ask_name, 'questions', questions, 'attach', attach)
   from otr_surveys where id = sid;
 $$;
 
