@@ -111,7 +111,7 @@ async function submit(e){
     if(q.type==='radio')v=(f.querySelector(`input[name="${q.id}"]:checked`)||{}).value||'';
     else if(q.type==='checkbox')v=[...f.querySelectorAll(`input[name="${q.id}"]:checked`)].map(x=>x.value);
     else v=(f.querySelector(`[name="${q.id}"]`).value||'').trim();
-    const empty=Array.isArray(v)?!v.length:!v;
+    const empty=Array.isArray(v)?(!v.length||(q.requireAll&&v.length<(q.options||[]).length)):!v;
     const box=f.querySelector(`.q[data-id="${q.id}"]`);
     if(q.required&&empty){box.classList.add('err');first=first||box;}else box.classList.remove('err');
     if(!empty)ans[q.id]=v;
