@@ -1,0 +1,128 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>설문 — 오프레코드 살롱</title>
+<meta name="robots" content="noindex">
+<meta property="og:title" content="오프레코드 살롱 설문"><meta property="og:description" content="세션을 위한 사전 질문을 남겨 주세요."><meta property="og:image" content="https://off-record.kr/og.jpg">
+<link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" href="/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=Josefin+Sans:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+<style>
+:root{--bg:#EFE9DD;--wh:#F8F4EC;--dk:#141414;--cr:#EDE6D6;--gold:#C9B37E;--gold-d:#A8843F;--ts:#3A3833;--tl:#7D776A;--bd:rgba(20,20,20,.13)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Pretendard,sans-serif;background:var(--bg);color:var(--dk);line-height:1.7;word-break:keep-all;-webkit-text-size-adjust:100%}
+.top{background:var(--dk);color:var(--cr);padding:1.1rem 1.25rem}
+.top a{color:var(--cr);text-decoration:none;font:600 .86rem 'Josefin Sans',Pretendard,sans-serif;letter-spacing:.07em;word-spacing:-.2em;white-space:nowrap}
+.top .the{font-size:.66em}
+.wrap{max-width:720px;margin:0 auto;padding:2rem 1.25rem 5rem}
+.hd{background:var(--dk);color:var(--cr);border-radius:18px;padding:2rem 1.75rem;margin-bottom:1.25rem}
+.hd .ses{font:600 .74rem 'Inter Tight',sans-serif;letter-spacing:.14em;color:var(--gold)}
+.hd h1{font-size:1.45rem;line-height:1.4;margin:.5rem 0 0;font-weight:600}
+.hd .dl{margin-top:.8rem;font-size:.85rem;color:rgba(237,230,214,.65)}
+.intro{background:var(--wh);border-radius:14px;padding:1.5rem 1.6rem;white-space:pre-wrap;font-size:.95rem;color:var(--ts);line-height:1.8;margin-bottom:1.25rem;box-shadow:0 1px 2px rgba(20,20,20,.06)}
+.sec{margin:2.2rem 0 .3rem;padding-bottom:.6rem;border-bottom:2px solid var(--dk)}
+.sec h2{font-size:1.15rem;font-weight:700}
+.sec p{margin-top:.35rem;font-size:.9rem;color:var(--ts);white-space:pre-wrap}
+.q{background:var(--wh);border-radius:14px;padding:1.4rem 1.5rem;margin-top:.9rem;box-shadow:0 1px 2px rgba(20,20,20,.06);border:1.5px solid transparent}
+.q.err{border-color:#C9504F}
+.q h3{font-size:1rem;font-weight:600;line-height:1.55}
+.q h3 em{color:#C9504F;font-style:normal;margin-left:.2rem}
+.q .d{margin-top:.3rem;font-size:.86rem;color:var(--tl);white-space:pre-wrap}
+.opts{display:grid;gap:.45rem;margin-top:.9rem}
+.opt{display:flex;gap:.65rem;align-items:flex-start;padding:.7rem .85rem;border:1px solid var(--bd);border-radius:10px;cursor:pointer;background:#fff;font-size:.93rem;line-height:1.5;transition:border-color .15s,background .15s}
+.opt:hover{border-color:var(--gold)}
+.opt input{margin-top:.25rem;accent-color:var(--dk);width:16px;height:16px;flex:none}
+.opt.on{border-color:var(--dk);background:#FBF7EE}
+.q input[type=text],.q textarea,.nm input{width:100%;margin-top:.9rem;padding:.8rem .9rem;border:1px solid var(--bd);border-radius:10px;font:inherit;font-size:.95rem;background:#fff;outline:none}
+.q input[type=text]:focus,.q textarea:focus,.nm input:focus{border-color:var(--dk)}
+.q textarea{min-height:120px;resize:vertical;line-height:1.7}
+.cnt{text-align:right;font-size:.78rem;color:var(--tl);margin-top:.3rem}
+.cnt.over{color:#C9504F}
+.emsg{display:none;margin-top:.5rem;font-size:.82rem;color:#C9504F}
+.q.err .emsg{display:block}
+.nm{background:var(--wh);border-radius:14px;padding:1.3rem 1.5rem;margin-top:.9rem}
+.nm label{font-weight:600;font-size:.95rem}
+.nm small{display:block;color:var(--tl);font-size:.82rem}
+.foot{margin-top:2rem;display:flex;flex-direction:column;align-items:center;gap:.8rem}
+.btn{min-width:220px;padding:1rem 2rem;border:0;border-radius:999px;background:var(--gold);color:var(--dk);font:700 1rem Pretendard,sans-serif;cursor:pointer}
+.btn:hover{background:#D8C596}
+.btn[disabled]{opacity:.6;cursor:default}
+.alert{display:none;padding:.9rem 1rem;border-radius:10px;background:#FBEDED;color:#8A2E3B;font-size:.9rem;width:100%;text-align:center}
+.alert.on{display:block}
+.msg{text-align:center;padding:4rem 1rem}
+.msg h2{font-size:1.3rem;margin-bottom:.6rem}
+.msg p{color:var(--ts)}
+.done-ic{width:56px;height:56px;border-radius:50%;background:var(--dk);color:var(--gold);display:flex;align-items:center;justify-content:center;margin:0 auto 1.2rem;font-size:1.6rem}
+@media(max-width:600px){.hd{padding:1.6rem 1.3rem}.q,.intro{padding:1.2rem 1.15rem}}
+</style></head><body>
+<div class="top"><a href="index.html">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</a></div>
+<main class="wrap" id="app"><div class="msg"><p>설문을 불러오는 중…</p></div></main>
+<script>
+const SU='https://dvlrzbckneucpvlacdll.supabase.co';
+const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE';
+const esc=t=>(t==null?'':String(t)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const app=document.getElementById('app');
+const rpc=(fn,body)=>fetch(SU+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:JSON.stringify(body)}).then(async r=>{const j=await r.json().catch(()=>null);if(!r.ok)throw new Error((j&&j.message)||'오류가 발생했습니다.');return j;});
+const msg=(h,p,ic)=>{app.innerHTML=`<div class="msg">${ic?`<div class="done-ic">${ic}</div>`:''}<h2>${h}</h2><p>${p||''}</p></div>`;scrollTo(0,0);};
+const W='일월화수목금토';
+const fmtDl=d=>{const x=new Date(d);return `${x.getFullYear()}. ${x.getMonth()+1}. ${x.getDate()}. (${W[x.getDay()]}) ${String(x.getHours()).padStart(2,'0')}:${String(x.getMinutes()).padStart(2,'0')}`;};
+let S=null;
+async function init(){
+  const sid=new URLSearchParams(location.search).get('s');
+  if(!sid)return msg('설문 주소가 올바르지 않습니다','받으신 링크를 다시 확인해 주세요.');
+  try{S=await rpc('otr_public_survey',{sid});}catch(e){return msg('설문을 불러오지 못했습니다',esc(e.message));}
+  if(!S)return msg('설문을 찾을 수 없습니다','받으신 링크를 다시 확인해 주세요.');
+  document.title=S.title+' — 오프레코드 살롱';
+  if(!S.is_open)return msg('마감된 설문입니다','참여해 주셔서 감사합니다.');
+  render();
+}
+function render(){
+  let h=`<div class="hd">${S.salon_no?`<div class="ses">SESSION 0${S.salon_no}</div>`:''}<h1>${esc(S.title)}</h1>${S.deadline?`<div class="dl">제출 마감 · ${fmtDl(S.deadline)}</div>`:''}</div>`;
+  if(S.intro)h+=`<div class="intro">${esc(S.intro)}</div>`;
+  h+='<form id="f" novalidate>';
+  if(S.ask_name)h+=`<div class="nm"><label for="nm">이름 <small>선택 입력 · 비워 두면 익명으로 제출됩니다</small></label><input id="nm" maxlength="50"></div>`;
+  (S.questions||[]).forEach(q=>{
+    if(q.type==='section'){h+=`<div class="sec"><h2>${esc(q.title)}</h2>${q.desc?`<p>${esc(q.desc)}</p>`:''}</div>`;return;}
+    h+=`<div class="q" data-id="${q.id}"><h3>${esc(q.title)}${q.required?'<em>*</em>':''}</h3>${q.desc?`<div class="d">${esc(q.desc)}</div>`:''}`;
+    if(q.type==='radio'||q.type==='checkbox'){
+      const t=q.type==='radio'?'radio':'checkbox';
+      if(q.type==='checkbox'&&q.max)h+=`<div class="d">최대 ${q.max}개까지 고를 수 있습니다.</div>`;
+      h+=`<div class="opts">${(q.options||[]).map(o=>`<label class="opt"><input type="${t}" name="${q.id}" value="${esc(o)}"><span>${esc(o)}</span></label>`).join('')}</div>`;
+    }else if(q.type==='short'){h+=`<input type="text" name="${q.id}" ${q.limit?`maxlength="${q.limit}"`:''} placeholder="답변을 입력하세요">`;}
+    else{h+=`<textarea name="${q.id}" ${q.limit?`maxlength="${q.limit}"`:''} placeholder="답변을 입력하세요"></textarea>${q.limit?`<div class="cnt"><span>0</span> / ${q.limit}자</div>`:''}`;}
+    h+=`<div class="emsg">응답이 필요한 문항입니다.</div></div>`;
+  });
+  h+=`<div class="foot"><div class="alert" id="al"></div><button class="btn" id="sb">제출하기</button></div></form>`;
+  app.innerHTML=h;
+  const f=document.getElementById('f');
+  f.addEventListener('change',e=>{
+    const inp=e.target;if(inp.type!=='radio'&&inp.type!=='checkbox')return;
+    const q=(S.questions||[]).find(x=>x.id===inp.name);
+    if(inp.type==='checkbox'&&q&&q.max){const on=f.querySelectorAll(`input[name="${inp.name}"]:checked`);if(on.length>q.max){inp.checked=false;alert(`최대 ${q.max}개까지 고를 수 있습니다.`);}}
+    f.querySelectorAll(`input[name="${inp.name}"]`).forEach(x=>x.closest('.opt').classList.toggle('on',x.checked));
+    inp.closest('.q').classList.remove('err');
+  });
+  f.addEventListener('input',e=>{const t=e.target;if(t.tagName==='TEXTAREA'){const c=t.parentElement.querySelector('.cnt span');if(c)c.textContent=t.value.length;}if(t.value.trim())t.closest('.q')?.classList.remove('err');});
+  f.addEventListener('submit',submit);
+}
+async function submit(e){
+  e.preventDefault();const f=e.target,al=document.getElementById('al'),sb=document.getElementById('sb');al.classList.remove('on');
+  const ans={};let first=null;
+  (S.questions||[]).filter(q=>q.type!=='section').forEach(q=>{
+    let v;
+    if(q.type==='radio')v=(f.querySelector(`input[name="${q.id}"]:checked`)||{}).value||'';
+    else if(q.type==='checkbox')v=[...f.querySelectorAll(`input[name="${q.id}"]:checked`)].map(x=>x.value);
+    else v=(f.querySelector(`[name="${q.id}"]`).value||'').trim();
+    const empty=Array.isArray(v)?!v.length:!v;
+    const box=f.querySelector(`.q[data-id="${q.id}"]`);
+    if(q.required&&empty){box.classList.add('err');first=first||box;}else box.classList.remove('err');
+    if(!empty)ans[q.id]=v;
+  });
+  if(first){al.textContent='응답이 필요한 문항이 있습니다.';al.classList.add('on');first.scrollIntoView({behavior:'smooth',block:'center'});return;}
+  sb.disabled=true;sb.textContent='제출 중…';
+  try{
+    await rpc('otr_submit_survey',{sid:S.id,name:(document.getElementById('nm')||{}).value||'',answers:ans});
+    msg('제출되었습니다','소중한 질문 감사합니다. 세션에서 만나요.','✓');
+  }catch(err){al.textContent=/[가-힣]/.test(err.message)?err.message:'제출 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.';al.classList.add('on');sb.disabled=false;sb.textContent='제출하기';}
+}
+init();
+</script>
+</body></html>

@@ -444,6 +444,69 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 #v-apps select{padding:.2rem .3rem}
 @media(max-width:1180px){#v-apps tr.app-row td:nth-child(9),#v-apps thead th:nth-child(9){display:none}#v-apps .ellip{max-width:120px}}
 @media(max-width:860px){#v-apps tr.app-row td:nth-child(2),#v-apps thead th:nth-child(2){display:none}}
+
+/* ===== 설문 ===== */
+.sv-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem;margin-top:1.5rem}
+.sv-card{background:var(--wh);border-radius:var(--r-sm);box-shadow:0 1px 2px rgba(20,20,20,.06),0 6px 18px rgba(20,20,20,.05);padding:1.4rem 1.5rem}
+.sv-top{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;font-size:.78rem;color:var(--tl)}
+.sv-badge{padding:.12rem .55rem;border-radius:999px;background:rgba(20,20,20,.08);font-weight:600}
+.sv-badge.on{background:#E2F0DD;color:#2F6A2A}
+.sv-ses{font-weight:600;color:#A8843F}
+.sv-dl{margin-left:auto}
+.sv-card h4{margin:.7rem 0 .3rem;font-size:1.05rem;line-height:1.4}
+.sv-meta{font-size:.85rem;color:var(--ts)}
+.sv-btns{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:1rem}
+.sv-btns .mn-btn,.mn-head .mn-btn{padding:.5rem 1rem;font-size:.82rem;text-decoration:none}
+.mn-btn.ghost{background:transparent;color:var(--ts);border:1px solid var(--bd)}
+.sv-form{display:grid;gap:1rem;margin-top:1.5rem;background:var(--wh);border-radius:var(--r-sm);padding:1.5rem;box-shadow:0 1px 2px rgba(20,20,20,.06)}
+.sv-form label,.sv-small{display:grid;gap:.35rem;font-size:.82rem;font-weight:600;color:var(--ts)}
+.sv-form small,.sv-small small{font-weight:400;color:var(--tl)}
+.sv-form input,.sv-form select,.sv-form textarea,.sv-q input,.sv-q textarea{width:100%;padding:.65rem .8rem;border:1px solid var(--bd);border-radius:10px;font:inherit;font-size:.92rem;background:#fff;font-weight:400}
+.sv-form .chk,.sv-q .chk{display:flex;align-items:center;gap:.45rem;font-weight:500}
+.sv-form .chk input,.sv-q .chk input{width:auto}
+.sv-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.sv-q{background:var(--wh);border-radius:var(--r-sm);padding:1.1rem 1.25rem;margin-top:.8rem;border-left:3px solid #C9B37E;display:grid;gap:.55rem;box-shadow:0 1px 2px rgba(20,20,20,.06)}
+.sv-q.sec{border-left-color:#141414;background:#F3EEE3}
+.sv-q-head{display:flex;justify-content:space-between;align-items:center}
+.sv-type{font-size:.74rem;font-weight:700;letter-spacing:.04em;color:#A8843F}
+.sv-q.sec .sv-type{color:#141414}
+.sv-q-btns{display:flex;gap:.2rem}
+.sv-q .ic,.sv-texts .ic,.sv-resp .ic{width:28px;height:28px;border-radius:50%;border:0;background:transparent;color:var(--tl);cursor:pointer;font-size:.9rem}
+.sv-q .ic:hover:not([disabled]){background:rgba(20,20,20,.07);color:#141414}
+.sv-q .ic[disabled]{opacity:.25;cursor:default}
+.sv-q .ic.del:hover,.sv-resp .ic.del:hover{background:#FBEDED;color:#A12A2A}
+.sv-q-title{font-weight:600}
+.sv-q-opts{display:flex;gap:1.2rem;align-items:center;flex-wrap:wrap;font-size:.84rem}
+.sv-q-opts label{display:flex;align-items:center;gap:.45rem}
+.sv-q-opts input[type=number]{width:110px}
+.sv-add{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem}
+.sv-add .mn-btn{padding:.5rem 1rem;font-size:.82rem}
+.sv-sums{display:grid;gap:1rem;margin-top:1.25rem}
+.sv-sum{background:var(--wh);border-radius:var(--r-sm);padding:1.2rem 1.4rem;box-shadow:0 1px 2px rgba(20,20,20,.06)}
+.sv-sum h5{margin:0 0 .8rem;font-size:.95rem}
+.sv-sum h5 small{font-weight:400;color:var(--tl);margin-left:.4rem}
+.sv-bar{display:grid;grid-template-columns:minmax(120px,280px) 1fr 36px;gap:.7rem;align-items:center;font-size:.85rem;padding:.2rem 0}
+.sv-bar .b{height:10px;background:rgba(20,20,20,.06);border-radius:99px;overflow:hidden}
+.sv-bar .b i{display:block;height:100%;background:#C9B37E;border-radius:99px}
+.sv-bar .c{text-align:right;font-weight:600}
+.sv-texts{list-style:none;margin:0;padding:0;display:grid;gap:.15rem}
+.sv-texts li{display:flex;gap:.4rem;align-items:flex-start;padding:.45rem .3rem;border-top:1px solid var(--bd);font-size:.88rem;line-height:1.6}
+.sv-texts li:first-child{border-top:0}
+.sv-texts li.pk{background:#FBF4E3}
+.sv-texts li.empty{color:var(--tl)}
+.sv-texts .star{flex:none;color:#ccc;font-size:1rem}
+.sv-texts .star.on{color:#C9A23F}
+.sv-texts small{color:var(--tl)}
+.sv-resps{display:grid;gap:.5rem;margin-top:1rem}
+.sv-resp{background:var(--wh);border-radius:var(--r-sm);padding:.8rem 1.1rem;box-shadow:0 1px 2px rgba(20,20,20,.05)}
+.sv-resp summary{cursor:pointer;display:flex;gap:.6rem;align-items:center;font-size:.88rem}
+.sv-resp summary .ic{margin-left:auto}
+.sv-ra{padding:.6rem 0;border-top:1px solid var(--bd)}
+.sv-ra h6{margin:0 0 .25rem;font-size:.76rem;color:var(--tl)}
+.sv-ra p{margin:0;white-space:pre-wrap;font-size:.9rem;line-height:1.65}
+.sv-toast{position:fixed;left:50%;bottom:2rem;transform:translate(-50%,20px);background:#141414;color:var(--cr);padding:.7rem 1.3rem;border-radius:999px;font-size:.88rem;opacity:0;pointer-events:none;transition:all .25s;z-index:3000}
+.sv-toast.on{opacity:1;transform:translate(-50%,0)}
+@media(max-width:700px){.sv-row{grid-template-columns:1fr}.sv-bar{grid-template-columns:1fr 1fr 30px}}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
   <h2><span class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span><small>ADMIN</small></h2>
@@ -453,8 +516,11 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 </div></div>
 <header class="admin-bar"><span><b class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</b><small>ADMIN</small></span>
 <nav class="tabs" id="tabs">
-  <button data-tab="notes" class="on">회의록</button><button data-tab="apps">신청</button><button data-tab="site">홈페이지</button><button data-tab="schedule">일정</button><button data-tab="speakers">연사</button><button data-tab="fees">사례비</button><button data-tab="actions">Next Action</button><button data-tab="decisions">결정 기록</button><button data-tab="plan">기획 자료</button>
+  <button data-tab="notes" class="on">회의록</button><button data-tab="apps">신청</button><button data-tab="surveys">설문</button><button data-tab="site">홈페이지</button><button data-tab="schedule">일정</button><button data-tab="speakers">연사</button><button data-tab="fees">사례비</button><button data-tab="actions">Next Action</button><button data-tab="decisions">결정 기록</button><button data-tab="plan">기획 자료</button>
 </nav><span class="bar-r"><a href="index.html">← 사이트로</a><a href="#" onclick="logout();return false">로그아웃</a></span></header>
+
+<div class="panel" id="p-surveys"><section class="section"><div class="container" id="v-surveys"><div class="mn-empty">불러오는 중…</div></div></section></div>
+<div class="sv-toast" id="svToast"></div>
 
 <div class="panel" id="p-apps"><section class="section"><div class="container">
   <div class="mn-head"><div><div class="eyebrow">Applications</div><h2 class="title" style="margin:0">참가 신청</h2></div><div class="chips" id="appChips"></div></div>
@@ -623,6 +689,7 @@ async function appCopy(kind){
 async function loadApps(){D.apps=await rpc('otr_app_list');RENDER.apps();}
 async function loadAll(){
   loadSite().catch(e=>{$('hMsg').textContent='설정을 불러오지 못했습니다. ('+e.message+')';});
+  loadSurveys().catch(e=>{const b=$('v-surveys');if(b)b.innerHTML='<div class="mn-empty">설문을 불러오지 못했습니다. ('+esc(e.message)+')</div>';});
   loadApps().catch(e=>{$('v-apps').innerHTML='<tr><td style="padding:2rem;color:var(--tl)">신청 내역을 불러오지 못했습니다. ('+esc(e.message)+')</td></tr>';});
   await Promise.all(Object.keys(T).map(k=>load(k).catch(e=>{
     const el=$('v-'+k);if(el)el.innerHTML='<div class="mn-empty">데이터를 불러오지 못했습니다. ('+esc(e.message)+')</div>';
@@ -811,6 +878,132 @@ const RENDER={
 };
 function logout(){try{localStorage.removeItem('otr_pw')}catch(e){}location.reload();}
 try{const saved=localStorage.getItem('otr_pw')||sessionStorage.getItem('otr_pw');if(saved)login(saved);}catch(e){}
+
+/* ================= 설문 (만들기 · 배포 · 응답) ================= */
+const SQ_TYPES={section:'구분 제목',radio:'객관식 (하나 선택)',checkbox:'체크박스 (여러 개 선택)',short:'단답형',long:'장문형'};
+let svView={mode:'list'},svDraft=null;
+const svUid=()=>Math.random().toString(36).slice(2,9);
+const svLink=id=>(location.protocol.startsWith('http')?location.origin+location.pathname.replace(/[^/]*$/,''):'https://off-record.kr/')+'survey.html?s='+id;
+const svResp=id=>(D.sresp||[]).filter(r=>r.survey_id===id);
+const svFmt=d=>{if(!d)return'마감일 없음';const x=new Date(d);return `${x.getMonth()+1}/${x.getDate()} ${String(x.getHours()).padStart(2,'0')}:${String(x.getMinutes()).padStart(2,'0')} 마감`;};
+const svOpen=s=>s.is_open&&(!s.deadline||new Date(s.deadline)>new Date());
+async function loadSurveys(){
+  const [a,b]=await Promise.all([rpc('otr_list',{tbl:'otr_surveys'}),rpc('otr_list',{tbl:'otr_survey_responses'})]);
+  D.surveys=a||[];D.sresp=b||[];renderSurveys();
+}
+async function svCopy(t,msg){try{await navigator.clipboard.writeText(t);}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();}svToast(msg||'복사했습니다');}
+function svToast(m){const el=$('svToast');el.textContent=m;el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),1800);}
+function svGo(v){svView=v;if(v.mode==='edit'){const s=(D.surveys||[]).find(x=>x.id===v.id);svDraft=s?JSON.parse(JSON.stringify(s)):{title:'',intro:'',salon_no:null,deadline:null,is_open:true,ask_name:false,questions:[]};}renderSurveys();scrollTo(0,0);}
+function renderSurveys(){
+  const box=$('v-surveys');if(!box)return;
+  if(svView.mode==='edit')return svRenderEdit(box);
+  if(svView.mode==='resp')return svRenderResp(box);
+  const L=[...(D.surveys||[])].sort((a,b)=>b.created_at.localeCompare(a.created_at));
+  box.innerHTML=`<div class="mn-head"><div><div class="eyebrow">Surveys</div><h2 class="title" style="margin:0">설문</h2></div><button class="mn-btn" onclick="svGo({mode:'edit',id:null})">+ 새 설문</button></div>
+  <p class="note">설문을 만들고 링크를 복사해 보내면, 응답이 여기에 모입니다. 응답은 익명으로 받고, 이름 칸은 설문마다 켤 수 있습니다.</p>
+  <div class="sv-list">${L.map(s=>{const n=svResp(s.id).length,op=svOpen(s);return `<div class="sv-card">
+    <div class="sv-top"><span class="sv-badge ${op?'on':''}">${op?'응답 받는 중':'마감'}</span>${s.salon_no?`<span class="sv-ses">Session 0${s.salon_no}</span>`:''}<span class="sv-dl">${esc(svFmt(s.deadline))}</span></div>
+    <h4>${esc(s.title)}</h4>
+    <div class="sv-meta"><b>${n}</b>명 응답 · 문항 ${(s.questions||[]).filter(q=>q.type!=='section').length}개</div>
+    <div class="sv-btns"><button class="mn-btn" onclick="svGo({mode:'resp',id:'${s.id}'})">응답 보기</button><button class="mn-btn ghost" onclick="svCopy('${svLink(s.id)}','링크를 복사했습니다')">링크 복사</button><a class="mn-btn ghost" href="survey.html?s=${s.id}" target="_blank">미리보기</a><button class="mn-btn ghost" onclick="svGo({mode:'edit',id:'${s.id}'})">편집</button></div>
+  </div>`;}).join('')||'<div class="mn-empty">아직 설문이 없습니다. \'+ 새 설문\'으로 만들어 보세요.</div>'}</div>`;
+}
+/* ---------- 편집 ---------- */
+function svRenderEdit(box){
+  const s=svDraft,dl=s.deadline?new Date(new Date(s.deadline).getTime()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,16):'';
+  box.innerHTML=`<div class="mn-head"><div><button class="lnk" onclick="svGo({mode:'list'})">← 설문 목록</button><h2 class="title" style="margin:.4rem 0 0">${s.id?'설문 편집':'새 설문'}</h2></div>
+    <div style="display:flex;gap:.5rem">${s.id?`<button class="mn-btn danger" onclick="svDelete()">삭제</button>`:''}<button class="mn-btn" onclick="svSave()">저장</button></div></div>
+  <div class="sv-form">
+    <label>설문 제목 *<input id="sv_title" value="${esc(s.title)}" placeholder="예) 사전 질문 설문지 (1회차 : 강남구 대표)"></label>
+    <label>안내문 <small>(마감일, 좋은 질문 쓰는 법 등. 줄바꿈 그대로 보입니다)</small><textarea id="sv_intro" rows="8">${esc(s.intro||'')}</textarea></label>
+    <div class="sv-row">
+      <label>연결 세션<select id="sv_salon"><option value="">없음</option>${[1,2,3,4].map(n=>`<option value="${n}" ${s.salon_no==n?'selected':''}>Session 0${n}</option>`).join('')}</select></label>
+      <label>마감 일시<input type="datetime-local" id="sv_deadline" value="${dl}"></label>
+    </div>
+    <div class="sv-row">
+      <label class="chk"><input type="checkbox" id="sv_open" ${s.is_open?'checked':''}> 응답 받기 (끄면 바로 마감)</label>
+      <label class="chk"><input type="checkbox" id="sv_name" ${s.ask_name?'checked':''}> 이름 칸 보이기 (선택 입력)</label>
+    </div>
+  </div>
+  <h3 class="sub-h" style="margin-top:2.5rem">문항</h3>
+  <div id="sv_qs">${s.questions.map((q,i)=>svQHtml(q,i)).join('')||'<div class="mn-empty">문항이 없습니다. 아래에서 추가하세요.</div>'}</div>
+  <div class="sv-add">${Object.entries(SQ_TYPES).map(([k,l])=>`<button class="mn-btn ghost" onclick="svAddQ('${k}')">+ ${l}</button>`).join('')}</div>`;
+}
+function svQHtml(q,i){
+  const n=svDraft.questions.length,isSec=q.type==='section',hasOpt=q.type==='radio'||q.type==='checkbox';
+  return `<div class="sv-q ${isSec?'sec':''}" data-i="${i}">
+    <div class="sv-q-head"><span class="sv-type">${SQ_TYPES[q.type]}</span>
+      <span class="sv-q-btns"><button class="ic" title="위로" ${i===0?'disabled':''} onclick="svMoveQ(${i},-1)">↑</button><button class="ic" title="아래로" ${i===n-1?'disabled':''} onclick="svMoveQ(${i},1)">↓</button><button class="ic del" title="문항 삭제" onclick="svDelQ(${i})">✕</button></span></div>
+    <input class="sv-q-title" placeholder="${isSec?'예) PART 1. 리딩북 확인':'질문을 입력하세요'}" value="${esc(q.title)}" oninput="svDraft.questions[${i}].title=this.value">
+    <textarea class="sv-q-desc" rows="2" placeholder="설명 (선택)" oninput="svDraft.questions[${i}].desc=this.value">${esc(q.desc||'')}</textarea>
+    ${hasOpt?`<label class="sv-small">보기 <small>(한 줄에 하나씩)</small><textarea rows="${Math.max(3,(q.options||[]).length+1)}" oninput="svDraft.questions[${i}].options=this.value.split('\\n').map(x=>x.trim()).filter(Boolean)">${esc((q.options||[]).join('\n'))}</textarea></label>`:''}
+    ${!isSec?`<div class="sv-q-opts"><label class="chk"><input type="checkbox" ${q.required?'checked':''} onchange="svDraft.questions[${i}].required=this.checked"> 필수</label>
+      ${q.type==='checkbox'?`<label>최대 선택 <input type="number" min="0" value="${q.max||''}" placeholder="제한 없음" oninput="svDraft.questions[${i}].max=Number(this.value)||null"></label>`:''}
+      ${q.type==='short'||q.type==='long'?`<label>글자 수 제한 <input type="number" min="0" value="${q.limit||''}" placeholder="제한 없음" oninput="svDraft.questions[${i}].limit=Number(this.value)||null"></label>`:''}
+      ${q.type==='short'||q.type==='long'?`<label class="chk"><input type="checkbox" ${q.curate?'checked':''} onchange="svDraft.questions[${i}].curate=this.checked"> 연사 전달용 질문</label>`:''}</div>`:''}
+  </div>`;
+}
+function svSyncHead(){const s=svDraft;s.title=$('sv_title').value.trim();s.intro=$('sv_intro').value;s.salon_no=Number($('sv_salon').value)||null;const d=$('sv_deadline').value;s.deadline=d?new Date(d).toISOString():null;s.is_open=$('sv_open').checked;s.ask_name=$('sv_name').checked;}
+function svAddQ(t){svSyncHead();svDraft.questions.push({id:svUid(),type:t,title:'',desc:'',required:t!=='section',options:t==='radio'||t==='checkbox'?['보기 1','보기 2']:undefined});renderSurveys();const qs=document.querySelectorAll('.sv-q');qs[qs.length-1].scrollIntoView({behavior:'smooth',block:'center'});}
+function svMoveQ(i,d){svSyncHead();const a=svDraft.questions;[a[i],a[i+d]]=[a[i+d],a[i]];renderSurveys();}
+function svDelQ(i){if(!confirm('이 문항을 삭제할까요?'))return;svSyncHead();svDraft.questions.splice(i,1);renderSurveys();}
+async function svSave(){
+  svSyncHead();const s=svDraft;
+  if(!s.title)return alert('설문 제목을 입력해 주세요.');
+  if(s.questions.some(q=>q.type!=='section'&&!q.title.trim()))return alert('제목이 비어 있는 문항이 있습니다.');
+  if(s.questions.some(q=>(q.type==='radio'||q.type==='checkbox')&&!(q.options||[]).length))return alert('보기가 없는 객관식·체크박스 문항이 있습니다.');
+  const row={title:s.title,intro:s.intro,salon_no:s.salon_no,deadline:s.deadline,is_open:s.is_open,ask_name:s.ask_name,questions:s.questions};if(s.id)row.id=s.id;
+  try{const id=await rpc('otr_save',{tbl:'otr_surveys',row_data:row});await loadSurveys();svToast('저장했습니다');svGo({mode:'edit',id:id||s.id});}catch(e){alert('저장 실패: '+e.message);}
+}
+async function svDelete(){
+  const n=svResp(svDraft.id).length;
+  if(!confirm(`이 설문을 삭제할까요?${n?`\n응답 ${n}건도 함께 삭제되며 되돌릴 수 없습니다.`:''}`))return;
+  try{await rpc('otr_delete',{tbl:'otr_surveys',rid:svDraft.id});await loadSurveys();svGo({mode:'list'});}catch(e){alert('삭제 실패: '+e.message);}
+}
+/* ---------- 응답 ---------- */
+function svAns(v){return Array.isArray(v)?v.join(', '):(v==null?'':String(v));}
+function svRenderResp(box){
+  const s=(D.surveys||[]).find(x=>x.id===svView.id);if(!s){svGo({mode:'list'});return;}
+  const R=svResp(s.id).sort((a,b)=>b.created_at.localeCompare(a.created_at));
+  const Q=(s.questions||[]).filter(q=>q.type!=='section');
+  const sum=Q.map(q=>{
+    const vals=R.map(r=>(r.answers||{})[q.id]).filter(v=>v!=null&&v!==''&&!(Array.isArray(v)&&!v.length));
+    if(q.type==='radio'||q.type==='checkbox'){
+      const cnt={};(q.options||[]).forEach(o=>cnt[o]=0);vals.forEach(v=>(Array.isArray(v)?v:[v]).forEach(x=>cnt[x]=(cnt[x]||0)+1));
+      const mx=Math.max(1,...Object.values(cnt));
+      return `<div class="sv-sum"><h5>${esc(q.title)} <small>${vals.length}명 응답</small></h5>${Object.entries(cnt).map(([o,c])=>`<div class="sv-bar"><span class="t">${esc(o)}</span><span class="b"><i style="width:${c/mx*100}%"></i></span><span class="c">${c}</span></div>`).join('')}</div>`;
+    }
+    return `<div class="sv-sum"><h5>${esc(q.title)} <small>${vals.length}명 응답${q.curate?' · 연사 전달용':''}</small></h5>
+      <ul class="sv-texts">${R.filter(r=>svAns((r.answers||{})[q.id]).trim()).map(r=>{const k=q.id,on=!!(r.picked||{})[k];return `<li class="${on?'pk':''}"><button class="ic star ${on?'on':''}" title="${on?'전달 목록에서 빼기':'연사 전달 목록에 넣기'}" onclick="svPick('${r.id}','${k}')">★</button><span>${esc(svAns(r.answers[k]))}${s.ask_name&&r.name?` <small>— ${esc(r.name)}</small>`:''}</span></li>`;}).join('')||'<li class="empty">응답 없음</li>'}</ul></div>`;
+  }).join('');
+  const picked=R.reduce((n,r)=>n+Object.values(r.picked||{}).filter(Boolean).length,0);
+  box.innerHTML=`<div class="mn-head"><div><button class="lnk" onclick="svGo({mode:'list'})">← 설문 목록</button><h2 class="title" style="margin:.4rem 0 0">${esc(s.title)}</h2></div>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap"><button class="mn-btn ghost" onclick="svCopy('${svLink(s.id)}','링크를 복사했습니다')">링크 복사</button><button class="mn-btn ghost" onclick="svCsv('${s.id}')">CSV ↓</button><button class="mn-btn" onclick="svCopyPicked('${s.id}')">★ 전달 질문 복사 (${picked})</button></div></div>
+  <p class="note">${svOpen(s)?'응답 받는 중':'마감'} · ${esc(svFmt(s.deadline))} · 총 <b>${R.length}</b>명 응답. 주관식 답변 옆 ★을 누르면 연사 전달 목록에 담깁니다.</p>
+  <div class="sv-sums">${sum||'<div class="mn-empty">문항이 없습니다.</div>'}</div>
+  <h3 class="sub-h" style="margin-top:2.5rem">응답별 보기</h3>
+  <div class="sv-resps">${R.map((r,i)=>`<details class="sv-resp"><summary><b>#${R.length-i}</b> ${r.created_at.slice(5,16).replace('T',' ').replace('-','/')}${r.name?` · ${esc(r.name)}`:''}<button class="ic del" title="응답 삭제" onclick="event.preventDefault();svDelResp('${r.id}')">✕</button></summary>
+    ${Q.map(q=>`<div class="sv-ra"><h6>${esc(q.title)}</h6><p>${esc(svAns((r.answers||{})[q.id]))||'<span style="color:var(--tl)">—</span>'}</p></div>`).join('')}</details>`).join('')||'<div class="mn-empty">아직 응답이 없습니다.</div>'}</div>`;
+}
+async function svPick(rid,k){
+  const r=(D.sresp||[]).find(x=>x.id===rid);if(!r)return;
+  const picked={...(r.picked||{})};picked[k]=!picked[k];if(!picked[k])delete picked[k];
+  try{await rpc('otr_save',{tbl:'otr_survey_responses',row_data:{id:r.id,picked}});r.picked=picked;renderSurveys();}catch(e){alert('저장 실패: '+e.message);}
+}
+function svCopyPicked(sid){
+  const s=D.surveys.find(x=>x.id===sid);const R=svResp(sid);const out=[];
+  (s.questions||[]).filter(q=>q.type==='short'||q.type==='long').forEach(q=>{const L=R.filter(r=>(r.picked||{})[q.id]).map(r=>'- '+svAns(r.answers[q.id]));if(L.length)out.push(`[${q.title}]\n`+L.join('\n'));});
+  if(!out.length)return alert('★로 고른 질문이 없습니다.');
+  svCopy(out.join('\n\n'),'전달 질문을 복사했습니다');
+}
+function svCsv(sid){
+  const s=D.surveys.find(x=>x.id===sid);const Q=(s.questions||[]).filter(q=>q.type!=='section');const R=svResp(sid);
+  const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+  const rows=[['응답 시각',...(s.ask_name?['이름']:[]),...Q.map(x=>x.title)],...R.map(r=>[r.created_at.slice(0,16).replace('T',' '),...(s.ask_name?[r.name||'']:[]),...Q.map(x=>svAns((r.answers||{})[x.id]))])];
+  const blob=new Blob(['\uFEFF'+rows.map(r=>r.map(q).join(',')).join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(s.title||'설문')+'_응답.csv';a.click();
+}
+async function svDelResp(rid){if(!confirm('이 응답을 삭제할까요? 되돌릴 수 없습니다.'))return;try{await rpc('otr_delete',{tbl:'otr_survey_responses',rid});await loadSurveys();}catch(e){alert('삭제 실패: '+e.message);}}
 </script>
 
 </body></html>
