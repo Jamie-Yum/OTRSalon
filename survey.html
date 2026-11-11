@@ -63,6 +63,9 @@ body{font-family:Pretendard,sans-serif;background:var(--bg);color:var(--dk);line
 .st.on i{border-color:var(--dk);background:var(--dk);box-shadow:inset 0 0 0 4px #fff}
 .st.on span{color:var(--dk);font-weight:600}
 @media(max-width:480px){.st{font-size:.76rem}}
+.opts.two{grid-template-columns:1fr 1fr}
+.opts.two .opt{align-items:center;padding:.65rem .75rem;font-size:.9rem}
+.opts.two .opt input{margin-top:0}
 </style></head><body>
 <div class="top"><a href="index.html">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</a></div>
 <main class="wrap" id="app"><div class="msg"><p>설문을 불러오는 중…</p></div></main>
@@ -98,7 +101,7 @@ function render(){
       const t=q.type==='radio'?'radio':'checkbox';
       if(q.type==='checkbox'&&q.max)h+=`<div class="d">최대 ${q.max}개까지 고를 수 있습니다.</div>`;
       if(q.type==='radio'&&q.scale)h+=`<div class="scale" style="--n:${(q.options||[]).length}">${(q.options||[]).map((o,k)=>`<label class="st"><input type="radio" name="${q.id}" value="${esc(o)}"><i></i><span>${esc(o)}</span></label>`).join('')}</div>`;
-      else h+=`<div class="opts">${(q.options||[]).map(o=>`<label class="opt"><input type="${t}" name="${q.id}" value="${esc(o)}"><span>${esc(o)}</span></label>`).join('')}</div>`;
+      else h+=`<div class="opts${Math.max(0,...(q.options||[]).map(o=>o.length))<=20?' two':''}">${(q.options||[]).map(o=>`<label class="opt"><input type="${t}" name="${q.id}" value="${esc(o)}"><span>${esc(o)}</span></label>`).join('')}</div>`;
     }else if(q.type==='short'){h+=`<input type="text" name="${q.id}" ${q.limit?`maxlength="${q.limit}"`:''} placeholder="답변을 입력하세요">`;}
     else{h+=`<textarea name="${q.id}" ${q.limit?`maxlength="${q.limit}"`:''} placeholder="답변을 입력하세요"></textarea>${q.limit?`<div class="cnt"><span>0</span> / ${q.limit}자</div>`:''}`;}
     h+=`<div class="emsg">응답이 필요한 문항입니다.</div></div>`;
