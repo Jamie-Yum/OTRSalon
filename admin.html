@@ -1103,7 +1103,7 @@ const RENDER={
   actions(){
     const t=today(),soon=new Date(Date.now()+3*864e5).toISOString().slice(0,10);
     const A=D.actions.filter(inS),ev=D.schedule?D.schedule.filter(inS).map(r=>r.event_date).filter(Boolean).sort():[];
-    const dn=a=>{if(!a.deadline)return '';const e=ev.find(x=>x>=a.deadline);if(!e)return '사후';const n=Math.round((new Date(e)-new Date(a.deadline))/864e5);return n?'D-'+n:'D-day';};
+    const dn=a=>{if(!a.deadline)return '';if(a.category==='사후')return '사후';const pv=ev.filter(x=>x<a.deadline).pop();if(pv&&(new Date(a.deadline)-new Date(pv))/864e5<=30)return '사후';const e=ev.find(x=>x>=a.deadline);if(!e)return '사후';const n=Math.round((new Date(e)-new Date(a.deadline))/864e5);return n?'D-'+n:'D-day';};
     const ownersOf=a=>(a.owner||'').split(/[·,]/).map(x=>x.trim()).filter(Boolean);
     const owners=[...new Set([...OWNERS.filter(o=>o!=='TF 전체'),...A.flatMap(ownersOf)])];
     const M=actMode;
