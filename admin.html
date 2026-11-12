@@ -690,12 +690,12 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 
 <div class="panel on" id="p-notes"><section class="section"><div class="container">
   <div class="eyebrow">TF Records</div><h2 class="title" style="margin:0 0 1.2rem">운영 기록</h2>
-  <nav class="rec-nav" id="recNav"><button data-sub="notes" class="on" onclick="recSub('notes')">회의록</button><button data-sub="actions" class="" onclick="recSub('actions')">할 일</button><button data-sub="ops" class="" onclick="recSub('ops')">현장 운영</button><button data-sub="decisions" class="" onclick="recSub('decisions')">결정 기록</button><button data-sub="plan" class="" onclick="recSub('plan')">기획 자료</button></nav>
-<div class="rec-sub on" id="sub-notes">
+  <nav class="rec-nav" id="recNav"><button data-sub="actions" class="on" onclick="recSub('actions')">할 일</button><button data-sub="ops" class="" onclick="recSub('ops')">현장 운영</button><button data-sub="decisions" class="" onclick="recSub('decisions')">결정 기록</button><button data-sub="plan" class="" onclick="recSub('plan')">기획 자료</button><button data-sub="notes" onclick="recSub('notes')">회의록</button></nav>
+<div class="rec-sub" id="sub-notes">
   <div class="mn-head"><div><h3 class="rec-h">회의록</h3></div><button class="mn-btn" onclick="edit('notes')">+ 새 회의록</button></div>
   <div class="mn-list" id="v-notes"><div class="mn-empty">불러오는 중…</div></div>
 </div>
-<div class="rec-sub" id="sub-actions">
+<div class="rec-sub on" id="sub-actions">
   <div class="mn-head"><div><h3 class="rec-h">할 일</h3></div><button class="mn-btn" onclick="edit('actions')">+ 할 일 추가</button></div>
   <div class="act-bar" id="actBar"></div>
   <div id="v-actions"></div>
@@ -930,7 +930,7 @@ document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{
   try{sessionStorage.setItem('otr_tab',b.dataset.tab)}catch(e){}
   scrollTo(0,0);
 });
-try{let t=sessionStorage.getItem('otr_tab');if(t==='schedule')t='speakers';if(['actions','decisions','plan'].includes(t)){recSub(t);t='notes';}else recSub(sessionStorage.getItem('otr_sub')||'notes');if(t)document.querySelector(`#tabs [data-tab="${t}"]`)?.click();}catch(e){}
+try{let t=sessionStorage.getItem('otr_tab');if(t==='schedule')t='speakers';if(['actions','decisions','plan'].includes(t)){recSub(t);t='notes';}else recSub(sessionStorage.getItem('otr_sub')||'actions');if(t)document.querySelector(`#tabs [data-tab="${t}"]`)?.click();}catch(e){}
 
 /* 공통 편집 모달 */
 function field(f,v){
