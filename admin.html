@@ -630,6 +630,8 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .ck-tbl input{accent-color:#2F7A3A}
 .ck-r{cursor:pointer;min-width:220px;white-space:pre-wrap}
 @media(max-width:700px){.ms{grid-template-columns:20px 1fr auto}.ms-p,.ms-o{display:none}}
+.own{display:inline-block;color:var(--oc);background:color-mix(in srgb,var(--oc) 11%,#fff);border:1px solid color-mix(in srgb,var(--oc) 35%,#fff);border-radius:999px;padding:.02rem .5rem;font-size:.8em;font-weight:700;line-height:1.5;white-space:nowrap;margin:.05rem 0}
+.owner-card h4 .own{font-size:.9em}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
   <h2><span class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span><small>ADMIN</small></h2>
@@ -752,6 +754,10 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 const SU='https://dvlrzbckneucpvlacdll.supabase.co';
 const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE';
 const OWNERS=['신다혜','조영주','염제명','김나라','위현민','김덕환','윤혜준','배강우','TF 전체'];
+const OWN_COLORS=['#B0473D','#3D6FB0','#2F7A3A','#8A4FB0','#C07A12','#1E8A86','#B0477E','#5A6B2A'];
+const ownC=n=>{const i=OWNERS.indexOf(n);if(i>=0&&i<OWN_COLORS.length)return OWN_COLORS[i];let h=0;for(const c of n)h=(h*31+c.charCodeAt(0))>>>0;return `hsl(${h%360} 40% 40%)`;};
+const ownRe=()=>new RegExp('('+OWNERS.filter(o=>o!=='TF 전체').join('|')+')','g');
+const own=t=>t?esc(t).replace(ownRe(),m=>`<span class="own" style="--oc:${ownC(m)}">${m}</span>`):'';
 const ACT_CATS=['참가자','안내 문자','연사','F&B','공간·제작물','당일 운영','사후','기타'];
 const ACT_STATUS=['미착수','진행 중','완료','보류'];
 const MSG_STATUS=['작성 중','승인','발송 완료'];
@@ -1041,7 +1047,7 @@ const RENDER={
   notes(){
     const L=[...D.notes].sort((a,b)=>b.meeting_date.localeCompare(a.meeting_date));
     $('v-notes').innerHTML=L.length?L.map(n=>`<div class="mn-item">
-      <div class="mn-sum" onclick="this.parentElement.classList.toggle('open')"><span class="mn-date">${n.meeting_date}</span><span class="mn-title">${esc(n.title)}</span><span class="mn-att">${esc(n.attendees)}</span></div>
+      <div class="mn-sum" onclick="this.parentElement.classList.toggle('open')"><span class="mn-date">${n.meeting_date}</span><span class="mn-title">${esc(n.title)}</span><span class="mn-att">${own(n.attendees)}</span></div>
       <div class="mn-body">
         ${n.content?`<h5>회의 내용</h5><pre>${esc(n.content)}</pre>`:''}
         ${n.decisions?`<h5>결정 사항 / NEXT ACTION</h5><pre class="mn-dec">${esc(n.decisions)}</pre>`:''}
@@ -1114,7 +1120,7 @@ const RENDER={
       $('v-actions').innerHTML=`<div class="owner-grid">${owners.filter(o=>!M.who||o===M.who).map(o=>{
         const X=L.filter(a=>ownersOf(a).includes(o)).sort((a,b)=>(a.status==='완료')-(b.status==='완료')||ord(a,b));
         if(!X.length&&M.who!==o)return '';
-        return `<div class="owner-card"><h4>${esc(o)} <small style="color:var(--tl);font-weight:500">· 남은 일 ${X.filter(a=>a.status!=='완료').length}건</small></h4>${X.map(a=>`<div class="act ${a.status==='완료'?'done':''}"><input type="checkbox" ${a.status==='완료'?'checked':''} onchange="quick('actions','${a.id}',{status:this.checked?'완료':'진행 중'})">
+        return `<div class="owner-card"><h4><span class="own" style="--oc:${ownC(o)}">${esc(o)}</span> <small style="color:var(--tl);font-weight:500">· 남은 일 ${X.filter(a=>a.status!=='완료').length}건</small></h4>${X.map(a=>`<div class="act ${a.status==='완료'?'done':''}"><input type="checkbox" ${a.status==='완료'?'checked':''} onchange="quick('actions','${a.id}',{status:this.checked?'완료':'진행 중'})">
           <span onclick="edit('actions','${a.id}')">${esc(a.action)}${a.category?` <small class="acat">${esc(a.category)}</small>`:''}${a.status==='보류'?' <small style="color:var(--tl)">(보류)</small>':''}</span>
           <em class="dl ${dCls(a)}" style="font-style:normal">${dTxt(a)}</em></div>`).join('')||'<p style="font-size:.85rem;color:var(--tl)">할 일 없음</p>'}
           <button class="lnk" style="margin-top:.5rem" onclick="edit('actions',null,{owner:'${esc(o)}'})">+ 추가</button></div>`}).join('')}</div>`;
@@ -1128,7 +1134,7 @@ const RENDER={
       ${X.length?`<table class="tbl act-tbl"><thead><tr><th>날짜</th><th>D-n</th><th>할 일</th><th>담당</th><th>지원 / 승인</th><th>상태</th></tr></thead><tbody>${X.map(a=>`<tr class="${a.status==='완료'?'done':''}">
         <td class="nw"><span class="dl ${dCls(a)}">${dTxt(a)}${dCls(a)==='over'?' 지남':''}</span></td><td class="nw"><span class="dn">${dn(a)}</span></td>
         <td><span class="act-t" onclick="edit('actions','${a.id}')">${esc(a.action)}</span>${a.memo?`<small class="act-m">${esc(a.memo)}</small>`:''}</td>
-        <td class="nw">${esc(a.owner)}</td><td class="nw" style="color:var(--ts)">${esc(a.support)||'—'}</td><td class="nw">${stSel(a)}</td></tr>`).join('')}</tbody></table>`:'<p class="note" style="margin:.4rem 0 0">표시할 할 일이 없습니다.</p>'}</div>`}).join('')||empty('할 일이 없습니다.');
+        <td class="nw">${own(a.owner)}</td><td class="nw" style="color:var(--ts)">${own(a.support)||'—'}</td><td class="nw">${stSel(a)}</td></tr>`).join('')}</tbody></table>`:'<p class="note" style="margin:.4rem 0 0">표시할 할 일이 없습니다.</p>'}</div>`}).join('')||empty('할 일이 없습니다.');
   },
   milestones(){
     const t=today(),L=D.milestones.filter(inS).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)||(a.start_date||'').localeCompare(b.start_date||''));
@@ -1153,7 +1159,7 @@ const RENDER={
   checklist(){
     const L=D.checklist.filter(inS).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
     const row=(r,last)=>`<tr class="${r.done?'done':''}"><td class="nw"><input type="checkbox" ${r.done?'checked':''} onchange="quick('checklist','${r.id}',{done:this.checked})"></td><td class="nw"><b>${esc(r.slot)}</b></td>
-      <td><span class="act-t" onclick="edit('checklist','${r.id}')">${esc(r.item)}</span></td><td class="nw">${esc(r.owner)}</td>${last?`<td class="ck-r" onclick="edit('checklist','${r.id}')">${r.result?esc(r.result):'<span style="color:var(--tl)">+ 기록</span>'}</td>`:''}</tr>`;
+      <td><span class="act-t" onclick="edit('checklist','${r.id}')">${esc(r.item)}</span></td><td class="nw">${own(r.owner)}</td>${last?`<td class="ck-r" onclick="edit('checklist','${r.id}')">${r.result?esc(r.result):'<span style="color:var(--tl)">+ 기록</span>'}</td>`:''}</tr>`;
     const V=L.filter(r=>r.kind==='답사'),R=L.filter(r=>r.kind==='당일');
     $('v-visit').innerHTML=`<thead><tr><th style="width:34px"></th><th>카테고리</th><th>확인할 내용</th><th>담당</th><th>현장 결정 / 후속 조치</th></tr></thead><tbody>${V.map(r=>row(r,1)).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--tl);padding:2rem">항목이 없습니다.</td></tr>'}</tbody>`;
     $('v-runsheet').innerHTML=`<thead><tr><th style="width:34px"></th><th>시각</th><th>실행 내용</th><th>담당</th></tr></thead><tbody>${R.map(r=>row(r,0)).join('')||'<tr><td colspan="4" style="text-align:center;color:var(--tl);padding:2rem">항목이 없습니다.</td></tr>'}</tbody>`;
