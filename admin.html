@@ -589,6 +589,47 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .rec-nav button.on{color:var(--dk);border-bottom-color:var(--dk)}
 .rec-sub{display:none}.rec-sub.on{display:block}
 .rec-h{font-size:1.25rem;font-weight:700;margin:0}
+/* 할 일 · 준비 일정 · 안내 문자 · 현장 운영 */
+.act-bar{display:flex;flex-wrap:wrap;gap:.8rem;align-items:center;margin:0 0 1.2rem}
+.act-bar select{font:inherit;font-size:.85rem;padding:.4rem .6rem;border:1px solid var(--bd);border-radius:6px;background:#fff}
+.act-bar .chk{font-size:.85rem;display:flex;gap:.35rem;align-items:center}
+.acat-box{background:var(--wh);border-radius:var(--r-sm);box-shadow:0 1px 2px rgba(20,20,20,.06),0 6px 18px rgba(20,20,20,.04);padding:1rem 1.2rem;margin-bottom:1rem}
+.acat-h{display:flex;align-items:center;gap:.8rem;margin-bottom:.4rem}
+.acat-h b{font-size:1rem}.acat-h span{font-size:.78rem;color:var(--tl)}
+.acat-h i{flex:1;max-width:160px;height:5px;border-radius:3px;background:linear-gradient(90deg,#2F7A3A var(--p),rgba(20,20,20,.08) var(--p))}
+.acat-h .lnk{margin-left:auto}
+.act-tbl{font-size:.86rem}.act-tbl th{font-size:.74rem;padding:.45rem .6rem}.act-tbl td{padding:.5rem .6rem;vertical-align:middle}
+.act-tbl tr.done td{opacity:.45}.act-tbl tr.done .act-t{text-decoration:line-through}
+.act-t{cursor:pointer}.act-t:hover{text-decoration:underline}
+.act-m{display:block;font-size:.76rem;color:var(--tl)}
+.acat{font-size:.7rem;color:var(--tl);border:1px solid var(--bd);border-radius:4px;padding:0 .3rem;margin-left:.2rem}
+.dn{font-size:.74rem;font-weight:700;color:var(--ts);font-variant-numeric:tabular-nums}
+.ast{appearance:none;font:inherit;font-size:.78rem;font-weight:600;padding:.25rem .6rem;border-radius:5px;border:1.5px solid var(--sc);color:var(--sc);background:#fff;cursor:pointer}
+.ast.s0{--sc:#8A8A8A}.ast.s1{--sc:#3D6FB0}.ast.s2{--sc:#2F7A3A}.ast.s3{--sc:#B07A1E}
+.ms-list{display:flex;flex-direction:column;gap:.4rem}
+.ms{display:grid;grid-template-columns:20px 6.5rem 1fr auto 4.2rem;gap:.8rem;align-items:center;background:var(--wh);border-radius:10px;padding:.7rem 1rem;border-left:4px solid var(--sc);box-shadow:0 1px 2px rgba(20,20,20,.05)}
+.ms.s0{--sc:#C9C9C9}.ms.s1{--sc:#3D6FB0}.ms.s2{--sc:#2F7A3A}.ms.s4{--sc:#B0473D}
+.ms input{accent-color:#2F7A3A}
+.ms-p{font-size:.82rem;font-weight:700;font-variant-numeric:tabular-nums}
+.ms-b{cursor:pointer;min-width:0}.ms-b b{display:block;font-size:.92rem}.ms-b small{font-size:.76rem;color:var(--tl)}
+.ms-o{font-size:.8rem;color:var(--ts);white-space:nowrap}
+.ms-s{font-size:.74rem;font-weight:700;color:var(--sc);text-align:right}
+.ms.s0 .ms-s{color:var(--tl)}.ms.s2 .ms-b{opacity:.55}
+.msg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;margin-top:1rem}
+.msg{background:var(--wh);border-radius:var(--r-sm);padding:1rem 1.1rem;box-shadow:0 1px 2px rgba(20,20,20,.06),0 6px 18px rgba(20,20,20,.04);border-top:3px solid var(--sc);display:flex;flex-direction:column}
+.msg.m0{--sc:#8A8A8A}.msg.m1{--sc:#3D6FB0}.msg.m2{--sc:#2F7A3A}
+.msg-h{display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+.msg-st{font-size:.72rem;font-weight:700;color:var(--sc);border:1.5px solid var(--sc);border-radius:5px;padding:.05rem .45rem;white-space:nowrap}
+.msg-t{font-size:.78rem;color:var(--tl);margin:.2rem 0 .6rem}
+.msg-b{white-space:pre-wrap;font:inherit;font-size:.84rem;line-height:1.6;background:var(--bg);border-radius:8px;padding:.7rem .8rem;margin:0;flex:1}
+.msg-b.empty{color:var(--tl)}
+.msg-f{font-size:.78rem;color:#8A5A12;background:#FBF3E2;border-radius:6px;padding:.45rem .6rem;margin:.6rem 0 0}
+.msg-foot{display:flex;gap:.7rem;align-items:center;margin-top:.7rem;font-size:.78rem;color:var(--ts)}
+.msg-foot span{margin-right:auto}
+.ck-tbl tr.done td{opacity:.45}
+.ck-tbl input{accent-color:#2F7A3A}
+.ck-r{cursor:pointer;min-width:220px;white-space:pre-wrap}
+@media(max-width:700px){.ms{grid-template-columns:20px 1fr auto}.ms-p,.ms-o{display:none}}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
   <h2><span class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span><small>ADMIN</small></h2>
@@ -614,6 +655,9 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
     <button class="lnk" style="color:var(--tl)" onclick="appSel.clear();RENDER.apps()">선택 해제</button>
     <span id="selMsg"></span></div>
   <div class="tbl-wrap"><table class="tbl" id="v-apps"></table></div>
+  <div class="mn-head" style="margin-top:3.5rem"><div><div class="eyebrow">Messages</div><h2 class="title" style="margin:0">안내 문자</h2></div><button class="mn-btn" onclick="edit('messages')">+ 문자 추가</button></div>
+  <p class="note">참가자 대상 발송은 승인자 컨펌 후 실행합니다. [ ] 부분은 확정 후 기입하세요.</p>
+  <div class="msg-grid" id="v-messages"></div>
 </div></section></div>
 
 <div class="panel" id="p-site"><section class="section"><div class="container">
@@ -646,14 +690,23 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 
 <div class="panel on" id="p-notes"><section class="section"><div class="container">
   <div class="eyebrow">TF Records</div><h2 class="title" style="margin:0 0 1.2rem">운영 기록</h2>
-  <nav class="rec-nav" id="recNav"><button data-sub="notes" class="on" onclick="recSub('notes')">회의록</button><button data-sub="actions" class="" onclick="recSub('actions')">Next Action</button><button data-sub="decisions" class="" onclick="recSub('decisions')">결정 기록</button><button data-sub="plan" class="" onclick="recSub('plan')">기획 자료</button></nav>
+  <nav class="rec-nav" id="recNav"><button data-sub="notes" class="on" onclick="recSub('notes')">회의록</button><button data-sub="actions" class="" onclick="recSub('actions')">할 일</button><button data-sub="ops" class="" onclick="recSub('ops')">현장 운영</button><button data-sub="decisions" class="" onclick="recSub('decisions')">결정 기록</button><button data-sub="plan" class="" onclick="recSub('plan')">기획 자료</button></nav>
 <div class="rec-sub on" id="sub-notes">
   <div class="mn-head"><div><h3 class="rec-h">회의록</h3></div><button class="mn-btn" onclick="edit('notes')">+ 새 회의록</button></div>
   <div class="mn-list" id="v-notes"><div class="mn-empty">불러오는 중…</div></div>
 </div>
 <div class="rec-sub" id="sub-actions">
-  <div class="mn-head"><div><h3 class="rec-h">담당자별 Next Action</h3></div><button class="mn-btn" onclick="edit('actions')">+ 할 일 추가</button></div>
-  <div class="owner-grid" id="v-actions"></div>
+  <div class="mn-head"><div><h3 class="rec-h">할 일</h3></div><button class="mn-btn" onclick="edit('actions')">+ 할 일 추가</button></div>
+  <div class="act-bar" id="actBar"></div>
+  <div id="v-actions"></div>
+</div>
+<div class="rec-sub" id="sub-ops">
+  <div class="mn-head"><div><h3 class="rec-h">현장답사</h3></div><button class="mn-btn" onclick="edit('checklist',null,{kind:'답사'})">+ 항목 추가</button></div>
+  <p class="note">답사 당일 결정 사항을 '현장 결정 / 후속 조치'에 기록합니다. 제작물 규격은 답사 후 확정.</p>
+  <div class="tbl-wrap"><table class="tbl ck-tbl" id="v-visit"></table></div>
+  <div class="mn-head" style="margin-top:2.5rem"><div><h3 class="rec-h">당일 운영 타임라인</h3></div><button class="mn-btn" onclick="edit('checklist',null,{kind:'당일'})">+ 항목 추가</button></div>
+  <div class="tbl-wrap"><table class="tbl ck-tbl" id="v-runsheet"></table></div>
+  <div id="v-checklist"></div>
 </div>
 <div class="rec-sub" id="sub-decisions">
   <div class="mn-head"><div><h3 class="rec-h">결정 기록</h3></div><button class="mn-btn" onclick="edit('decisions')">+ 결정 추가</button></div>
@@ -671,6 +724,8 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
   <div class="mn-head"><div><div class="eyebrow">Schedule</div><h2 class="title" style="margin:0">회차 일정</h2></div><button class="mn-btn" onclick="edit('schedule')">+ 회차 추가</button></div>
   <p class="note">여기서 바꾼 내용이 홈페이지 일정 섹션에 바로 반영됩니다. 담당 Host·내부 메모는 홈페이지에 노출되지 않습니다. 날짜가 지난 회차는 홈페이지에서 자동으로 '종료'로 표시됩니다.</p>
   <div class="tbl-wrap"><table class="tbl" id="v-schedule"></table></div>
+  <div class="mn-head" style="margin-top:2.5rem"><h3 class="bd-h" style="margin:0">준비 일정 <small>핵심 마일스톤 · 세부 업무는 운영 기록 › 할 일</small></h3><button class="mn-btn ghost" onclick="edit('milestones')">+ 일정 추가</button></div>
+  <div class="ms-list" id="v-milestones"></div>
   <div class="mn-head" style="margin-top:3.5rem"><div><div class="eyebrow">Speakers</div><h2 class="title" style="margin:0">연사 섭외 현황</h2></div><button class="mn-btn" onclick="edit('speakers')">+ 연사 추가</button></div>
   <div class="kanban" id="v-kanban"></div>
   <h3 class="sub-h">연사 리스트</h3>
@@ -696,12 +751,15 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 <script>
 const SU='https://dvlrzbckneucpvlacdll.supabase.co';
 const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE';
-const OWNERS=['신다혜','조영주','염제명','위현민','TF 전체'];
+const OWNERS=['신다혜','조영주','염제명','김나라','위현민','김덕환','윤혜준','배강우','TF 전체'];
+const ACT_CATS=['참가자','안내 문자','연사','F&B','공간·제작물','당일 운영','사후','기타'];
+const ACT_STATUS=['미착수','진행 중','완료','보류'];
+const MSG_STATUS=['작성 중','승인','발송 완료'];
 const SP_STATUS=['후보','컨택 중','확정','보류','거절'];
 const CATS=['TIME','PRICE','INVITATION','SPEAKER','사례비','운영','기타'];
 const SCH_STATUS=['모집 중','예정','마감','종료'];
 const EXP_CATS=['사례비','장소','식음','기념품·인쇄','기타'];
-const SEASON_KEYS=['speakers','fees','schedule'];
+const SEASON_KEYS=['speakers','fees','schedule','actions','milestones','messages','checklist'];
 let SEASON=1;try{SEASON=Number(localStorage.getItem('otr_season'))||1}catch(e){}
 const inS=r=>(r.season_no||1)===SEASON;
 const SALONS=[{v:1,l:'Session 01 (2026.11)'},{v:2,l:'Session 02 (2027.02)'},{v:3,l:'Session 03 (2027.05)'},{v:4,l:'Session 04 (2027.08)'}];
@@ -720,9 +778,26 @@ const T={
     {k:'speaker',l:'대상 / 내용',list:'spNames',ph:'예) 강남구 대표 / 장소 대관 / 조찬 케이터링'},
     {k:'fee',l:'금액 (만원)',t:'num',half:1,def:30},{k:'gift',l:'Gift (만원, 사례비일 때)',t:'num',half:1,def:10},
     {k:'status',l:'지급 상태',t:'sel',opts:['지급 예정','지급 완료','보류'],half:1},{k:'paid_date',l:'지급일',t:'date',half:1},{k:'memo',l:'메모',t:'area'}]},
-  actions:{tbl:'otr_actions',name:'Next Action',fields:[
-    {k:'owner',l:'담당자',t:'sel',opts:OWNERS,req:1,half:1},{k:'deadline',l:'Deadline',t:'date',half:1},
-    {k:'action',l:'할 일',t:'area',req:1},{k:'status',l:'상태',t:'sel',opts:['진행 중','완료','보류'],half:1},{k:'memo',l:'메모',t:'area'}]},
+  actions:{tbl:'otr_actions',name:'할 일',fields:[
+    {k:'category',l:'카테고리',t:'sel',opts:ACT_CATS,half:1,def:'기타'},{k:'status',l:'상태',t:'sel',opts:ACT_STATUS,half:1,def:'미착수'},
+    {k:'action',l:'할 일',t:'area',req:1},
+    {k:'owner',l:'담당',list:'owNames',req:1,half:1,ph:'예) 위현민 / 신다혜·김나라'},{k:'support',l:'지원 / 승인',list:'owNames',half:1,ph:'예) 조영주 승인'},
+    {k:'deadline',l:'기한',t:'date',half:1},{k:'date_text',l:'날짜 표기 (선택)',half:1,ph:'예) 수시 / 11/09–10'},
+    {k:'memo',l:'메모',t:'area'}]},
+  milestones:{tbl:'otr_milestones',name:'준비 일정',fields:[
+    {k:'title',l:'주요 일정',req:1},{k:'period',l:'기간 표기',half:1,ph:'예) 11/09–10'},{k:'owner',l:'책임',list:'owNames',half:1},
+    {k:'start_date',l:'시작일',t:'date',half:1},{k:'end_date',l:'종료일',t:'date',half:1},
+    {k:'criteria',l:'완료 기준'},{k:'sort_order',l:'정렬 순서',t:'num',half:1},{k:'done',l:'완료',t:'chk',half:1}]},
+  messages:{tbl:'otr_messages',name:'안내 문자',fields:[
+    {k:'kind',l:'구분',req:1,half:1,ph:'예) ② 상세 안내'},{k:'timing',l:'발송 시점',half:1,ph:'예) 11/21(토) / 입금 확인 즉시'},
+    {k:'send_date',l:'발송 예정일',t:'date',half:1},{k:'status',l:'상태',t:'sel',opts:MSG_STATUS,half:1,def:'작성 중'},
+    {k:'body',l:'문자 초안 ([ ]는 확정 후 기입)',t:'area',big:1},{k:'feedback',l:'수정 피드백 / 확인 사항',t:'area'},
+    {k:'approver',l:'승인',list:'owNames',half:1},{k:'executor',l:'실행',list:'owNames',half:1},
+    {k:'sent_date',l:'발송일',t:'date',half:1},{k:'sort_order',l:'정렬 순서',t:'num',half:1}]},
+  checklist:{tbl:'otr_checklist',name:'현장 운영 항목',fields:[
+    {k:'kind',l:'구분',t:'sel',opts:['답사','당일'],req:1,half:1},{k:'slot',l:'카테고리 / 시각',half:1,ph:'예) 브랜딩 / 06:30'},
+    {k:'item',l:'내용',t:'area',req:1},{k:'owner',l:'담당',list:'owNames',half:1},{k:'sort_order',l:'정렬 순서',t:'num',half:1},
+    {k:'result',l:'현장 결정 / 후속 조치',t:'area'},{k:'done',l:'완료',t:'chk'}]},
   decisions:{tbl:'otr_decisions',name:'결정 기록',fields:[
     {k:'decided_date',l:'결정일',t:'date',req:1,half:1},{k:'category',l:'구분',t:'sel',opts:CATS,req:1,half:1},
     {k:'content',l:'결정 내용',t:'area',req:1},{k:'memo',l:'배경 / 메모',t:'area'}]},
@@ -742,6 +817,9 @@ const T={
     {k:'content',l:'내용',t:'area',big:1}]}
 };
 const D={};let PW='',cur=null,decCat='전체';
+let actMode={view:'cat',who:'',hide:false};try{Object.assign(actMode,JSON.parse(localStorage.getItem('otr_act')||'{}'))}catch(e){}
+function actSet(k,v){actMode[k]=v;try{localStorage.setItem('otr_act',JSON.stringify(actMode))}catch(e){}RENDER.actions();}
+async function msgCopy(id,btn){const m=D.messages.find(x=>x.id===id);try{await navigator.clipboard.writeText(m.body)}catch(e){const ta=document.createElement('textarea');ta.value=m.body;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();}btn.textContent='복사됨';setTimeout(()=>btn.textContent='복사',1500);}
 const $=id=>document.getElementById(id);
 const esc=t=>(t==null?'':String(t)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const today=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
@@ -830,7 +908,7 @@ async function bpSave(btn){
   try{await rpc('otr_save',{tbl:'otr_seasons',row_data:S});bpEdit=false;await load('seasons');}catch(e){alert('저장 실패: '+e.message);btn.disabled=false;}
 }
 function setSeason(v){SEASON=Number(v)||1;try{localStorage.setItem('otr_season',SEASON)}catch(e){}
-  ['apps','speakers','schedule','fees'].forEach(k=>{try{if(D[k==='fees'?'fees':k])RENDER[k]()}catch(e){}});try{if(D.surveys)renderSurveys()}catch(e){}}
+  ['apps','speakers','schedule','fees','actions','milestones','messages','checklist'].forEach(k=>{try{if(D[k])RENDER[k]()}catch(e){}});try{if(D.surveys)renderSurveys()}catch(e){}}
 async function loadApps(){D.apps=await rpc('otr_app_list');RENDER.apps();}
 async function loadAll(){
   loadSite().catch(e=>{$('hMsg').textContent='설정을 불러오지 못했습니다. ('+e.message+')';});
@@ -870,6 +948,7 @@ function edit(key,id,preset){
   let html=`<h3>${t.name} ${id?'수정':'추가'}</h3>`,buf=[];
   t.fields.forEach(f=>{const h=field(f,row[f.k]);if(f.half){buf.push(h);if(buf.length===2){html+=`<div class="mn-row" style="grid-template-columns:1fr 1fr">${buf.join('')}</div>`;buf=[];}}else{if(buf.length){html+=`<div class="mn-row" style="grid-template-columns:1fr 1fr">${buf.join('')}<div></div></div>`;buf=[];}html+=h;}});
   if(buf.length)html+=`<div class="mn-row" style="grid-template-columns:1fr 1fr">${buf.join('')}<div></div></div>`;
+  html+=`<datalist id="owNames">${OWNERS.map(o=>`<option value="${esc(o)}">`).join('')}</datalist>`;
   html+=`<datalist id="spNames">${(D.speakers||[]).map(s=>`<option value="${esc(s.name)}">`).join('')}</datalist>`;
   html+=`<div class="mn-actions">${id?`<button class="mn-btn danger" style="margin-right:auto" onclick="del()">삭제</button>`:''}<button class="mn-btn ghost" onclick="closeModal()">취소</button><button class="mn-btn" id="mSave" onclick="save()">저장</button></div>`;
   $('mForm').innerHTML=html;$('modal').classList.add('open');
@@ -1017,16 +1096,67 @@ const RENDER={
   },
   actions(){
     const t=today(),soon=new Date(Date.now()+3*864e5).toISOString().slice(0,10);
-    const owners=[...new Set([...OWNERS,...D.actions.map(a=>a.owner)])];
-    $('v-actions').innerHTML=owners.map(o=>{
-      const L=D.actions.filter(a=>a.owner===o).sort((a,b)=>(a.status==='완료')-(b.status==='완료')||(a.deadline||'9').localeCompare(b.deadline||'9'));
-      const open=L.filter(a=>a.status!=='완료').length;
-      return `<div class="owner-card"><h4>${esc(o)} <small style="color:var(--tl);font-weight:500">· 진행 ${open}건</small></h4>${L.map(a=>{
-        const done=a.status==='완료',cls=done||!a.deadline?'':a.deadline<t?'over':a.deadline<=soon?'soon':'';
-        return `<div class="act ${done?'done':''}"><input type="checkbox" ${done?'checked':''} onchange="quick('actions','${a.id}',{status:this.checked?'완료':'진행 중'})">
-        <span onclick="edit('actions','${a.id}')">${esc(a.action)}${a.status==='보류'?' <small style="color:var(--tl)">(보류)</small>':''}</span>
-        <em class="dl ${cls}" style="font-style:normal">${a.deadline?a.deadline.slice(5).replace('-','/')+(cls==='over'?' 지남':''):'__ / __'}</em></div>`}).join('')||'<p style="font-size:.85rem;color:var(--tl)">할 일 없음</p>'}
-        <button class="lnk" style="margin-top:.5rem" onclick="edit('actions',null,{owner:'${esc(o)}'})">+ 추가</button></div>`}).join('');
+    const A=D.actions.filter(inS),ev=D.schedule?D.schedule.filter(inS).map(r=>r.event_date).filter(Boolean).sort():[];
+    const dn=a=>{if(!a.deadline)return '';const e=ev.find(x=>x>=a.deadline);if(!e)return '사후';const n=Math.round((new Date(e)-new Date(a.deadline))/864e5);return n?'D-'+n:'D-day';};
+    const ownersOf=a=>(a.owner||'').split(/[·,]/).map(x=>x.trim()).filter(Boolean);
+    const owners=[...new Set([...OWNERS.filter(o=>o!=='TF 전체'),...A.flatMap(ownersOf)])];
+    const M=actMode;
+    $('actBar').innerHTML=`<div class="seg">${[['cat','카테고리별'],['owner','담당자별']].map(([k,l])=>`<button class="${M.view===k?'on':''}" onclick="actSet('view','${k}')">${l}</button>`).join('')}</div>
+      <select onchange="actSet('who',this.value)"><option value="">담당 전체</option>${owners.map(o=>`<option ${o===M.who?'selected':''}>${esc(o)}</option>`).join('')}</select>
+      <label class="chk"><input type="checkbox" ${M.hide?'checked':''} onchange="actSet('hide',this.checked)"> 완료 숨기기</label>
+      <span class="note" style="margin:0">완료 ${A.filter(a=>a.status==='완료').length} / ${A.length}</span>`;
+    const L=A.filter(a=>(!M.who||ownersOf(a).includes(M.who)||(a.support||'').includes(M.who))&&!(M.hide&&a.status==='완료'));
+    const dCls=a=>a.status==='완료'||!a.deadline?'':a.deadline<t?'over':a.deadline<=soon?'soon':'';
+    const dTxt=a=>a.date_text||(a.deadline?a.deadline.slice(5).replace('-','/'):'—');
+    const stSel=a=>`<select class="ast s${Math.max(0,ACT_STATUS.indexOf(a.status))}" onchange="quick('actions','${a.id}',{status:this.value})">${ACT_STATUS.map(o=>`<option ${o===a.status?'selected':''}>${o}</option>`).join('')}</select>`;
+    const ord=(a,b)=>(a.deadline||'0').localeCompare(b.deadline||'0')||(a.sort_order||0)-(b.sort_order||0);
+    if(M.view==='owner'){
+      $('v-actions').innerHTML=`<div class="owner-grid">${owners.filter(o=>!M.who||o===M.who).map(o=>{
+        const X=L.filter(a=>ownersOf(a).includes(o)).sort((a,b)=>(a.status==='완료')-(b.status==='완료')||ord(a,b));
+        if(!X.length&&M.who!==o)return '';
+        return `<div class="owner-card"><h4>${esc(o)} <small style="color:var(--tl);font-weight:500">· 남은 일 ${X.filter(a=>a.status!=='완료').length}건</small></h4>${X.map(a=>`<div class="act ${a.status==='완료'?'done':''}"><input type="checkbox" ${a.status==='완료'?'checked':''} onchange="quick('actions','${a.id}',{status:this.checked?'완료':'진행 중'})">
+          <span onclick="edit('actions','${a.id}')">${esc(a.action)}${a.category?` <small class="acat">${esc(a.category)}</small>`:''}${a.status==='보류'?' <small style="color:var(--tl)">(보류)</small>':''}</span>
+          <em class="dl ${dCls(a)}" style="font-style:normal">${dTxt(a)}</em></div>`).join('')||'<p style="font-size:.85rem;color:var(--tl)">할 일 없음</p>'}
+          <button class="lnk" style="margin-top:.5rem" onclick="edit('actions',null,{owner:'${esc(o)}'})">+ 추가</button></div>`}).join('')}</div>`;
+      return;
+    }
+    const cats=[...ACT_CATS,...new Set(A.map(a=>a.category||'기타').filter(c=>!ACT_CATS.includes(c)))];
+    $('v-actions').innerHTML=cats.map(c=>{
+      const all=A.filter(a=>(a.category||'기타')===c),X=L.filter(a=>(a.category||'기타')===c).sort(ord);
+      if(!all.length)return '';const dn_=all.filter(a=>a.status==='완료').length;
+      return `<div class="acat-box"><div class="acat-h"><b>${esc(c)}</b><span>${dn_} / ${all.length} 완료</span><i style="--p:${Math.round(dn_/all.length*100)}%"></i><button class="lnk" onclick="edit('actions',null,{category:'${esc(c)}'})">+ 추가</button></div>
+      ${X.length?`<table class="tbl act-tbl"><thead><tr><th>날짜</th><th>D-n</th><th>할 일</th><th>담당</th><th>지원 / 승인</th><th>상태</th></tr></thead><tbody>${X.map(a=>`<tr class="${a.status==='완료'?'done':''}">
+        <td class="nw"><span class="dl ${dCls(a)}">${dTxt(a)}${dCls(a)==='over'?' 지남':''}</span></td><td class="nw"><span class="dn">${dn(a)}</span></td>
+        <td><span class="act-t" onclick="edit('actions','${a.id}')">${esc(a.action)}</span>${a.memo?`<small class="act-m">${esc(a.memo)}</small>`:''}</td>
+        <td class="nw">${esc(a.owner)}</td><td class="nw" style="color:var(--ts)">${esc(a.support)||'—'}</td><td class="nw">${stSel(a)}</td></tr>`).join('')}</tbody></table>`:'<p class="note" style="margin:.4rem 0 0">표시할 할 일이 없습니다.</p>'}</div>`}).join('')||empty('할 일이 없습니다.');
+  },
+  milestones(){
+    const t=today(),L=D.milestones.filter(inS).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)||(a.start_date||'').localeCompare(b.start_date||''));
+    $('v-milestones').innerHTML=L.map(m=>{
+      const st=m.done?['완료','s2']:m.end_date&&m.end_date<t?['지연','s4']:m.start_date&&m.start_date<=t?['진행 중','s1']:['예정','s0'];
+      return `<div class="ms ${st[1]}"><input type="checkbox" ${m.done?'checked':''} onchange="quick('milestones','${m.id}',{done:this.checked})" title="완료">
+        <span class="ms-p">${esc(m.period)||'—'}</span><div class="ms-b" onclick="edit('milestones','${m.id}')"><b>${esc(m.title)}</b><small>${esc(m.criteria||'')}</small></div>
+        <span class="ms-o">${esc(m.owner||'')}</span><span class="ms-s">${st[0]}</span></div>`}).join('')||empty('준비 일정이 없습니다.');
+  },
+  messages(){
+    const L=D.messages.filter(inS).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
+    $('v-messages').innerHTML=L.map(m=>{const k=Math.max(0,MSG_STATUS.indexOf(m.status));
+      return `<div class="msg m${k}"><div class="msg-h"><b>${esc(m.kind)}</b><span class="msg-st">${esc(m.status||'작성 중')}</span></div>
+      <div class="msg-t">${esc(m.timing||'')}${m.send_date?` · ${m.send_date.slice(5).replace('-','/')}`:''}${m.sent_date?` · <b>${m.sent_date.slice(5).replace('-','/')} 발송</b>`:''}</div>
+      ${m.body?`<pre class="msg-b">${esc(m.body)}</pre>`:'<p class="msg-b empty">초안이 없습니다.</p>'}
+      ${m.feedback?`<p class="msg-f">${esc(m.feedback)}</p>`:''}
+      <div class="msg-foot"><span>승인 ${esc(m.approver||'—')} · 실행 ${esc(m.executor||'—')}</span>
+        ${m.body?`<button class="lnk" onclick="msgCopy('${m.id}',this)">복사</button>`:''}
+        ${m.status==='발송 완료'?`<button class="lnk" onclick="quick('messages','${m.id}',{status:'승인',sent_date:null})">발송 취소</button>`:m.status==='승인'?`<button class="lnk" onclick="quick('messages','${m.id}',{status:'발송 완료',sent_date:today()})">발송 완료</button>`:`<button class="lnk" onclick="quick('messages','${m.id}',{status:'승인'})">승인</button>`}
+        <button class="lnk" onclick="edit('messages','${m.id}')">수정</button></div></div>`}).join('')||empty('안내 문자가 없습니다.');
+  },
+  checklist(){
+    const L=D.checklist.filter(inS).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
+    const row=(r,last)=>`<tr class="${r.done?'done':''}"><td class="nw"><input type="checkbox" ${r.done?'checked':''} onchange="quick('checklist','${r.id}',{done:this.checked})"></td><td class="nw"><b>${esc(r.slot)}</b></td>
+      <td><span class="act-t" onclick="edit('checklist','${r.id}')">${esc(r.item)}</span></td><td class="nw">${esc(r.owner)}</td>${last?`<td class="ck-r" onclick="edit('checklist','${r.id}')">${r.result?esc(r.result):'<span style="color:var(--tl)">+ 기록</span>'}</td>`:''}</tr>`;
+    const V=L.filter(r=>r.kind==='답사'),R=L.filter(r=>r.kind==='당일');
+    $('v-visit').innerHTML=`<thead><tr><th style="width:34px"></th><th>카테고리</th><th>확인할 내용</th><th>담당</th><th>현장 결정 / 후속 조치</th></tr></thead><tbody>${V.map(r=>row(r,1)).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--tl);padding:2rem">항목이 없습니다.</td></tr>'}</tbody>`;
+    $('v-runsheet').innerHTML=`<thead><tr><th style="width:34px"></th><th>시각</th><th>실행 내용</th><th>담당</th></tr></thead><tbody>${R.map(r=>row(r,0)).join('')||'<tr><td colspan="4" style="text-align:center;color:var(--tl);padding:2rem">항목이 없습니다.</td></tr>'}</tbody>`;
   },
   decisions(){
     $('decChips').innerHTML=['전체',...CATS].map(c=>`<button class="${c===decCat?'on':''}" onclick="decCat='${c}';RENDER.decisions()">${c}</button>`).join('');
@@ -1037,6 +1167,7 @@ const RENDER={
   schedule(){
     const W='일월화수목금토',t=today();
     const L=D.schedule.filter(inS).sort((a,b)=>a.salon_no-b.salon_no);
+    if(D.actions)RENDER.actions();
     $('v-schedule').innerHTML=`<thead><tr><th>회차</th><th>연·월</th><th>날짜</th><th>시간</th><th>장소</th><th>담당 Host</th><th>상태</th><th>홈페이지 안내</th><th></th></tr></thead><tbody>${
       L.map(r=>{const past=r.event_date&&r.event_date<t;const d=r.event_date?new Date(r.event_date+'T00:00'):null;
       return `<tr><td><b>Session 0${r.salon_no}</b></td><td>${r.year||'—'}.${r.month||'—'}</td><td>${d?`${d.getMonth()+1}/${d.getDate()} (${W[d.getDay()]})`:'<span style="color:var(--tl)">미정</span>'}</td><td>${esc(r.time_text)||'—'}</td><td>${esc(r.place)||'—'}</td><td>${esc(r.host)||'—'}</td>

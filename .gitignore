@@ -1,3 +1,4 @@
 otr_setup.sql
 otr_plan_docs.sql
 *.pdf
+otr_ops_seed.sql
