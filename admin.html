@@ -511,6 +511,18 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .sv-tool button{padding:.25rem .65rem;border:1px solid var(--bd);border-radius:6px;background:#fff;font:inherit;font-size:.78rem;font-weight:500;cursor:pointer;color:var(--ts)}
 .sv-tool button:hover{border-color:#141414;color:#141414}
 .sv-tool button b{font-weight:800}
+/* 연사 상태 색: 후보·컨택 중·확정·보류·거절 */
+.kcol{--sc:#9A958A;--sb:rgba(154,149,138,.12)}
+.kcol.s1{--sc:#3D6FB0;--sb:rgba(61,111,176,.1)}
+.kcol.s2{--sc:#2F7A3A;--sb:rgba(47,122,58,.1)}
+.kcol.s3{--sc:#B07A1E;--sb:rgba(176,122,30,.1)}
+.kcol.s4{--sc:#B0473D;--sb:rgba(176,71,61,.09)}
+.kcol h4 em{font-style:normal;display:inline-flex;align-items:center;gap:.4rem;color:var(--sc)}
+.kcol h4 em::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--sc)}
+.kcol .kcard{border-left:4px solid var(--sc)}
+.kcol.s2 .kcard{background:linear-gradient(var(--sb),var(--sb)),var(--wh)}
+.kcol.s3 .kcard,.kcol.s4 .kcard{opacity:.78}
+.kcol .kcard:hover{opacity:1}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
   <h2><span class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span><small>ADMIN</small></h2>
@@ -826,7 +838,7 @@ const RENDER={
   speakers(){
     const L=[...D.speakers].sort((a,b)=>(a.salon_no||9)-(b.salon_no||9)||(a.sort_order||0)-(b.sort_order||0));
     $('v-kanban').innerHTML=SP_STATUS.map(st=>{const c=L.filter(s=>(s.status||'후보')===st);
-      return `<div class="kcol"><h4>${st}<span>${c.length}</span></h4>${c.map(s=>`<div class="kcard" onclick="edit('speakers','${s.id}')"><b>${esc(s.name)}${s.is_public?'<span class="pub">공개</span>':''}</b><small>${esc(s.role||'')}</small><br><small>${salonL(s.salon_no)} · ${esc(s.owner||'담당 미정')}</small></div>`).join('')}</div>`}).join('');
+      const k=SP_STATUS.indexOf(st);return `<div class="kcol s${k}"><h4><em>${st}</em><span>${c.length}</span></h4>${c.map(s=>`<div class="kcard s${k}" onclick="edit('speakers','${s.id}')"><b>${esc(s.name)}${s.is_public?'<span class="pub">공개</span>':''}</b><small>${esc(s.role||'')}</small><br><small>${salonL(s.salon_no)} · ${esc(s.owner||'담당 미정')}</small></div>`).join('')}</div>`}).join('');
     $('v-speakers').innerHTML=`<thead><tr><th>공개</th><th>이름</th><th>소속 / 역할</th><th>분야</th><th>회차</th><th>상태</th><th>담당</th><th>꼭 묻고 싶은 질문</th><th></th></tr></thead><tbody>${
       L.map(s=>`<tr><td><input type="checkbox" ${s.is_public?'checked':''} onchange="quick('speakers','${s.id}',{is_public:this.checked})"></td>
       <td style="white-space:nowrap"><b>${esc(s.name)}</b></td><td>${esc(s.role)}</td><td>${esc(s.field)}</td><td>${salonL(s.salon_no)}</td>
