@@ -632,6 +632,18 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 @media(max-width:700px){.ms{grid-template-columns:20px 1fr auto}.ms-p,.ms-o{display:none}}
 .own{display:inline-block;color:var(--oc);background:color-mix(in srgb,var(--oc) 11%,#fff);border:1px solid color-mix(in srgb,var(--oc) 35%,#fff);border-radius:999px;padding:.02rem .5rem;font-size:.8em;font-weight:700;line-height:1.5;white-space:nowrap;margin:.05rem 0}
 .owner-card h4 .own{font-size:.9em}
+.sv-rt-l{display:grid;gap:.35rem;font-size:.82rem;font-weight:600;color:var(--ts)}
+.rte{border:1px solid var(--bd);border-radius:10px;background:#fff;overflow:hidden}
+.rte:focus-within{border-color:#141414}
+.rte-bar{display:flex;flex-wrap:wrap;gap:.25rem;padding:.35rem .4rem;border-bottom:1px solid var(--bd);background:#FAF8F3}
+.rte-bar button{padding:.2rem .55rem;border:1px solid transparent;border-radius:6px;background:none;font:inherit;font-size:.8rem;font-weight:500;color:var(--ts);cursor:pointer;min-width:2rem}
+.rte-bar button:hover{background:#fff;border-color:var(--bd);color:#141414}
+.rte-area{min-height:3.2rem;padding:.7rem .85rem;font-size:.92rem;font-weight:400;line-height:1.75;color:#2a2a2a;outline:none}
+#sv_intro{min-height:12rem}
+.rte-area:empty:before,.rte-area.empty:before{content:attr(data-ph);color:#aaa}
+.rte-area b{font-weight:700}.rte-area .hl{color:#9A7B3C;font-weight:600}
+.rte-area ul,.rte-area ol{margin:.3rem 0 .3rem 1.3rem;padding:0}
+.rte-area blockquote{margin:.5rem 0;padding:.5rem .8rem;border-left:3px solid #C9B37E;background:rgba(201,179,126,.12);border-radius:0 8px 8px 0}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
   <h2><span class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span><small>ADMIN</small></h2>
@@ -1225,7 +1237,7 @@ function svRenderEdit(box){
     <div style="display:flex;gap:.5rem">${s.id?`<button class="mn-btn danger" onclick="svDelete()">삭제</button>`:''}<button class="mn-btn" onclick="svSave()">저장</button></div></div>
   <div class="sv-form">
     <label>설문 제목 *<input id="sv_title" value="${esc(s.title)}" placeholder="예) 사전 질문 설문지 (1회차 : 강남구 대표)"></label>
-    <label>안내문 <small>(줄바꿈 그대로 보입니다 · 글자를 고르고 <b>B</b>를 누르면 굵게)</small><span class="sv-tool"><button type="button" onclick="svBold($('sv_intro'))"><b>B</b> 굵게</button></span><textarea id="sv_intro" rows="8">${esc(s.intro||'')}</textarea></label>
+    <div class="sv-rt-l">안내문 <small>(보이는 그대로 설문에 표시됩니다 · 글자를 고르고 위 버튼을 누르세요)</small>${rtEditor('sv_intro',s.intro,'설문 맨 위에 보일 안내문','svDraft.intro=v')}</div>
     <label>첨부 자료 <small>(안내문 위에 버튼으로 표시 · 비우면 숨김)</small><input id="sv_att_t" value="${esc((s.attach||{}).title||'')}" placeholder="버튼 이름 예) 리딩북 · 강남구 대표 (PDF)"><input id="sv_att_u" value="${esc((s.attach||{}).url||'')}" placeholder="파일 주소 https://..." style="margin-top:.4rem"></label>
     <div class="sv-row">
       <label>연결 세션<select id="sv_salon"><option value="">없음</option>${[1,2,3,4].map(n=>`<option value="${n}" ${s.salon_no==n?'selected':''}>Session 0${n}</option>`).join('')}</select></label>
@@ -1246,7 +1258,7 @@ function svQHtml(q,i){
     <div class="sv-q-head"><span class="sv-type">${SQ_TYPES[q.type]}</span>
       <span class="sv-q-btns"><button class="ic" title="위로" ${i===0?'disabled':''} onclick="svMoveQ(${i},-1)">↑</button><button class="ic" title="아래로" ${i===n-1?'disabled':''} onclick="svMoveQ(${i},1)">↓</button><button class="ic del" title="문항 삭제" onclick="svDelQ(${i})">✕</button></span></div>
     <input class="sv-q-title" placeholder="${isSec?'예) PART 1. 리딩북 확인':'질문을 입력하세요'}" value="${esc(q.title)}" oninput="svDraft.questions[${i}].title=this.value">
-    <span class="sv-tool"><button type="button" onclick="svBold(this.parentElement.nextElementSibling)"><b>B</b> 굵게</button></span><textarea class="sv-q-desc" rows="2" placeholder="설명 (선택)" oninput="svDraft.questions[${i}].desc=this.value">${esc(q.desc||'')}</textarea>
+    ${rtEditor('sv_qd_'+i,q.desc,'설명 (선택)','svDraft.questions['+i+'].desc=v')}
     ${hasOpt?`<label class="sv-small">보기 <small>(한 줄에 하나씩)</small><textarea rows="${Math.max(3,(q.options||[]).length+1)}" oninput="svDraft.questions[${i}].options=this.value.split('\\n').map(x=>x.trim()).filter(Boolean)">${esc((q.options||[]).join('\n'))}</textarea></label>`:''}
     ${!isSec?`<div class="sv-q-opts"><label class="chk"><input type="checkbox" ${q.required?'checked':''} onchange="svDraft.questions[${i}].required=this.checked"> 필수</label>
       ${q.type==='radio'?`<label class="chk"><input type="checkbox" ${q.scale?'checked':''} onchange="svDraft.questions[${i}].scale=this.checked"> 가로선 단계로 표시 (예: 1~4단계)</label>`:''}
@@ -1256,7 +1268,7 @@ function svQHtml(q,i){
       ${q.type==='short'||q.type==='long'?`<label class="chk"><input type="checkbox" ${q.curate?'checked':''} onchange="svDraft.questions[${i}].curate=this.checked"> 연사 전달용 질문</label>`:''}</div>`:''}
   </div>`;
 }
-function svSyncHead(){const s=svDraft;s.title=$('sv_title').value.trim();s.intro=$('sv_intro').value;s.salon_no=Number($('sv_salon').value)||null;const d=$('sv_deadline').value;s.deadline=d?new Date(d).toISOString():null;s.is_open=$('sv_open').checked;s.ask_name=$('sv_name').checked;const au=$('sv_att_u').value.trim();s.attach=au?{url:au,title:$('sv_att_t').value.trim()}:null;}
+function svSyncHead(){const s=svDraft;s.title=$('sv_title').value.trim();s.salon_no=Number($('sv_salon').value)||null;const d=$('sv_deadline').value;s.deadline=d?new Date(d).toISOString():null;s.is_open=$('sv_open').checked;s.ask_name=$('sv_name').checked;const au=$('sv_att_u').value.trim();s.attach=au?{url:au,title:$('sv_att_t').value.trim()}:null;}
 function svAddQ(t){svSyncHead();svDraft.questions.push({id:svUid(),type:t,title:'',desc:'',required:t!=='section',options:t==='radio'||t==='checkbox'?['보기 1','보기 2']:undefined});renderSurveys();const qs=document.querySelectorAll('.sv-q');qs[qs.length-1].scrollIntoView({behavior:'smooth',block:'center'});}
 function svMoveQ(i,d){svSyncHead();const a=svDraft.questions;[a[i],a[i+d]]=[a[i+d],a[i]];renderSurveys();}
 function svDelQ(i){if(!confirm('이 문항을 삭제할까요?'))return;svSyncHead();svDraft.questions.splice(i,1);renderSurveys();}
@@ -1319,6 +1331,44 @@ function svCsv(sid){
 async function svDelResp(rid){if(!confirm('이 응답을 삭제할까요? 되돌릴 수 없습니다.'))return;try{await rpc('otr_delete',{tbl:'otr_survey_responses',rid});await loadSurveys();}catch(e){alert('삭제 실패: '+e.message);}}
 
 /* 설문 편집: 선택한 글자를 **굵게** 감싸기 (이미 굵으면 해제) */
+const md=t=>esc(t).replace(/\*\*([\s\S]+?)\*\*/g,'<b>$1</b>');
+/* 서식 텍스트: 저장은 허용 태그만 남긴 HTML, 예전 **굵게** 텍스트도 호환 */
+const rtIsHtml=t=>/<\/?(b|i|u|br|div|ul|ol|li|span|blockquote)\b/i.test(t||'');
+const mdToHtml=t=>esc(t||'').replace(/\*\*([\s\S]+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>');
+function rtClean(html){
+  const doc=new DOMParser().parseFromString('<div>'+(html||'')+'</div>','text/html');
+  const OK={B:'b',STRONG:'b',I:'i',EM:'i',U:'u',BR:'br',DIV:'div',P:'div',UL:'ul',OL:'ol',LI:'li',BLOCKQUOTE:'blockquote'};
+  const walk=n=>{let o='';n.childNodes.forEach(c=>{
+    if(c.nodeType===3){o+=esc(c.nodeValue);return;}if(c.nodeType!==1||/^(SCRIPT|STYLE|TEMPLATE|IFRAME|OBJECT|SVG)$/i.test(c.tagName))return;
+    const tg=c.tagName,inner=walk(c),st=c.getAttribute('style')||'';
+    if(tg==='SPAN'&&c.classList.contains('hl')||tg==='FONT'&&c.getAttribute('color')||!OK[tg]&&/color\s*:/.test(st)){o+=`<span class="hl">${inner}</span>`;return;}
+    if(!OK[tg]){o+=/font-weight\s*:\s*(bold|[6-9]00)/.test(st)?`<b>${inner}</b>`:inner;return;}
+    o+=OK[tg]==='br'?'<br>':`<${OK[tg]}>${inner}</${OK[tg]}>`;});return o;};
+  const out=walk(doc.body.firstChild).replace(/^(<div><br><\/div>)+|(<div><br><\/div>)+$/g,'');
+  return out.replace(/<[^>]+>|&nbsp;|\s/g,'')?out:'';
+}
+const rich=t=>rtIsHtml(t)?`<div class="rt">${rtClean(t)}</div>`:md(t);
+
+const RT_TOOLS=[['bold','<b>B</b>','굵게 (Ctrl+B)'],['italic','<i>I</i>','기울임 (Ctrl+I)'],['underline','<u>U</u>','밑줄 (Ctrl+U)'],['hl','<span style="color:#9A7B3C;font-weight:700">A</span>','강조색 (골드)'],
+  ['insertUnorderedList','• 목록','글머리 목록'],['insertOrderedList','1. 목록','번호 목록'],['quote','❝ 박스','인용 박스 (다시 누르면 해제)'],['removeFormat','서식 지우기','선택한 글자 서식 지우기']];
+function rtEditor(id,val,ph,onch){
+  const html=rtIsHtml(val)?rtClean(val):mdToHtml(val);
+  return `<div class="rte"><div class="rte-bar">${RT_TOOLS.map(([c,l,t])=>`<button type="button" title="${t}" onmousedown="event.preventDefault();rtCmd('${id}','${c}')">${l}</button>`).join('')}</div>
+    <div class="rte-area" id="${id}" contenteditable="true" data-ph="${esc(ph||'')}" data-onch="${esc(onch||'')}" oninput="rtChanged(this)" onpaste="rtPaste(event)">${html}</div></div>`;
+}
+function rtChanged(el){const f=el.dataset.onch;if(f)new Function('v',f)(rtClean(el.innerHTML));el.classList.toggle('empty',!el.textContent.trim());}
+function rtCmd(id,c){
+  const el=$(id);el.focus();document.execCommand('styleWithCSS',false,false);
+  if(c==='hl'){const sel=getSelection();if(!sel.rangeCount||sel.isCollapsed)return alert('강조할 글자를 먼저 드래그해서 선택해 주세요.');
+    const a=sel.anchorNode&&(sel.anchorNode.nodeType===1?sel.anchorNode:sel.anchorNode.parentElement).closest('.hl');
+    if(a&&el.contains(a)){a.replaceWith(...a.childNodes);}else{const r=sel.getRangeAt(0),sp=document.createElement('span');sp.className='hl';sp.appendChild(r.extractContents());r.insertNode(sp);sel.removeAllRanges();const nr=document.createRange();nr.selectNodeContents(sp);sel.addRange(nr);}}
+  else if(c==='quote'){const sel=getSelection();const n=sel.anchorNode&&(sel.anchorNode.nodeType===1?sel.anchorNode:sel.anchorNode.parentElement).closest('blockquote');
+    document.execCommand('formatBlock',false,n&&el.contains(n)?'div':'blockquote');}
+  else if(c==='removeFormat'){document.execCommand('removeFormat');const sel=getSelection();if(sel.rangeCount){el.querySelectorAll('.hl').forEach(h=>{if(sel.containsNode(h,true))h.replaceWith(...h.childNodes);});}}
+  else document.execCommand(c);
+  rtChanged(el);
+}
+function rtPaste(e){e.preventDefault();const t=(e.clipboardData||window.clipboardData).getData('text/plain');document.execCommand('insertHTML',false,mdToHtml(t));}
 function svBold(ta){
   if(!ta)return;const s=ta.selectionStart,e=ta.selectionEnd,v=ta.value;
   if(s===e){alert('굵게 할 글자를 먼저 드래그해서 선택해 주세요.');ta.focus();return;}
