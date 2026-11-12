@@ -1003,7 +1003,7 @@ function heroPrev(){
 }
 $('hType').querySelectorAll('button').forEach(b=>b.onclick=()=>{$('hType').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));heroPrev();});
 ['h_image','h_video','h_poster','h_dim','h_pos'].forEach(id=>$(id).addEventListener('input',heroPrev));
-async function loadSite(){const st=await rpc('otr_public_settings');if(st&&st.hero)heroFill(st.hero);}
+async function loadSite(){const r=await fetch(SU+'/rest/v1/rpc/otr_public_settings',{method:'POST',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:'{}'});if(!r.ok)throw new Error(r.status);const st=await r.json();if(st&&st.hero)heroFill(st.hero);}
 async function saveHero(){
   const h=heroForm();
   if(h.type==='image'&&!h.image)return alert('사진 URL을 입력해 주세요.');
