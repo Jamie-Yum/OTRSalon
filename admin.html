@@ -582,6 +582,13 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .bp-er input{font:inherit;font-size:.85rem;padding:.4rem .55rem;border:1px solid var(--bd);border-radius:6px;background:#fff;min-width:0}
 .bp-lab span{font-size:.74rem;color:var(--tl);font-weight:600}
 @media(max-width:600px){.bp{padding:1.1rem}.bp-er{grid-template-columns:1fr 1fr}.bp-er input:first-child{grid-column:1/-1}}
+/* 운영 기록: 하위 탭 */
+.rec-nav{display:flex;gap:.3rem;flex-wrap:wrap;border-bottom:1px solid var(--bd);margin-bottom:1.6rem}
+.rec-nav button{background:none;border:0;border-bottom:2.5px solid transparent;margin-bottom:-1px;padding:.6rem .9rem;font:inherit;font-size:.92rem;font-weight:600;color:var(--tl);cursor:pointer}
+.rec-nav button:hover{color:var(--dk)}
+.rec-nav button.on{color:var(--dk);border-bottom-color:var(--dk)}
+.rec-sub{display:none}.rec-sub.on{display:block}
+.rec-h{font-size:1.25rem;font-weight:700;margin:0}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
   <h2><span class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span><small>ADMIN</small></h2>
@@ -591,7 +598,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 </div></div>
 <header class="admin-bar"><span><b class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</b><small>ADMIN</small></span>
 <nav class="tabs" id="tabs">
-  <button data-tab="notes" class="on">회의록</button><button data-tab="apps">신청</button><button data-tab="surveys">설문</button><button data-tab="site">홈페이지</button><button data-tab="speakers">일정·연사</button><button data-tab="fees">예산 관리</button><button data-tab="actions">Next Action</button><button data-tab="decisions">결정 기록</button><button data-tab="plan">기획 자료</button>
+  <button data-tab="notes" class="on">운영 기록</button><button data-tab="apps">신청</button><button data-tab="surveys">설문</button><button data-tab="site">홈페이지</button><button data-tab="speakers">일정·연사</button><button data-tab="fees">예산 관리</button>
 </nav><span class="bar-r"><select id="seasonSel" class="season-sel" onchange="setSeason(this.value)" title="시즌 선택"><option value="1">Season 1</option></select><a href="index.html">← 사이트로</a><a href="#" onclick="logout();return false">로그아웃</a></span></header>
 
 <div class="panel" id="p-surveys"><section class="section"><div class="container" id="v-surveys"><div class="mn-empty">불러오는 중…</div></div></section></div>
@@ -638,8 +645,26 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 </div></section></div>
 
 <div class="panel on" id="p-notes"><section class="section"><div class="container">
-  <div class="mn-head"><div><div class="eyebrow">Meeting Notes</div><h2 class="title" style="margin:0">회의록</h2></div><button class="mn-btn" onclick="edit('notes')">+ 새 회의록</button></div>
+  <div class="eyebrow">TF Records</div><h2 class="title" style="margin:0 0 1.2rem">운영 기록</h2>
+  <nav class="rec-nav" id="recNav"><button data-sub="notes" class="on" onclick="recSub('notes')">회의록</button><button data-sub="actions" class="" onclick="recSub('actions')">Next Action</button><button data-sub="decisions" class="" onclick="recSub('decisions')">결정 기록</button><button data-sub="plan" class="" onclick="recSub('plan')">기획 자료</button></nav>
+<div class="rec-sub on" id="sub-notes">
+  <div class="mn-head"><div><h3 class="rec-h">회의록</h3></div><button class="mn-btn" onclick="edit('notes')">+ 새 회의록</button></div>
   <div class="mn-list" id="v-notes"><div class="mn-empty">불러오는 중…</div></div>
+</div>
+<div class="rec-sub" id="sub-actions">
+  <div class="mn-head"><div><h3 class="rec-h">담당자별 Next Action</h3></div><button class="mn-btn" onclick="edit('actions')">+ 할 일 추가</button></div>
+  <div class="owner-grid" id="v-actions"></div>
+</div>
+<div class="rec-sub" id="sub-decisions">
+  <div class="mn-head"><div><h3 class="rec-h">결정 기록</h3></div><button class="mn-btn" onclick="edit('decisions')">+ 결정 추가</button></div>
+  <p class="note">결정이 바뀌면 기존 기록을 고치지 말고 새로 추가하세요. 이력이 그대로 남습니다.</p>
+  <div class="chips" id="decChips"></div>
+  <div class="dec-list" id="v-decisions"></div>
+</div>
+<div class="rec-sub" id="sub-plan">
+  <div class="mn-head"><div><h3 class="rec-h">기획 자료</h3></div><button class="mn-btn" onclick="edit('plan')">+ 자료 추가</button></div>
+  <div class="plan-list" id="v-plan"></div>
+</div>
 </div></section></div>
 
 <div class="panel" id="p-speakers"><section class="section"><div class="container">
@@ -664,22 +689,8 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
   <div class="tbl-wrap"><table class="tbl" id="v-fees"></table></div>
 </div></section></div>
 
-<div class="panel" id="p-actions"><section class="section"><div class="container">
-  <div class="mn-head"><div><div class="eyebrow">Next Action</div><h2 class="title" style="margin:0">담당자별 Next Action</h2></div><button class="mn-btn" onclick="edit('actions')">+ 할 일 추가</button></div>
-  <div class="owner-grid" id="v-actions"></div>
-</div></section></div>
 
-<div class="panel" id="p-decisions"><section class="section"><div class="container">
-  <div class="mn-head"><div><div class="eyebrow">Decision Log</div><h2 class="title" style="margin:0">결정 기록</h2></div><button class="mn-btn" onclick="edit('decisions')">+ 결정 추가</button></div>
-  <p class="note">결정이 바뀌면 기존 기록을 고치지 말고 새로 추가하세요. 이력이 그대로 남습니다.</p>
-  <div class="chips" id="decChips"></div>
-  <div class="dec-list" id="v-decisions"></div>
-</div></section></div>
 
-<div class="panel" id="p-plan"><section class="section"><div class="container">
-  <div class="mn-head"><div><div class="eyebrow">Planning</div><h2 class="title" style="margin:0">기획 자료</h2></div><button class="mn-btn" onclick="edit('plan')">+ 자료 추가</button></div>
-  <div class="plan-list" id="v-plan"></div>
-</div></section></div>
 <div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="mn-editor" id="mForm"></div></div>
 <footer><p>© 2026 OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON · REPIUM LAB · 내부 공유용</p></footer>
 <script>
@@ -830,6 +841,10 @@ async function loadAll(){
   })));
 }
 
+function recSub(k){if(!document.getElementById('sub-'+k))k='notes';
+  document.querySelectorAll('#recNav button').forEach(b=>b.classList.toggle('on',b.dataset.sub===k));
+  document.querySelectorAll('.rec-sub').forEach(d=>d.classList.toggle('on',d.id==='sub-'+k));
+  try{sessionStorage.setItem('otr_sub',k)}catch(e){}}
 /* 탭 */
 document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));
@@ -837,7 +852,7 @@ document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{
   try{sessionStorage.setItem('otr_tab',b.dataset.tab)}catch(e){}
   scrollTo(0,0);
 });
-try{let t=sessionStorage.getItem('otr_tab');if(t==='schedule')t='speakers';if(t)document.querySelector(`#tabs [data-tab="${t}"]`)?.click();}catch(e){}
+try{let t=sessionStorage.getItem('otr_tab');if(t==='schedule')t='speakers';if(['actions','decisions','plan'].includes(t)){recSub(t);t='notes';}else recSub(sessionStorage.getItem('otr_sub')||'notes');if(t)document.querySelector(`#tabs [data-tab="${t}"]`)?.click();}catch(e){}
 
 /* 공통 편집 모달 */
 function field(f,v){
