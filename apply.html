@@ -249,7 +249,7 @@ footer .ft{display:flex;align-items:center;justify-content:space-between;gap:1re
 footer p{font-size:.76rem;color:rgba(255,255,255,.25);letter-spacing:.04em;font-family:'Inter Tight',sans-serif}
 .admin-btn{font-size:.7rem;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.3);text-decoration:none;padding:.35rem .75rem;border:1px solid rgba(255,255,255,.12);transition:all .2s;white-space:nowrap}
 .admin-btn:hover{color:#fff;border-color:var(--ac);background:var(--ac)}
-.lp{position:fixed;inset:0;z-index:99998;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45)}
+.lp{position:fixed;inset:0;z-index:99998;pointer-events:none;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45)}
 .lp circle{fill:none;stroke-width:4}
 
 /* STICKY CTA (mobile) */
@@ -556,7 +556,7 @@ body::after{display:none}
 .ov-sch small{display:block;color:rgba(237,230,214,.5);font-size:.78rem}
 .ov-sch .tba{color:rgba(237,230,214,.45)}
 @media(max-width:600px){.ov{padding:1.25rem 1.1rem}.ov-list div{grid-template-columns:52px 1fr}.ov-sch li{grid-template-columns:80px 1fr}}
-.lp{position:fixed;inset:0;z-index:99998;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45)}
+.lp{position:fixed;inset:0;z-index:99998;pointer-events:none;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45)}
 .lp circle{fill:none;stroke-width:4}
 .nav-logo{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 </style><style>
