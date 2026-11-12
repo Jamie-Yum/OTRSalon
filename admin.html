@@ -561,6 +561,27 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 #v-fees tr.hold td{color:var(--tl)}
 .ecat{display:inline-block;font-size:.74rem;font-weight:700;padding:.1rem .5rem;border-radius:4px;background:rgba(20,20,20,.07)}
 @media(max-width:700px){.bd-kpi{grid-template-columns:1fr 1fr}.bd-kpi b{font-size:1.3rem}}
+/* 수입 및 지출 전망 */
+.bp{background:var(--wh);border-radius:var(--r-sm);box-shadow:0 1px 2px rgba(20,20,20,.06),0 6px 18px rgba(20,20,20,.05);padding:1.4rem 1.6rem;margin-top:1.25rem}
+.bp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem}
+.bp-tbl{width:100%;border-collapse:collapse;font-size:.9rem}
+.bp-tbl th{text-align:right;font-size:.8rem;color:var(--tl);font-weight:600;padding:.5rem .4rem;border-bottom:1.5px solid rgba(20,20,20,.2)}
+.bp-tbl th:first-child,.bp-tbl td:first-child{text-align:left}
+.bp-tbl td{text-align:right;padding:.6rem .4rem;border-bottom:1px solid var(--bd);font-variant-numeric:tabular-nums}
+.bp-tbl td small{display:block;font-size:.74rem;color:var(--tl)}
+.bp-tbl tr.tot td{font-weight:700}
+.bp-tbl tr.res td{border-bottom:0;font-size:.98rem}
+.bp-tbl .neg,.bp-card .neg{color:#B0473D!important}
+.bp-card{margin-top:1rem;border:1px solid var(--bd);border-radius:12px;padding:1rem 1.2rem;background:#fff}
+.bp-card small{font-size:.82rem;color:var(--tl)}
+.bp-card>b{display:block;font-size:1.9rem;font-weight:800;color:#2F7A3A;margin:.2rem 0 .6rem}
+.bp-foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--bd);padding-top:.7rem;font-size:.85rem;color:var(--ts)}
+.bp-foot b{font-size:1.15rem;color:#2F7A3A}
+.bp-edit h4{font-size:.85rem;margin:1.1rem 0 .4rem}
+.bp-er{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:.4rem;margin-bottom:.35rem;align-items:center}
+.bp-er input{font:inherit;font-size:.85rem;padding:.4rem .55rem;border:1px solid var(--bd);border-radius:6px;background:#fff;min-width:0}
+.bp-lab span{font-size:.74rem;color:var(--tl);font-weight:600}
+@media(max-width:600px){.bp{padding:1.1rem}.bp-er{grid-template-columns:1fr 1fr}.bp-er input:first-child{grid-column:1/-1}}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
   <h2><span class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span><small>ADMIN</small></h2>
@@ -635,6 +656,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 <div class="panel" id="p-fees"><section class="section"><div class="container">
   <div class="mn-head"><div><div class="eyebrow">Budget</div><h2 class="title" style="margin:0">예산 관리</h2></div><button class="mn-btn ghost" onclick="edit('seasons',null,{season_no:Math.max(0,...(D.seasons||[]).map(x=>x.season_no))+1})">+ 새 시즌</button></div>
   <div id="bdSum"></div>
+  <div id="bdPlan"></div>
   <h3 class="bd-h">회비 내역 <small>확정 = 입금 완료 · 확정으로 바꾼 날이 입금일로 자동 기록됩니다 (수정 가능)</small></h3>
   <div class="tbl-wrap"><table class="tbl" id="v-dues"></table></div>
   <div class="mn-head" style="margin-top:2.5rem"><h3 class="bd-h" style="margin:0">지출 내역</h3><button class="mn-btn" onclick="edit('fees')">+ 지출 추가</button></div>
@@ -756,6 +778,45 @@ function budget(){
   const n=dues.filter(r=>r.status==='확정'&&!r.refunded).length,inc=dues.filter(r=>!r.refunded).length*(s.price||0);
   const fees=(D.fees||[]).filter(inS),amt=r=>(r.fee||0)+(r.gift||0);
   return {s,dues,n,inc,fees,out:fees.filter(r=>r.status!=='보류').reduce((t,r)=>t+amt(r),0),paid:fees.filter(r=>r.status==='지급 완료').reduce((t,r)=>t+amt(r),0)};
+}
+/* 수입 및 지출 전망 */
+let bpEdit=false,bpDraft=null;
+const wonF=v=>(v||0).toLocaleString()+'원',sgn=v=>(v>=0?'+':'')+wonF(v),manF=v=>(v>=0?'+':'')+Math.round(v/1e4).toLocaleString()+'만원';
+function bpCalc(){
+  const B=budget(),S=B.s,bg=S.budget||{income:[],expense:[]},price=(S.price||0)*1e4;
+  const pend=(D.apps||[]).filter(r=>inS(r)&&r.status==='접수').length;
+  const gen={name:`일반 참가비 (${S.price||0}만원)`,sub:`확정 ${B.n}명 · 접수 ${pend}명`,conf:B.n*price,plan:(B.n+pend)*price,auto:1};
+  const inc=[gen,...(bg.income||[])],exp=bg.expense||[];
+  const t=(L,k)=>L.reduce((a,r)=>a+(Number(r[k])||0),0);
+  return {inc,exp,pend,ic:t(inc,'conf'),ip:t(inc,'plan'),ec:t(exp,'conf'),ep:t(exp,'plan')};
+}
+function bpHtml(){
+  const S=budget().s;if(!S.id)return'';
+  if(bpEdit)return bpEditHtml();
+  const C=bpCalc(),row=(r,cls='')=>`<tr class="${cls}"><td>${esc(r.name)}${r.sub?`<small>${esc(r.sub)}</small>`:''}</td><td>${wonF(r.conf)}</td><td>${wonF(r.plan)}</td></tr>`;
+  const rc=C.ic-C.ec,rp=C.ip-C.ep;
+  return `<div class="bp"><div class="bp-head"><h3 class="bd-h" style="margin:0">수입 및 지출 전망</h3><button class="lnk" onclick="bpOpen()">항목 편집</button></div>
+  <table class="bp-tbl"><thead><tr><th>항목</th><th>확정 기준</th><th>예정 포함</th></tr></thead><tbody>
+  ${C.inc.map(r=>row(r)).join('')}<tr class="tot"><td>총수입</td><td>${wonF(C.ic)}</td><td>${wonF(C.ip)}</td></tr>
+  ${C.exp.map(r=>row(r)).join('')}<tr class="tot"><td>총지출</td><td>${wonF(C.ec)}</td><td>${wonF(C.ep)}</td></tr>
+  <tr class="tot res"><td>예상 잔여금</td><td class="${rc<0?'neg':''}">${sgn(rc)}</td><td class="${rp<0?'neg':''}">${sgn(rp)}</td></tr></tbody></table>
+  <div class="bp-card"><small>현재 확정 기준 예상 잔여금</small><b class="${rc<0?'neg':''}">${manF(rc)}</b>
+  <div class="bp-foot"><span>접수 ${C.pend}명 모두 확정 시</span><b class="${rp<0?'neg':''}">${manF(rp)}</b></div></div>
+  <p class="note" style="margin-top:.6rem">일반 참가비는 신청 현황에서 자동 계산됩니다 (확정 기준 = 확정 인원, 예정 포함 = 확정 + 접수 인원). 나머지 항목은 '항목 편집'에서 고칩니다.</p></div>`;
+}
+function bpOpen(){const S=budget().s;bpDraft=JSON.parse(JSON.stringify(S.budget||{income:[],expense:[]}));bpDraft.income=bpDraft.income||[];bpDraft.expense=bpDraft.expense||[];bpEdit=true;RENDER.fees();}
+function bpEditHtml(){
+  const sec=(k,l)=>`<h4>${l}</h4>${bpDraft[k].map((r,i)=>`<div class="bp-er"><input value="${esc(r.name)}" placeholder="항목 이름" oninput="bpDraft.${k}[${i}].name=this.value"><input type="number" value="${r.conf??''}" placeholder="확정 기준 (원)" oninput="bpDraft.${k}[${i}].conf=Number(this.value)||0"><input type="number" value="${r.plan??''}" placeholder="예정 포함 (원)" oninput="bpDraft.${k}[${i}].plan=Number(this.value)||0"><button class="lnk" onclick="bpDraft.${k}.splice(${i},1);RENDER.fees()">삭제</button></div>`).join('')}<button class="lnk" onclick="bpDraft.${k}.push({name:'',conf:0,plan:0});RENDER.fees()">+ ${l} 항목 추가</button>`;
+  return `<div class="bp bp-edit"><div class="bp-head"><h3 class="bd-h" style="margin:0">수입 및 지출 전망 · 항목 편집</h3></div>
+  <p class="note">금액은 원 단위로 입력합니다. 일반 참가비는 자동 계산이라 여기 없습니다.</p>
+  <div class="bp-er bp-lab"><span>항목</span><span>확정 기준</span><span>예정 포함</span><span></span></div>
+  ${sec('income','수입')}${sec('expense','지출')}
+  <div class="mn-actions" style="margin-top:1.2rem"><button class="mn-btn ghost" onclick="bpEdit=false;RENDER.fees()">취소</button><button class="mn-btn" onclick="bpSave(this)">저장</button></div></div>`;
+}
+async function bpSave(btn){
+  const S={...budget().s};const clean=L=>L.filter(r=>(r.name||'').trim()).map(r=>({name:r.name.trim(),conf:r.conf||0,plan:r.plan||0}));
+  S.budget={income:clean(bpDraft.income),expense:clean(bpDraft.expense)};btn.disabled=true;
+  try{await rpc('otr_save',{tbl:'otr_seasons',row_data:S});bpEdit=false;await load('seasons');}catch(e){alert('저장 실패: '+e.message);btn.disabled=false;}
 }
 function setSeason(v){SEASON=Number(v)||1;try{localStorage.setItem('otr_season',SEASON)}catch(e){}
   ['apps','speakers','schedule','fees'].forEach(k=>{try{if(D[k==='fees'?'fees':k])RENDER[k]()}catch(e){}});try{if(D.surveys)renderSurveys()}catch(e){}}
@@ -917,6 +978,7 @@ const RENDER={
         <div><small>지출 <em>(지급 완료 ${won(B.paid)}원)</em></small><b>${won(B.out)}<i>원</i></b></div>
         <div class="${B.inc-B.out<0?'neg':''}"><small>잔액</small><b>${won(B.inc-B.out)}<i>원</i></b></div>
       </div></div>`;
+    $('bdPlan').innerHTML=bpHtml();
     $('v-dues').innerHTML=`<thead><tr><th>이름</th><th>소속 / 역할</th><th>초대자</th><th>상태</th><th>금액</th><th>입금일</th><th>환불</th></tr></thead><tbody>${
       B.dues.map(r=>`<tr class="${r.refunded?'refund':''}"><td class="nw"><b>${esc(r.name)}</b></td><td>${esc((r.role||'').split('\n')[0])}</td><td class="nw">${invTag(r.inviter)}</td><td class="nw">${esc(r.status)}</td>
       <td class="nw">${r.refunded?'<s>'+won(S.price)+'</s>':won(S.price)}</td>
