@@ -566,6 +566,7 @@ body::after{display:none}
 .sp-card:not(.tbc) .lu-top b{color:#C9B37E}
 .sp-card:not(.tbc) .sp-body .lu-when{border-top-color:rgba(201,179,126,.28);color:rgba(237,230,214,.85)}
 .sp-card:not(.tbc):hover{border-color:rgba(201,179,126,.7);box-shadow:0 22px 48px rgba(0,0,0,.28),0 0 0 1px rgba(201,179,126,.25),0 10px 40px rgba(201,179,126,.16)}
+.nav-logo{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 </style></head><body>
 
 <nav class="nav" id="nav">
@@ -774,7 +775,7 @@ fetch(SU+'/rest/v1/rpc/otr_public_settings',{method:'POST',headers:{apikey:SK,Au
     if(pct>.1)lp.style.display='flex';ring.style.strokeDashoffset=213.6*(1-pct);
     if(pct>=1){stop();location.href='admin.html';}},30);}
   function stop(){clearInterval(t);t=null;lp.style.display='none';ring.style.strokeDashoffset=213.6;}
-  logo.addEventListener('mousedown',begin);logo.addEventListener('touchstart',begin,{passive:true});
+  logo.setAttribute('draggable','false');logo.addEventListener('mousedown',e=>{e.preventDefault();begin();});logo.addEventListener('touchstart',begin,{passive:true});
   ['mouseup','mouseleave','touchend','touchcancel'].forEach(ev=>logo.addEventListener(ev,()=>{if(t){moved=Date.now()-start>300;stop();}}));
   logo.addEventListener('click',e=>{if(moved)e.preventDefault();});
   logo.addEventListener('contextmenu',e=>e.preventDefault());

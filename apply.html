@@ -556,6 +556,9 @@ body::after{display:none}
 .ov-sch small{display:block;color:rgba(237,230,214,.5);font-size:.78rem}
 .ov-sch .tba{color:rgba(237,230,214,.45)}
 @media(max-width:600px){.ov{padding:1.25rem 1.1rem}.ov-list div{grid-template-columns:52px 1fr}.ov-sch li{grid-template-columns:80px 1fr}}
+.lp{position:fixed;inset:0;z-index:99998;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45)}
+.lp circle{fill:none;stroke-width:4}
+.nav-logo{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 </style><style>
 .apply-page{min-height:100vh;min-height:100svh;padding-top:calc(68px + 4rem)}
 .nav{background:rgba(20,20,20,.92)}
@@ -711,6 +714,23 @@ form.addEventListener('submit',async e=>{
       return `<li><span><b>Session 0${r.salon_no}</b><small>${esc(date)}</small></span><span>${h?`${esc(h.name)} <small>${esc(h.role||'')}</small>`:'<span class="tba">연사 곧 공개</span>'}</span></li>`;
     }).join('');
   });
+})();
+</script>
+<div class="lp" id="lp"><svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" stroke="rgba(255,255,255,.2)"/><circle id="lpRing" cx="40" cy="40" r="34" stroke="#fff" stroke-dasharray="213.6" stroke-dashoffset="213.6" transform="rotate(-90 40 40)"/></svg></div>
+<script>
+/* 로고 2초 길게 누르기 → 관리자 페이지 */
+(function(){
+  const logo=document.querySelector('.nav-logo'),lp=document.getElementById('lp'),ring=document.getElementById('lpRing');if(!logo)return;
+  logo.setAttribute('draggable','false');
+  let t=null,start=0,moved=false;
+  function begin(){start=Date.now();moved=false;t=setInterval(()=>{const pct=Math.min((Date.now()-start)/2000,1);
+    if(pct>.1)lp.style.display='flex';ring.style.strokeDashoffset=213.6*(1-pct);
+    if(pct>=1){stop();location.href='admin.html';}},30);}
+  function stop(){clearInterval(t);t=null;lp.style.display='none';ring.style.strokeDashoffset=213.6;}
+  logo.addEventListener('mousedown',e=>{e.preventDefault();begin();});logo.addEventListener('touchstart',begin,{passive:true});
+  ['mouseup','mouseleave','touchend','touchcancel'].forEach(ev=>logo.addEventListener(ev,()=>{if(t){moved=Date.now()-start>300;stop();}}));
+  logo.addEventListener('click',e=>{if(moved)e.preventDefault();});
+  logo.addEventListener('contextmenu',e=>e.preventDefault());
 })();
 </script>
 </body></html>
