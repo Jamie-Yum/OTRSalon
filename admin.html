@@ -641,9 +641,21 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .rte-area{min-height:3.2rem;padding:.7rem .85rem;font-size:.92rem;font-weight:400;line-height:1.75;color:#2a2a2a;outline:none}
 #sv_intro{min-height:12rem}
 .rte-area:empty:before,.rte-area.empty:before{content:attr(data-ph);color:#aaa}
+.rte-blk{display:inline-flex;align-items:center;gap:.25rem;margin-left:.3rem;padding-left:.5rem;border-left:1px solid var(--bd);font-size:.76rem;color:var(--tl)}
+.rte-bar .sw{min-width:0;width:1.15rem;height:1.15rem;padding:0;border-radius:50%;border:1px solid rgba(20,20,20,.18)!important}
+.rte-bar .sw:hover{transform:scale(1.15)}
+.rte-bar .sw.c-cream{background:#F7F2E7!important}.rte-bar .sw.c-gold{background:#E6D9B8!important}.rte-bar .sw.c-gray{background:#E2E0DB!important}.rte-bar .sw.c-blue{background:#D6E2F0!important}.rte-bar .sw.c-dark{background:#1E1E1E!important}
 .rte-area b{font-weight:700}.rte-area .hl{color:#9A7B3C;font-weight:600}
 .rte-area ul,.rte-area ol{margin:.3rem 0 .3rem 1.3rem;padding:0}
 .rte-area blockquote{margin:.5rem 0;padding:.5rem .8rem;border-left:3px solid #C9B37E;background:rgba(201,179,126,.12);border-radius:0 8px 8px 0}
+.rt h4,.rte-area h4{font-size:1rem;font-weight:700;color:#141414;margin:.2rem 0 .4rem;line-height:1.5}
+.blk{border-radius:12px;padding:.9rem 1.1rem;margin:.7rem 0}
+.blk>:first-child{margin-top:0}.blk>:last-child{margin-bottom:0}
+.blk.c-cream{background:#F7F2E7}
+.blk.c-gold{background:rgba(201,179,126,.16);border-left:3px solid #C9B37E;border-radius:0 12px 12px 0}
+.blk.c-gray{background:#F0EFEC}
+.blk.c-blue{background:#EAF0F7}
+.blk.c-dark{background:#1E1E1E;color:#EDE6D6}.blk.c-dark b,.blk.c-dark h4{color:#fff}.blk.c-dark .hl{color:#D9C38F}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
   <h2><span class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span><small>ADMIN</small></h2>
@@ -1333,15 +1345,16 @@ async function svDelResp(rid){if(!confirm('이 응답을 삭제할까요? 되돌
 /* 설문 편집: 선택한 글자를 **굵게** 감싸기 (이미 굵으면 해제) */
 const md=t=>esc(t).replace(/\*\*([\s\S]+?)\*\*/g,'<b>$1</b>');
 /* 서식 텍스트: 저장은 허용 태그만 남긴 HTML, 예전 **굵게** 텍스트도 호환 */
-const rtIsHtml=t=>/<\/?(b|i|u|br|div|ul|ol|li|span|blockquote)\b/i.test(t||'');
+const rtIsHtml=t=>/<\/?(b|i|u|br|div|ul|ol|li|span|blockquote|h4)\b/i.test(t||'');
 const mdToHtml=t=>esc(t||'').replace(/\*\*([\s\S]+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>');
 function rtClean(html){
   const doc=new DOMParser().parseFromString('<div>'+(html||'')+'</div>','text/html');
-  const OK={B:'b',STRONG:'b',I:'i',EM:'i',U:'u',BR:'br',DIV:'div',P:'div',UL:'ul',OL:'ol',LI:'li',BLOCKQUOTE:'blockquote'};
+  const OK={B:'b',STRONG:'b',I:'i',EM:'i',U:'u',BR:'br',DIV:'div',P:'div',UL:'ul',OL:'ol',LI:'li',BLOCKQUOTE:'blockquote',H4:'h4',H3:'h4',H2:'h4'};
   const walk=n=>{let o='';n.childNodes.forEach(c=>{
     if(c.nodeType===3){o+=esc(c.nodeValue);return;}if(c.nodeType!==1||/^(SCRIPT|STYLE|TEMPLATE|IFRAME|OBJECT|SVG)$/i.test(c.tagName))return;
     const tg=c.tagName,inner=walk(c),st=c.getAttribute('style')||'';
     if(tg==='SPAN'&&c.classList.contains('hl')||tg==='FONT'&&c.getAttribute('color')||!OK[tg]&&/color\s*:/.test(st)){o+=`<span class="hl">${inner}</span>`;return;}
+    if(tg==='DIV'&&c.classList.contains('blk')){const cc=['cream','gold','gray','blue','dark'].find(k=>c.classList.contains('c-'+k))||'cream';o+=`<div class="blk c-${cc}">${inner}</div>`;return;}
     if(!OK[tg]){o+=/font-weight\s*:\s*(bold|[6-9]00)/.test(st)?`<b>${inner}</b>`:inner;return;}
     o+=OK[tg]==='br'?'<br>':`<${OK[tg]}>${inner}</${OK[tg]}>`;});return o;};
   const out=walk(doc.body.firstChild).replace(/^(<div><br><\/div>)+|(<div><br><\/div>)+$/g,'');
@@ -1350,11 +1363,34 @@ function rtClean(html){
 const rich=t=>rtIsHtml(t)?`<div class="rt">${rtClean(t)}</div>`:md(t);
 
 const RT_TOOLS=[['bold','<b>B</b>','굵게 (Ctrl+B)'],['italic','<i>I</i>','기울임 (Ctrl+I)'],['underline','<u>U</u>','밑줄 (Ctrl+U)'],['hl','<span style="color:#9A7B3C;font-weight:700">A</span>','강조색 (골드)'],
-  ['insertUnorderedList','• 목록','글머리 목록'],['insertOrderedList','1. 목록','번호 목록'],['quote','❝ 박스','인용 박스 (다시 누르면 해제)'],['removeFormat','서식 지우기','선택한 글자 서식 지우기']];
+  ['insertUnorderedList','• 목록','글머리 목록'],['insertOrderedList','1. 목록','번호 목록'],['h4','소제목','소제목 (다시 누르면 본문)'],['quote','❝ 박스','인용 박스 (다시 누르면 해제)'],['removeFormat','서식 지우기','선택한 글자 서식 지우기']];
 function rtEditor(id,val,ph,onch){
   const html=rtIsHtml(val)?rtClean(val):mdToHtml(val);
-  return `<div class="rte"><div class="rte-bar">${RT_TOOLS.map(([c,l,t])=>`<button type="button" title="${t}" onmousedown="event.preventDefault();rtCmd('${id}','${c}')">${l}</button>`).join('')}</div>
+  return `<div class="rte"><div class="rte-bar">${RT_TOOLS.map(([c,l,t])=>`<button type="button" title="${t}" onmousedown="event.preventDefault();rtCmd('${id}','${c}')">${l}</button>`).join('')}
+      <span class="rte-blk">단락 ${BLK_COLORS.map(([k,l])=>`<button type="button" class="sw c-${k}" title="${l} 단락으로 묶기 (같은 색 다시 누르면 해제)" onmousedown="event.preventDefault();rtBlock('${id}','${k}')"></button>`).join('')}</span></div>
     <div class="rte-area" id="${id}" contenteditable="true" data-ph="${esc(ph||'')}" data-onch="${esc(onch||'')}" oninput="rtChanged(this)" onpaste="rtPaste(event)">${html}</div></div>`;
+}
+const BLK_COLORS=[['cream','크림'],['gold','골드 라인'],['gray','그레이'],['blue','블루'],['dark','다크']];
+function rtBlock(id,color){
+  const el=$(id);el.focus();const sel=getSelection();if(!sel.rangeCount)return;const r=sel.getRangeAt(0);
+  const cur=(r.startContainer.nodeType===1?r.startContainer:r.startContainer.parentElement).closest('.blk');
+  if(cur&&el.contains(cur)){
+    if(cur.classList.contains('c-'+color))cur.replaceWith(...cur.childNodes);
+    else cur.className='blk c-'+color;
+    rtChanged(el);return;}
+  const top=n=>{while(n&&n.parentNode!==el)n=n.parentNode;return n;};
+  let a=top(r.startContainer),b=top(r.endContainer);
+  if(!a){a=el.firstChild;b=el.lastChild;}
+  if(!a){return;}
+  // 줄 단위로 확장: <br> 경계까지
+  while(a.previousSibling&&a.previousSibling.nodeName!=='BR'&&!/^(DIV|UL|OL|BLOCKQUOTE|H4)$/.test(a.previousSibling.nodeName)&&!/^(DIV|UL|OL|BLOCKQUOTE|H4)$/.test(a.nodeName))a=a.previousSibling;
+  while(b.nextSibling&&b.nodeName!=='BR'&&!/^(DIV|UL|OL|BLOCKQUOTE|H4)$/.test(b.nodeName)&&b.nextSibling.nodeName!=='BR'&&!/^(DIV|UL|OL|BLOCKQUOTE|H4)$/.test(b.nextSibling.nodeName))b=b.nextSibling;
+  if(b.nextSibling&&b.nextSibling.nodeName==='BR')b=b.nextSibling;
+  const d=document.createElement('div');d.className='blk c-'+color;a.parentNode.insertBefore(d,a);
+  let n=a;while(n){const nx=n.nextSibling;d.appendChild(n);if(n===b)break;n=nx;}
+  while(d.lastChild&&d.lastChild.nodeName==='BR')d.lastChild.remove();
+  if(d.nextSibling&&d.nextSibling.nodeName==='BR')d.nextSibling.remove();
+  rtChanged(el);
 }
 function rtChanged(el){const f=el.dataset.onch;if(f)new Function('v',f)(rtClean(el.innerHTML));el.classList.toggle('empty',!el.textContent.trim());}
 function rtCmd(id,c){
@@ -1364,6 +1400,8 @@ function rtCmd(id,c){
     if(a&&el.contains(a)){a.replaceWith(...a.childNodes);}else{const r=sel.getRangeAt(0),sp=document.createElement('span');sp.className='hl';sp.appendChild(r.extractContents());r.insertNode(sp);sel.removeAllRanges();const nr=document.createRange();nr.selectNodeContents(sp);sel.addRange(nr);}}
   else if(c==='quote'){const sel=getSelection();const n=sel.anchorNode&&(sel.anchorNode.nodeType===1?sel.anchorNode:sel.anchorNode.parentElement).closest('blockquote');
     document.execCommand('formatBlock',false,n&&el.contains(n)?'div':'blockquote');}
+  else if(c==='h4'){const sel=getSelection();const n=sel.anchorNode&&(sel.anchorNode.nodeType===1?sel.anchorNode:sel.anchorNode.parentElement).closest('h4');
+    document.execCommand('formatBlock',false,n&&el.contains(n)?'div':'h4');}
   else if(c==='removeFormat'){document.execCommand('removeFormat');const sel=getSelection();if(sel.rangeCount){el.querySelectorAll('.hl').forEach(h=>{if(sel.containsNode(h,true))h.replaceWith(...h.childNodes);});}}
   else document.execCommand(c);
   rtChanged(el);

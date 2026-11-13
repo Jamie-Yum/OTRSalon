@@ -79,6 +79,14 @@ body{font-family:Pretendard,sans-serif;background:var(--bg);color:var(--dk);line
 .rt .hl{color:#9A7B3C;font-weight:600}
 .rt ul,.rt ol{margin:.35rem 0 .35rem 1.3rem;padding:0}.rt li{margin:.15rem 0}
 .rt blockquote{margin:.6rem 0;padding:.6rem .9rem;border-left:3px solid #C9B37E;background:rgba(201,179,126,.12);border-radius:0 8px 8px 0}
+.rt h4,.rte-area h4{font-size:1rem;font-weight:700;color:#141414;margin:.2rem 0 .4rem;line-height:1.5}
+.blk{border-radius:12px;padding:.9rem 1.1rem;margin:.7rem 0}
+.blk>:first-child{margin-top:0}.blk>:last-child{margin-bottom:0}
+.blk.c-cream{background:#F7F2E7}
+.blk.c-gold{background:rgba(201,179,126,.16);border-left:3px solid #C9B37E;border-radius:0 12px 12px 0}
+.blk.c-gray{background:#F0EFEC}
+.blk.c-blue{background:#EAF0F7}
+.blk.c-dark{background:#1E1E1E;color:#EDE6D6}.blk.c-dark b,.blk.c-dark h4{color:#fff}.blk.c-dark .hl{color:#D9C38F}
 </style></head><body>
 <div class="top"><a href="index.html">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</a></div>
 <main class="wrap" id="app"><div class="msg"><p>설문을 불러오는 중…</p></div></main>
@@ -89,15 +97,16 @@ const esc=t=>(t==null?'':String(t)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt
 const app=document.getElementById('app');
 const md=t=>esc(t).replace(/\*\*([\s\S]+?)\*\*/g,'<b>$1</b>');
 /* 서식 텍스트: 저장은 허용 태그만 남긴 HTML, 예전 **굵게** 텍스트도 호환 */
-const rtIsHtml=t=>/<\/?(b|i|u|br|div|ul|ol|li|span|blockquote)\b/i.test(t||'');
+const rtIsHtml=t=>/<\/?(b|i|u|br|div|ul|ol|li|span|blockquote|h4)\b/i.test(t||'');
 const mdToHtml=t=>esc(t||'').replace(/\*\*([\s\S]+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>');
 function rtClean(html){
   const doc=new DOMParser().parseFromString('<div>'+(html||'')+'</div>','text/html');
-  const OK={B:'b',STRONG:'b',I:'i',EM:'i',U:'u',BR:'br',DIV:'div',P:'div',UL:'ul',OL:'ol',LI:'li',BLOCKQUOTE:'blockquote'};
+  const OK={B:'b',STRONG:'b',I:'i',EM:'i',U:'u',BR:'br',DIV:'div',P:'div',UL:'ul',OL:'ol',LI:'li',BLOCKQUOTE:'blockquote',H4:'h4',H3:'h4',H2:'h4'};
   const walk=n=>{let o='';n.childNodes.forEach(c=>{
     if(c.nodeType===3){o+=esc(c.nodeValue);return;}if(c.nodeType!==1||/^(SCRIPT|STYLE|TEMPLATE|IFRAME|OBJECT|SVG)$/i.test(c.tagName))return;
     const tg=c.tagName,inner=walk(c),st=c.getAttribute('style')||'';
     if(tg==='SPAN'&&c.classList.contains('hl')||tg==='FONT'&&c.getAttribute('color')||!OK[tg]&&/color\s*:/.test(st)){o+=`<span class="hl">${inner}</span>`;return;}
+    if(tg==='DIV'&&c.classList.contains('blk')){const cc=['cream','gold','gray','blue','dark'].find(k=>c.classList.contains('c-'+k))||'cream';o+=`<div class="blk c-${cc}">${inner}</div>`;return;}
     if(!OK[tg]){o+=/font-weight\s*:\s*(bold|[6-9]00)/.test(st)?`<b>${inner}</b>`:inner;return;}
     o+=OK[tg]==='br'?'<br>':`<${OK[tg]}>${inner}</${OK[tg]}>`;});return o;};
   const out=walk(doc.body.firstChild).replace(/^(<div><br><\/div>)+|(<div><br><\/div>)+$/g,'');
