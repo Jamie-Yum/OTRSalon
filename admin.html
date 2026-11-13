@@ -853,6 +853,7 @@ async function msgCopy(id,btn){const m=D.messages.find(x=>x.id===id);try{await n
 const $=id=>document.getElementById(id);
 const esc=t=>(t==null?'':String(t)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const today=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const kst=iso=>{if(!iso)return '';const d=new Date(new Date(iso).getTime()+9*36e5).toISOString();return d.slice(0,10)+' '+d.slice(11,16);};
 const salonL=v=>v?'Session 0'+v:'—';
 
 async function rpc(fn,body){
@@ -1016,7 +1017,7 @@ async function appDel(id){if(!confirm('이 신청을 삭제할까요? 되돌릴 
 function appCsv(){
   const L=D.apps||[],h=['접수일','이름','연락처','소속/역할','초대자','Pass','상태','사전 질문','메모'];
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const csv='\uFEFF'+[h,...L.map(r=>[r.created_at.slice(0,16).replace('T',' '),r.name,r.phone,r.role,r.inviter,r.pass,r.status,r.question,r.memo])].map(r=>r.map(q).join(',')).join('\n');
+  const csv='\uFEFF'+[h,...L.map(r=>[kst(r.created_at),r.name,r.phone,r.role,r.inviter,r.pass,r.status,r.question,r.memo])].map(r=>r.map(q).join(',')).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='otr_applications_'+today()+'.csv';a.click();
 }
 /* 홈페이지 설정 — 히어로 배경 */
@@ -1058,7 +1059,7 @@ const RENDER={
     const one=t=>`<span class="ellip" title="${esc(t)}">${esc(t)}</span>`;
     $('v-apps').innerHTML=`<thead><tr><th style="width:34px"><input type="checkbox" id="selAll" onchange="appToggleAll(this.checked)" title="전체 선택"></th><th>접수일</th>${sortTh('name','이름')}<th>소속 / 역할</th><th>연락처</th>${sortTh('inviter','초대자')}${sortTh('status','상태')}<th>요즘 관심사</th><th>주요 커리어</th><th></th></tr></thead><tbody>${
       L.map(r=>{const m=intro(r.question);const has=Object.keys(m).length;
-      return `<tr class="app-row as${APP_STATUS.indexOf(r.status)}${appSel.has(r.id)?' sel':''}"><td><input type="checkbox" ${appSel.has(r.id)?'checked':''} onchange="appToggle('${r.id}',this.checked);this.closest('tr').classList.toggle('sel',this.checked)"></td><td class="nw" style="color:var(--tl)">${r.created_at.slice(5,10).replace('-','/')} ${r.created_at.slice(11,16)}</td>
+      return `<tr class="app-row as${APP_STATUS.indexOf(r.status)}${appSel.has(r.id)?' sel':''}"><td><input type="checkbox" ${appSel.has(r.id)?'checked':''} onchange="appToggle('${r.id}',this.checked);this.closest('tr').classList.toggle('sel',this.checked)"></td><td class="nw" style="color:var(--tl)">${kst(r.created_at).slice(5).replace('-','/')}</td>
       <td class="nw"><b>${esc(r.name)}</b></td><td>${one(r.role)}</td><td class="nw">${esc(r.phone)}</td><td class="nw">${invTag(r.inviter)}</td>
       <td><select class="st-sel" onchange="this.closest('tr').className=this.closest('tr').className.replace(/\bas\d/,'as'+APP_STATUS.indexOf(this.value));appUpdate('${r.id}',{new_status:this.value})">${APP_STATUS.map(o=>`<option ${o===r.status?'selected':''}>${o}</option>`).join('')}</select></td>
       <td>${one(has?(m['요즘 관심사']||''):r.question)}</td><td>${one(m['주요 커리어']||m['커리어']||'')}</td>
@@ -1319,7 +1320,7 @@ function svRenderResp(box){
   <p class="note">${svOpen(s)?'응답 받는 중':'마감'} · ${esc(svFmt(s.deadline))} · 총 <b>${R.length}</b>명 응답. 주관식 답변 옆 ★을 누르면 연사 전달 목록에 담깁니다.</p>
   <div class="sv-sums">${sum||'<div class="mn-empty">문항이 없습니다.</div>'}</div>
   <h3 class="sub-h" style="margin-top:2.5rem">응답별 보기</h3>
-  <div class="sv-resps">${R.map((r,i)=>`<details class="sv-resp"><summary><b>#${R.length-i}</b> ${r.created_at.slice(5,16).replace('T',' ').replace('-','/')}${r.name?` · ${esc(r.name)}`:''}<button class="ic del" title="응답 삭제" onclick="event.preventDefault();svDelResp('${r.id}')">✕</button></summary>
+  <div class="sv-resps">${R.map((r,i)=>`<details class="sv-resp"><summary><b>#${R.length-i}</b> ${kst(r.created_at).slice(5).replace('-','/')}${r.name?` · ${esc(r.name)}`:''}<button class="ic del" title="응답 삭제" onclick="event.preventDefault();svDelResp('${r.id}')">✕</button></summary>
     ${Q.map(q=>`<div class="sv-ra"><h6>${esc(q.title)}</h6><p>${esc(svAns((r.answers||{})[q.id]))||'<span style="color:var(--tl)">—</span>'}</p></div>`).join('')}</details>`).join('')||'<div class="mn-empty">아직 응답이 없습니다.</div>'}</div>`;
 }
 async function svPick(rid,k){
@@ -1336,7 +1337,7 @@ function svCopyPicked(sid){
 function svCsv(sid){
   const s=D.surveys.find(x=>x.id===sid);const Q=(s.questions||[]).filter(q=>q.type!=='section');const R=svResp(sid);
   const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const rows=[['응답 시각',...(s.ask_name?['이름']:[]),...Q.map(x=>x.title)],...R.map(r=>[r.created_at.slice(0,16).replace('T',' '),...(s.ask_name?[r.name||'']:[]),...Q.map(x=>svAns((r.answers||{})[x.id]))])];
+  const rows=[['응답 시각',...(s.ask_name?['이름']:[]),...Q.map(x=>x.title)],...R.map(r=>[kst(r.created_at),...(s.ask_name?[r.name||'']:[]),...Q.map(x=>svAns((r.answers||{})[x.id]))])];
   const blob=new Blob(['\uFEFF'+rows.map(r=>r.map(q).join(',')).join('\n')],{type:'text/csv'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(s.title||'설문')+'_응답.csv';a.click();
 }
