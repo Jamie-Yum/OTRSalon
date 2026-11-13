@@ -1,0 +1,14 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>사전 질문 설문 · Season 1 Session 01 — 오프레코드 살롱</title>
+<meta name="robots" content="noindex">
+<meta property="og:title" content="오프레코드 살롱 · Season 1 Session 01 사전 질문 설문"><meta property="og:description" content="11월 28일 살롱에서 함께 나눌 질문을 남겨 주세요."><meta property="og:image" content="https://off-record.kr/og.jpg">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<style>html,body{background:#EFE9DD}</style>
+<script>
+const SID='0d4c7498-d97c-42d4-8a24-9dc44363f0b8';
+fetch('/survey.html',{cache:'no-cache'}).then(r=>{if(!r.ok)throw 0;return r.text()}).then(t=>{
+  t=t.replace(/<head>/i,`<head><base href="/"><script>window.SID='${SID}'<\/script>`);
+  document.open();document.write(t);document.close();
+}).catch(()=>location.replace('/survey.html?s='+SID));
+</script>
+</head><body></body></html>

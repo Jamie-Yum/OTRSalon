@@ -120,7 +120,7 @@ const W='일월화수목금토';
 const fmtDl=d=>{const x=new Date(d);return `${x.getFullYear()}. ${x.getMonth()+1}. ${x.getDate()}. (${W[x.getDay()]}) ${String(x.getHours()).padStart(2,'0')}:${String(x.getMinutes()).padStart(2,'0')}`;};
 let S=null;
 async function init(){
-  const sid=new URLSearchParams(location.search).get('s');
+  const sid=window.SID||new URLSearchParams(location.search).get('s');
   if(!sid)return msg('설문 주소가 올바르지 않습니다','받으신 링크를 다시 확인해 주세요.');
   try{S=await rpc('otr_public_survey',{sid});}catch(e){return msg('설문을 불러오지 못했습니다',esc(e.message));}
   if(!S)return msg('설문을 찾을 수 없습니다','받으신 링크를 다시 확인해 주세요.');
