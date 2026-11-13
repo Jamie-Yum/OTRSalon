@@ -67,13 +67,13 @@ body{font-family:Pretendard,sans-serif;background:var(--bg);color:var(--dk);line
 .opts.two .opt{align-items:center;padding:.65rem .75rem;font-size:.9rem}
 .opts.two .opt input{margin-top:0}
 /* 첨부 PDF */
-.att{display:flex;align-items:center;gap:1rem;background:var(--dk);color:var(--cr);border-radius:14px;padding:1.1rem 1.3rem;margin-bottom:1rem;text-decoration:none;transition:transform .15s}
-.att:hover{transform:translateY(-1px)}
-.att-ic{flex:none;width:46px;height:46px;border-radius:10px;border:1.5px solid var(--gold);color:var(--gold);display:flex;align-items:center;justify-content:center;font:700 .74rem 'Inter Tight',sans-serif;letter-spacing:.08em}
+.att{display:flex;align-items:center;gap:1rem;background:#1F3A5F;color:#fff;border:1.5px solid var(--gold);border-radius:14px;padding:1.1rem 1.3rem;margin-bottom:1.1rem;text-decoration:none;box-shadow:0 6px 18px rgba(31,58,95,.28);transition:transform .15s,box-shadow .15s}
+.att:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(31,58,95,.36)}
+.att-ic{flex:none;width:46px;height:46px;border-radius:10px;background:var(--gold);color:#141414;display:flex;align-items:center;justify-content:center;font:700 .74rem 'Inter Tight',sans-serif;letter-spacing:.08em}
 .att-t{flex:1;display:flex;flex-direction:column;gap:.15rem;min-width:0}
-.att-t small{font-size:.78rem;color:var(--gold)}
-.att-t b{font-size:1rem;font-weight:600}
-.att-go{flex:none;font-size:.85rem;color:var(--gold);font-weight:600}
+.att-t small{font-size:.78rem;color:#E9DCB8}
+.att-t b{font-size:1rem;font-weight:600;color:#fff}
+.att-go{flex:none;font-size:.85rem;color:#E2CD94;font-weight:600;transition:transform .2s}.att:hover .att-go{transform:translateX(4px)}
 .rt{white-space:normal}
 .rt b,.sec-d b{font-weight:700;color:var(--dk)}
 .rt .hl{color:#9A7B3C;font-weight:600}
