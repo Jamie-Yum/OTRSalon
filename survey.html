@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-<title>설문 — 오프레코드 살롱</title>
+<title>설문 — 오프더레코드 살롱</title>
 <meta name="robots" content="noindex">
-<meta property="og:title" content="오프레코드 살롱 설문"><meta property="og:description" content="세션을 위한 사전 질문을 남겨 주세요."><meta property="og:image" content="https://off-record.kr/og.jpg">
+<meta property="og:title" content="오프더레코드 살롱 설문"><meta property="og:description" content="세션을 위한 사전 질문을 남겨 주세요."><meta property="og:image" content="https://off-record.kr/og.jpg">
 <link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" href="/favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=Josefin+Sans:wght@500;600&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
@@ -124,7 +124,7 @@ async function init(){
   if(!sid)return msg('설문 주소가 올바르지 않습니다','받으신 링크를 다시 확인해 주세요.');
   try{S=await rpc('otr_public_survey',{sid});}catch(e){return msg('설문을 불러오지 못했습니다',esc(e.message));}
   if(!S)return msg('설문을 찾을 수 없습니다','받으신 링크를 다시 확인해 주세요.');
-  document.title=S.title+' — 오프레코드 살롱';
+  document.title=S.title+' — 오프더레코드 살롱';
   if(!S.is_open)return msg('마감된 설문입니다','참여해 주셔서 감사합니다.');
   render();
 }
