@@ -656,6 +656,13 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .blk.c-gray{background:#F0EFEC}
 .blk.c-blue{background:#EAF0F7}
 .blk.c-dark{background:#1E1E1E;color:#EDE6D6}.blk.c-dark b,.blk.c-dark h4{color:#fff}.blk.c-dark .hl{color:#D9C38F}
+.act[draggable],.act-tbl tr[draggable]{cursor:grab}
+.act.dragging,.act-tbl tr.dragging{opacity:.35}
+.owner-card.drop,.acat-box.drop{outline:2px dashed #3D6FB0;outline-offset:3px;background:#F2F6FB}
+.act-t.editing{outline:1.5px solid #3D6FB0;border-radius:4px;padding:0 .2rem;background:#fff;cursor:text;text-decoration:none!important}
+.act-ed{border:0;background:none;color:var(--tl);cursor:pointer;font-size:.8rem;padding:0 .25rem;opacity:0;transition:opacity .15s}
+.act:hover .act-ed,.act-tbl tr:hover .act-ed{opacity:1}.act-ed:hover{color:#141414}
+@media(hover:none){.act-ed{opacity:1}}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
   <h2><span class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span><small>ADMIN</small></h2>
@@ -848,6 +855,27 @@ const T={
 };
 const D={};let PW='',cur=null,decCat='전체';
 let actMode={view:'cat',who:'',hide:false};try{Object.assign(actMode,JSON.parse(localStorage.getItem('otr_act')||'{}'))}catch(e){}
+let actDrg=null;
+function actDrag(e,id,from){actDrg={id,from};e.dataTransfer.effectAllowed='copyMove';try{e.dataTransfer.setData('text/plain',id)}catch(_){}e.currentTarget.classList.add('dragging');}
+function actEnd(){document.querySelectorAll('.dragging,.drop').forEach(x=>x.classList.remove('dragging','drop'));}
+function actOver(e){if(!actDrg)return;e.preventDefault();e.dataTransfer.dropEffect=e.ctrlKey||e.altKey?'copy':'move';e.currentTarget.classList.add('drop');}
+async function actDrop(e,field,to){
+  e.preventDefault();const d=actDrg;actDrg=null;actEnd();if(!d)return;
+  const a=D.actions.find(x=>x.id===d.id);if(!a)return;
+  if(field==='category'){if((a.category||'기타')!==to)await quick('actions',a.id,{category:to});return;}
+  const L=(a.owner||'').split(/[·,]/).map(x=>x.trim()).filter(Boolean);if(L.includes(to)&&!(d.from&&d.from!==to))return;
+  const keep=e.ctrlKey||e.altKey;
+  let N=keep?[...L]:L.filter(x=>x!==d.from);if(!N.includes(to))N.push(to);
+  if(N.join('·')!==L.join('·'))await quick('actions',a.id,{owner:N.join('·')});
+}
+function actInline(el,id){
+  if(el.isContentEditable)return;const old=el.textContent,row=el.closest('[draggable]');if(row)row.draggable=false;
+  el.contentEditable='true';el.classList.add('editing');el.focus();const r=document.createRange();r.selectNodeContents(el);const sl=getSelection();sl.removeAllRanges();sl.addRange(r);
+  const done=async save=>{el.onblur=el.onkeydown=null;el.contentEditable='false';el.classList.remove('editing');if(row)row.draggable=true;
+    const v=el.textContent.trim();if(!save||!v||v===old){el.textContent=old;return;}await quick('actions',id,{action:v});};
+  el.onkeydown=ev=>{if(ev.key==='Enter'&&!ev.shiftKey){ev.preventDefault();done(true);}else if(ev.key==='Escape'){ev.preventDefault();done(false);}};
+  el.onblur=()=>done(true);
+}
 function actSet(k,v){actMode[k]=v;try{localStorage.setItem('otr_act',JSON.stringify(actMode))}catch(e){}RENDER.actions();}
 async function msgCopy(id,btn){const m=D.messages.find(x=>x.id===id);try{await navigator.clipboard.writeText(m.body)}catch(e){const ta=document.createElement('textarea');ta.value=m.body;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();}btn.textContent='복사됨';setTimeout(()=>btn.textContent='복사',1500);}
 const $=id=>document.getElementById(id);
@@ -1145,8 +1173,8 @@ const RENDER={
       $('v-actions').innerHTML=`<div class="owner-grid">${owners.filter(o=>!M.who||o===M.who).map(o=>{
         const X=L.filter(a=>ownersOf(a).includes(o)).sort((a,b)=>(a.status==='완료')-(b.status==='완료')||ord(a,b));
         if(!X.length&&M.who!==o)return '';
-        return `<div class="owner-card"><h4><span class="own" style="--oc:${ownC(o)}">${esc(o)}</span> <small style="color:var(--tl);font-weight:500">· 남은 일 ${X.filter(a=>a.status!=='완료').length}건</small></h4>${X.map(a=>`<div class="act ${a.status==='완료'?'done':''}"><input type="checkbox" ${a.status==='완료'?'checked':''} onchange="quick('actions','${a.id}',{status:this.checked?'완료':'진행 중'})">
-          <span onclick="edit('actions','${a.id}')">${esc(a.action)}${a.category?` <small class="acat">${esc(a.category)}</small>`:''}${a.status==='보류'?' <small style="color:var(--tl)">(보류)</small>':''}</span>
+        return `<div class="owner-card" ondragover="actOver(event)" ondragleave="this.classList.remove('drop')" ondrop="actDrop(event,'owner','${esc(o)}')"><h4><span class="own" style="--oc:${ownC(o)}">${esc(o)}</span> <small style="color:var(--tl);font-weight:500">· 남은 일 ${X.filter(a=>a.status!=='완료').length}건</small></h4>${X.map(a=>`<div class="act ${a.status==='완료'?'done':''}" draggable="true" ondragstart="actDrag(event,'${a.id}','${esc(o)}')" ondragend="actEnd()"><input type="checkbox" ${a.status==='완료'?'checked':''} onchange="quick('actions','${a.id}',{status:this.checked?'완료':'진행 중'})">
+          <span><span class="act-t" title="클릭해서 바로 수정" onclick="actInline(this,'${a.id}')">${esc(a.action)}</span><button class="act-ed" title="자세히 편집 (담당·날짜·메모)" onclick="edit('actions','${a.id}')">✎</button>${a.category?` <small class="acat">${esc(a.category)}</small>`:''}${a.status==='보류'?' <small style="color:var(--tl)">(보류)</small>':''}</span>
           <em class="dl ${dCls(a)}" style="font-style:normal">${dTxt(a)}</em></div>`).join('')||'<p style="font-size:.85rem;color:var(--tl)">할 일 없음</p>'}
           <button class="lnk" style="margin-top:.5rem" onclick="edit('actions',null,{owner:'${esc(o)}'})">+ 추가</button></div>`}).join('')}</div>`;
       return;
@@ -1155,10 +1183,10 @@ const RENDER={
     $('v-actions').innerHTML=cats.map(c=>{
       const all=A.filter(a=>(a.category||'기타')===c),X=L.filter(a=>(a.category||'기타')===c).sort(ord);
       if(!all.length)return '';const dn_=all.filter(a=>a.status==='완료').length;
-      return `<div class="acat-box"><div class="acat-h"><b>${esc(c)}</b><span>${dn_} / ${all.length} 완료</span><i style="--p:${Math.round(dn_/all.length*100)}%"></i><button class="lnk" onclick="edit('actions',null,{category:'${esc(c)}'})">+ 추가</button></div>
-      ${X.length?`<table class="tbl act-tbl"><thead><tr><th>날짜</th><th>D-n</th><th>할 일</th><th>담당</th><th>지원 / 승인</th><th>상태</th></tr></thead><tbody>${X.map(a=>`<tr class="${a.status==='완료'?'done':''}">
+      return `<div class="acat-box" ondragover="actOver(event)" ondragleave="this.classList.remove('drop')" ondrop="actDrop(event,'category','${esc(c)}')"><div class="acat-h"><b>${esc(c)}</b><span>${dn_} / ${all.length} 완료</span><i style="--p:${Math.round(dn_/all.length*100)}%"></i><button class="lnk" onclick="edit('actions',null,{category:'${esc(c)}'})">+ 추가</button></div>
+      ${X.length?`<table class="tbl act-tbl"><thead><tr><th>날짜</th><th>D-n</th><th>할 일</th><th>담당</th><th>지원 / 승인</th><th>상태</th></tr></thead><tbody>${X.map(a=>`<tr class="${a.status==='완료'?'done':''}" draggable="true" ondragstart="actDrag(event,'${a.id}')" ondragend="actEnd()">
         <td class="nw"><span class="dl ${dCls(a)}">${dTxt(a)}${dCls(a)==='over'?' 지남':''}</span></td><td class="nw"><span class="dn">${dn(a)}</span></td>
-        <td><span class="act-t" onclick="edit('actions','${a.id}')">${esc(a.action)}</span>${a.memo?`<small class="act-m">${esc(a.memo)}</small>`:''}</td>
+        <td><span class="act-t" title="클릭해서 바로 수정" onclick="actInline(this,'${a.id}')">${esc(a.action)}</span><button class="act-ed" title="자세히 편집 (담당·날짜·메모)" onclick="edit('actions','${a.id}')">✎</button>${a.memo?`<small class="act-m">${esc(a.memo)}</small>`:''}</td>
         <td class="nw">${own(a.owner)}</td><td class="nw" style="color:var(--ts)">${own(a.support)||'—'}</td><td class="nw">${stSel(a)}</td></tr>`).join('')}</tbody></table>`:'<p class="note" style="margin:.4rem 0 0">표시할 할 일이 없습니다.</p>'}</div>`}).join('')||empty('할 일이 없습니다.');
   },
   milestones(){
