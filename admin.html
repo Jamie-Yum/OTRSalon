@@ -871,15 +871,24 @@ async function actReorder(id,patch,beforeId,afterId){
   let i=beforeId?G.findIndex(a=>a.id===beforeId):afterId?G.findIndex(a=>a.id===afterId)+1:G.length;if(i<0)i=G.length;
   const lo=i>0?G[i-1].sort_order:null,hi=i<G.length?G[i].sort_order:null;
   let v=lo==null&&hi==null?1000:lo==null?hi-1000:hi==null?lo+1000:Math.floor((lo+hi)/2);
-  if(norm||lo!=null&&hi!=null&&hi-lo<2){
-    G.splice(i,0,src);const ch=G.map((a,k)=>({a,n:(k+1)*1000})).filter(x=>x.a.id===id||x.a.sort_order!==x.n);
-    await Promise.all(ch.map(x=>rpc('otr_save',{tbl:'otr_actions',row_data:{...x.a,...(x.a.id===id?patch:{}),sort_order:x.n}})));
-    await load('actions');return;}
-  await quick('actions',id,{...patch,sort_order:v});
+  let ch;
+  if(norm||lo!=null&&hi!=null&&hi-lo<2){G.splice(i,0,src);ch=G.map((r,k)=>({r,n:(k+1)*1000})).filter(x=>x.r.id===id||x.r.sort_order!==x.n);}
+  else ch=[{r:src,n:v}];
+  /* 화면 먼저 바꾸고 저장은 뒤에서 */
+  const rows=ch.map(x=>({...x.r,...(x.r.id===id?patch:{}),sort_order:x.n}));
+  rows.forEach(r=>{const k=D.actions.findIndex(y=>y.id===r.id);if(k>=0)D.actions[k]=r;});RENDER.actions();
+  try{await Promise.all(rows.map(r=>rpc('otr_save',{tbl:'otr_actions',row_data:r})));}catch(e){alert('저장 실패: '+e.message);}
+  await load('actions');
 }
 function actDrag(e,id,from){actDrg={id,from};e.dataTransfer.effectAllowed='copyMove';try{e.dataTransfer.setData('text/plain',id)}catch(_){}e.currentTarget.classList.add('dragging');}
 function actEnd(){document.querySelectorAll('.dragging,.drop,.ins-top,.ins-bot').forEach(x=>x.classList.remove('dragging','drop','ins-top','ins-bot'));}
 function actOver(e){if(!actDrg)return;e.preventDefault();e.dataTransfer.dropEffect=e.ctrlKey||e.altKey?'copy':'move';e.currentTarget.classList.add('drop');}
+/* 놓을 수 있는 영역 표시: dragenter·dragover 모두 허용해야 바로 놓아도 drop이 됨 */
+['dragenter','dragover'].forEach(t=>document.addEventListener(t,e=>{if(!actDrg)return;const box=e.target.closest&&e.target.closest('.owner-card,.acat-box');if(!box)return;e.preventDefault();
+  if(e.dataTransfer)e.dataTransfer.dropEffect=e.ctrlKey||e.altKey?'copy':'move';
+  document.querySelectorAll('.owner-card.drop,.acat-box.drop').forEach(x=>{if(x!==box)x.classList.remove('drop')});box.classList.add('drop');
+  const r=e.target.closest('[data-id]');document.querySelectorAll('.ins-top,.ins-bot').forEach(x=>{if(x!==r)x.classList.remove('ins-top','ins-bot')});
+  if(r&&r.dataset.id!==actDrg.id){const b=r.getBoundingClientRect(),top=e.clientY<b.top+b.height/2;r.classList.toggle('ins-top',top);r.classList.toggle('ins-bot',!top);}}));
 async function actDrop(e,field,to){
   e.preventDefault();const d=actDrg;actDrg=null;
   const box=e.currentTarget,row=e.target.closest&&e.target.closest('[data-id]');
