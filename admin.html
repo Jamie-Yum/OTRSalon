@@ -663,6 +663,8 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .act-ed{border:0;background:none;color:var(--tl);cursor:pointer;font-size:.8rem;padding:0 .25rem;opacity:0;transition:opacity .15s}
 .act:hover .act-ed,.act-tbl tr:hover .act-ed{opacity:1}.act-ed:hover{color:#141414}
 @media(hover:none){.act-ed{opacity:1}}
+.act.ins-top{box-shadow:inset 0 3px 0 #3D6FB0}.act.ins-bot{box-shadow:inset 0 -3px 0 #3D6FB0}
+.act-tbl tr.ins-top td{box-shadow:inset 0 3px 0 #3D6FB0}.act-tbl tr.ins-bot td{box-shadow:inset 0 -3px 0 #3D6FB0}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
   <h2><span class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span><small>ADMIN</small></h2>
@@ -856,17 +858,42 @@ const T={
 const D={};let PW='',cur=null,decCat='전체';
 let actMode={view:'cat',who:'',hide:false};try{Object.assign(actMode,JSON.parse(localStorage.getItem('otr_act')||'{}'))}catch(e){}
 let actDrg=null;
+const actSo=a=>a.sort_order==null?Infinity:a.sort_order;
+function actOrd(a,b){return actSo(a)-actSo(b)||(a.deadline||'0').localeCompare(b.deadline||'0');}
+function actOverRow(e){if(!actDrg)return;const r=e.currentTarget,b=r.getBoundingClientRect(),top=e.clientY<b.top+b.height/2;
+  document.querySelectorAll('.ins-top,.ins-bot').forEach(x=>x.classList.remove('ins-top','ins-bot'));
+  if(r.dataset.id!==actDrg.id)r.classList.add(top?'ins-top':'ins-bot');}
+/* 순서: 전체 할 일을 하나의 순서(sort_order)로 관리, 놓은 자리 앞뒤 사이 값으로 끼워 넣음 */
+async function actReorder(id,patch,beforeId,afterId){
+  let G=D.actions.filter(inS).sort(actOrd);
+  const norm=G.some(a=>a.sort_order==null)||new Set(G.map(a=>a.sort_order)).size<G.length;
+  const src=D.actions.find(x=>x.id===id);G=G.filter(a=>a.id!==id);
+  let i=beforeId?G.findIndex(a=>a.id===beforeId):afterId?G.findIndex(a=>a.id===afterId)+1:G.length;if(i<0)i=G.length;
+  const lo=i>0?G[i-1].sort_order:null,hi=i<G.length?G[i].sort_order:null;
+  let v=lo==null&&hi==null?1000:lo==null?hi-1000:hi==null?lo+1000:Math.floor((lo+hi)/2);
+  if(norm||lo!=null&&hi!=null&&hi-lo<2){
+    G.splice(i,0,src);const ch=G.map((a,k)=>({a,n:(k+1)*1000})).filter(x=>x.a.id===id||x.a.sort_order!==x.n);
+    await Promise.all(ch.map(x=>rpc('otr_save',{tbl:'otr_actions',row_data:{...x.a,...(x.a.id===id?patch:{}),sort_order:x.n}})));
+    await load('actions');return;}
+  await quick('actions',id,{...patch,sort_order:v});
+}
 function actDrag(e,id,from){actDrg={id,from};e.dataTransfer.effectAllowed='copyMove';try{e.dataTransfer.setData('text/plain',id)}catch(_){}e.currentTarget.classList.add('dragging');}
-function actEnd(){document.querySelectorAll('.dragging,.drop').forEach(x=>x.classList.remove('dragging','drop'));}
+function actEnd(){document.querySelectorAll('.dragging,.drop,.ins-top,.ins-bot').forEach(x=>x.classList.remove('dragging','drop','ins-top','ins-bot'));}
 function actOver(e){if(!actDrg)return;e.preventDefault();e.dataTransfer.dropEffect=e.ctrlKey||e.altKey?'copy':'move';e.currentTarget.classList.add('drop');}
 async function actDrop(e,field,to){
-  e.preventDefault();const d=actDrg;actDrg=null;actEnd();if(!d)return;
-  const a=D.actions.find(x=>x.id===d.id);if(!a)return;
-  if(field==='category'){if((a.category||'기타')!==to)await quick('actions',a.id,{category:to});return;}
-  const L=(a.owner||'').split(/[·,]/).map(x=>x.trim()).filter(Boolean);if(L.includes(to)&&!(d.from&&d.from!==to))return;
-  const keep=e.ctrlKey||e.altKey;
-  let N=keep?[...L]:L.filter(x=>x!==d.from);if(!N.includes(to))N.push(to);
-  if(N.join('·')!==L.join('·'))await quick('actions',a.id,{owner:N.join('·')});
+  e.preventDefault();const d=actDrg;actDrg=null;
+  const box=e.currentTarget,row=e.target.closest&&e.target.closest('[data-id]');
+  let beforeId=null,afterId=null;
+  if(row&&box.contains(row)&&row.dataset.id!==d?.id){const b=row.getBoundingClientRect();if(e.clientY<b.top+b.height/2)beforeId=row.dataset.id;else afterId=row.dataset.id;}
+  else if(d){const ids=[...box.querySelectorAll('[data-id]')].map(x=>x.dataset.id).filter(x=>x!==d.id);if(ids.length)afterId=ids[ids.length-1];}
+  actEnd();if(!d)return;
+  const a=D.actions.find(x=>x.id===d.id);if(!a)return;const patch={};
+  if(field==='category'){if((a.category||'기타')!==to)patch.category=to;}
+  else{const L=(a.owner||'').split(/[·,]/).map(x=>x.trim()).filter(Boolean);
+    const keep=e.ctrlKey||e.altKey;let N=keep?[...L]:L.filter(x=>x!==d.from);if(!N.includes(to))N.push(to);
+    if(N.join('·')!==L.join('·'))patch.owner=N.join('·');}
+  if(!beforeId&&!afterId&&!Object.keys(patch).length)return;
+  await actReorder(a.id,patch,beforeId,afterId);
 }
 function actInline(el,id){
   if(el.isContentEditable)return;const old=el.textContent,row=el.closest('[draggable]');if(row)row.draggable=false;
@@ -1168,12 +1195,12 @@ const RENDER={
     const dCls=a=>a.status==='완료'||!a.deadline?'':a.deadline<t?'over':a.deadline<=soon?'soon':'';
     const dTxt=a=>a.date_text||(a.deadline?a.deadline.slice(5).replace('-','/'):'—');
     const stSel=a=>`<select class="ast s${Math.max(0,ACT_STATUS.indexOf(a.status))}" onchange="quick('actions','${a.id}',{status:this.value})">${ACT_STATUS.map(o=>`<option ${o===a.status?'selected':''}>${o}</option>`).join('')}</select>`;
-    const ord=(a,b)=>(a.deadline||'0').localeCompare(b.deadline||'0')||(a.sort_order||0)-(b.sort_order||0);
+    const ord=actOrd;
     if(M.view==='owner'){
       $('v-actions').innerHTML=`<div class="owner-grid">${owners.filter(o=>!M.who||o===M.who).map(o=>{
         const X=L.filter(a=>ownersOf(a).includes(o)).sort((a,b)=>(a.status==='완료')-(b.status==='완료')||ord(a,b));
         if(!X.length&&M.who!==o)return '';
-        return `<div class="owner-card" ondragover="actOver(event)" ondragleave="this.classList.remove('drop')" ondrop="actDrop(event,'owner','${esc(o)}')"><h4><span class="own" style="--oc:${ownC(o)}">${esc(o)}</span> <small style="color:var(--tl);font-weight:500">· 남은 일 ${X.filter(a=>a.status!=='완료').length}건</small></h4>${X.map(a=>`<div class="act ${a.status==='완료'?'done':''}" draggable="true" ondragstart="actDrag(event,'${a.id}','${esc(o)}')" ondragend="actEnd()"><input type="checkbox" ${a.status==='완료'?'checked':''} onchange="quick('actions','${a.id}',{status:this.checked?'완료':'진행 중'})">
+        return `<div class="owner-card" ondragover="actOver(event)" ondragleave="this.classList.remove('drop')" ondrop="actDrop(event,'owner','${esc(o)}')"><h4><span class="own" style="--oc:${ownC(o)}">${esc(o)}</span> <small style="color:var(--tl);font-weight:500">· 남은 일 ${X.filter(a=>a.status!=='완료').length}건</small></h4>${X.map(a=>`<div class="act ${a.status==='완료'?'done':''}" data-id="${a.id}" ondragover="actOverRow(event)" draggable="true" ondragstart="actDrag(event,'${a.id}','${esc(o)}')" ondragend="actEnd()"><input type="checkbox" ${a.status==='완료'?'checked':''} onchange="quick('actions','${a.id}',{status:this.checked?'완료':'진행 중'})">
           <span><span class="act-t" title="클릭해서 바로 수정" onclick="actInline(this,'${a.id}')">${esc(a.action)}</span><button class="act-ed" title="자세히 편집 (담당·날짜·메모)" onclick="edit('actions','${a.id}')">✎</button>${a.category?` <small class="acat">${esc(a.category)}</small>`:''}${a.status==='보류'?' <small style="color:var(--tl)">(보류)</small>':''}</span>
           <em class="dl ${dCls(a)}" style="font-style:normal">${dTxt(a)}</em></div>`).join('')||'<p style="font-size:.85rem;color:var(--tl)">할 일 없음</p>'}
           <button class="lnk" style="margin-top:.5rem" onclick="edit('actions',null,{owner:'${esc(o)}'})">+ 추가</button></div>`}).join('')}</div>`;
@@ -1184,7 +1211,7 @@ const RENDER={
       const all=A.filter(a=>(a.category||'기타')===c),X=L.filter(a=>(a.category||'기타')===c).sort(ord);
       if(!all.length)return '';const dn_=all.filter(a=>a.status==='완료').length;
       return `<div class="acat-box" ondragover="actOver(event)" ondragleave="this.classList.remove('drop')" ondrop="actDrop(event,'category','${esc(c)}')"><div class="acat-h"><b>${esc(c)}</b><span>${dn_} / ${all.length} 완료</span><i style="--p:${Math.round(dn_/all.length*100)}%"></i><button class="lnk" onclick="edit('actions',null,{category:'${esc(c)}'})">+ 추가</button></div>
-      ${X.length?`<table class="tbl act-tbl"><thead><tr><th>날짜</th><th>D-n</th><th>할 일</th><th>담당</th><th>지원 / 승인</th><th>상태</th></tr></thead><tbody>${X.map(a=>`<tr class="${a.status==='완료'?'done':''}" draggable="true" ondragstart="actDrag(event,'${a.id}')" ondragend="actEnd()">
+      ${X.length?`<table class="tbl act-tbl"><thead><tr><th>날짜</th><th>D-n</th><th>할 일</th><th>담당</th><th>지원 / 승인</th><th>상태</th></tr></thead><tbody>${X.map(a=>`<tr class="${a.status==='완료'?'done':''}" data-id="${a.id}" ondragover="actOverRow(event)" draggable="true" ondragstart="actDrag(event,'${a.id}')" ondragend="actEnd()">
         <td class="nw"><span class="dl ${dCls(a)}">${dTxt(a)}${dCls(a)==='over'?' 지남':''}</span></td><td class="nw"><span class="dn">${dn(a)}</span></td>
         <td><span class="act-t" title="클릭해서 바로 수정" onclick="actInline(this,'${a.id}')">${esc(a.action)}</span><button class="act-ed" title="자세히 편집 (담당·날짜·메모)" onclick="edit('actions','${a.id}')">✎</button>${a.memo?`<small class="act-m">${esc(a.memo)}</small>`:''}</td>
         <td class="nw">${own(a.owner)}</td><td class="nw" style="color:var(--ts)">${own(a.support)||'—'}</td><td class="nw">${stSel(a)}</td></tr>`).join('')}</tbody></table>`:'<p class="note" style="margin:.4rem 0 0">표시할 할 일이 없습니다.</p>'}</div>`}).join('')||empty('할 일이 없습니다.');
