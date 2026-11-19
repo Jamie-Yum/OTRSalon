@@ -1447,7 +1447,7 @@ function svRenderResp(box){
   }).join('');
   const picked=R.reduce((n,r)=>n+Object.values(r.picked||{}).filter(Boolean).length,0);
   box.innerHTML=`<div class="mn-head"><div><button class="lnk" onclick="svGo({mode:'list'})">← 설문 목록</button><h2 class="title" style="margin:.4rem 0 0">${esc(s.title)}</h2></div>
-    <div style="display:flex;gap:.5rem;flex-wrap:wrap"><button class="mn-btn ghost" onclick="svCopy('${svLink(s.id)}','링크를 복사했습니다')">링크 복사</button><button class="mn-btn ghost" onclick="svCsv('${s.id}')">CSV ↓</button><button class="mn-btn" onclick="svCopyPicked('${s.id}')">★ 전달 질문 복사 (${picked})</button></div></div>
+    <div style="display:flex;gap:.5rem;flex-wrap:wrap"><button class="mn-btn ghost" onclick="svCopy('${svLink(s.id)}','링크를 복사했습니다')">링크 복사</button><button class="mn-btn ghost" onclick="svReport('${s.id}')">보고서 보기 · PDF</button><button class="mn-btn ghost" onclick="svXlsx('${s.id}',this)">엑셀 ↓</button><button class="mn-btn ghost" onclick="svReport('${s.id}',1)">★ 연사 전달용 보고서</button><button class="mn-btn" onclick="svCopyPicked('${s.id}')">★ 전달 질문 복사 (${picked})</button></div></div>
   <p class="note">${svOpen(s)?'응답 받는 중':'마감'} · ${esc(svFmt(s.deadline))} · 총 <b>${R.length}</b>명 응답. 주관식 답변 옆 ★을 누르면 연사 전달 목록에 담깁니다.</p>
   <div class="sv-sums">${sum||'<div class="mn-empty">문항이 없습니다.</div>'}</div>
   <h3 class="sub-h" style="margin-top:2.5rem">응답별 보기</h3>
@@ -1464,6 +1464,85 @@ function svCopyPicked(sid){
   (s.questions||[]).filter(q=>q.type==='short'||q.type==='long').forEach(q=>{const L=R.filter(r=>(r.picked||{})[q.id]).map(r=>'- '+svAns(r.answers[q.id]));if(L.length)out.push(`[${q.title}]\n`+L.join('\n'));});
   if(!out.length)return alert('★로 고른 질문이 없습니다.');
   svCopy(out.join('\n\n'),'전달 질문을 복사했습니다');
+}
+/* 문항별 응답 보고서 (새 창, A4 인쇄·PDF 저장) — picked=1이면 ★ 고른 답변만 */
+function svReport(sid,picked){
+  const s=D.surveys.find(x=>x.id===sid),R=svResp(sid).sort((a,b)=>a.created_at.localeCompare(b.created_at));
+  let Q=(s.questions||[]).filter(q=>q.type!=='section');
+  if(picked){Q=Q.filter(q=>(q.type==='short'||q.type==='long')&&R.some(r=>(r.picked||{})[q.id]));if(!Q.length)return alert('★로 고른 답변이 없습니다. 응답 화면에서 답변 옆 ★을 눌러 골라 주세요.');}
+  const has=v=>v!=null&&v!==''&&!(Array.isArray(v)&&!v.length);
+  const period=R.length?`${kst(R[0].created_at).slice(0,10)} ~ ${kst(R[R.length-1].created_at).slice(0,10)}`:'';
+  const TL={radio:'객관식',checkbox:'복수 선택',short:'단답형',long:'서술형'};
+  const body=Q.map((q,i)=>{
+    const rs=R.filter(r=>has((r.answers||{})[q.id])&&(!picked||(r.picked||{})[q.id]));
+    let inner='';
+    if(q.type==='radio'||q.type==='checkbox'){
+      const cnt={};(q.options||[]).forEach(o=>cnt[o]=0);rs.forEach(r=>{const v=r.answers[q.id];(Array.isArray(v)?v:[v]).forEach(x=>cnt[x]=(cnt[x]||0)+1);});
+      const tot=Math.max(1,rs.length);
+      inner=`<table class="bars">${Object.entries(cnt).map(([o,c])=>`<tr><td class="o">${esc(o)}</td><td class="b"><i style="width:${c/tot*100}%"></i></td><td class="c">${c}명 <small>${Math.round(c/tot*100)}%</small></td></tr>`).join('')}</table>`;
+    }else{
+      inner=rs.length?`<ol class="ans">${rs.map(r=>`<li class="${!picked&&(r.picked||{})[q.id]?'pk':''}">${esc(svAns(r.answers[q.id])).replace(/\n/g,'<br>')}${s.ask_name&&r.name?` <span class="who">— ${esc(r.name)}</span>`:''}</li>`).join('')}</ol>`:'<p class="none">응답 없음</p>';
+    }
+    return `<section class="q"><div class="qh"><span class="no">Q${i+1}</span><h2>${esc(q.title)}</h2></div><p class="meta">${TL[q.type]||''} · ${rs.length}명 응답</p>${inner}</section>`;
+  }).join('');
+  const w=window.open('','_blank');if(!w)return alert('팝업이 차단되었습니다. 이 사이트의 팝업을 허용해 주세요.');
+  w.document.write(`<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>${esc(s.title)}${picked?' · 연사 전달용':''} — 응답 보고서</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+  <style>
+  *{box-sizing:border-box;margin:0;padding:0}body{font-family:Pretendard,sans-serif;color:#1d1d1b;background:#F2EEE6;line-height:1.7;word-break:keep-all}
+  .page{max-width:820px;margin:2rem auto;background:#fff;padding:3.2rem 3.4rem;border-radius:14px;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+  .bar{position:sticky;top:0;background:#141414;color:#EDE6D6;padding:.7rem 1.2rem;display:flex;justify-content:space-between;align-items:center;font-size:.85rem;z-index:2}
+  .bar button{background:#C9B37E;color:#141414;border:0;border-radius:8px;padding:.45rem 1rem;font:inherit;font-weight:700;cursor:pointer}
+  .brand{font-size:.72rem;letter-spacing:.22em;color:#A8843F;font-weight:700}
+  h1{font-size:1.65rem;margin:.4rem 0 .6rem;line-height:1.35}
+  .sum{display:flex;gap:1.6rem;flex-wrap:wrap;font-size:.86rem;color:#6b665c;padding-bottom:1.4rem;border-bottom:2px solid #141414;margin-bottom:1.8rem}.sum b{color:#141414}
+  .q{padding:1.3rem 0 1.5rem;border-bottom:1px solid #e6e1d6;break-inside:avoid-page}
+  .qh{display:flex;gap:.7rem;align-items:baseline}.no{font-weight:800;color:#A8843F;font-size:.95rem;flex:none}
+  .q h2{font-size:1.05rem;line-height:1.5}.meta{font-size:.76rem;color:#8a8478;margin:.2rem 0 .8rem 2.3rem}
+  .ans{margin-left:2.3rem;padding-left:1.1rem;display:flex;flex-direction:column;gap:.55rem}
+  .ans li{font-size:.92rem;padding-left:.2rem}.ans li::marker{color:#A8843F;font-weight:700;font-size:.82rem}
+  .ans li.pk{background:#FBF4E2;border-radius:6px;padding:.15rem .45rem}.ans li.pk::before{content:'★ ';color:#C9A23E}
+  .who{color:#8a8478;font-size:.8rem}.none{margin-left:2.3rem;color:#aaa;font-size:.85rem}
+  .bars{margin-left:2.3rem;width:calc(100% - 2.3rem);border-collapse:collapse;font-size:.88rem}
+  .bars td{padding:.3rem .4rem;vertical-align:middle}.bars .o{width:42%}.bars .b{width:40%}
+  .bars .b i{display:block;height:12px;border-radius:6px;background:#C9B37E;min-width:2px}.bars .c{white-space:nowrap;font-weight:600}.bars small{color:#8a8478;font-weight:400;margin-left:.2rem}
+  .foot{margin-top:2rem;font-size:.75rem;color:#8a8478;display:flex;justify-content:space-between}
+  @media print{body{background:#fff}.bar{display:none}.page{margin:0;max-width:none;box-shadow:none;border-radius:0;padding:0}@page{size:A4;margin:16mm 15mm}}
+  </style></head><body>
+  <div class="bar"><span>인쇄 창에서 '대상'을 <b>PDF로 저장</b>으로 고르면 PDF 파일이 됩니다.</span><button onclick="print()">인쇄 · PDF 저장</button></div>
+  <div class="page"><div class="brand">OFF THE RECORD SALON${picked?' · 연사 전달용':''}</div><h1>${esc(s.title)}</h1>
+  <div class="sum"><span>응답 <b>${R.length}명</b></span>${period?`<span>응답 기간 <b>${period}</b></span>`:''}<span>문항 <b>${Q.length}개</b></span>${picked?'<span>★ 고른 답변만</span>':''}<span>출력 <b>${kst(new Date().toISOString())}</b></span></div>
+  ${body||'<p class="none">문항이 없습니다.</p>'}
+  <div class="foot"><span>오프더레코드 살롱 · 내부 공유용</span><span>off-record.kr</span></div></div></body></html>`);
+  w.document.close();
+}
+/* 서식 있는 엑셀 (응답 시트 + 문항별 요약 시트) */
+let XLSXP=null;
+function xlsxLib(){return XLSXP||(XLSXP=new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js';sc.onload=()=>ok(window.XLSX);sc.onerror=()=>{XLSXP=null;no(new Error('엑셀 모듈을 불러오지 못했습니다'));};document.head.appendChild(sc);}));}
+async function svXlsx(sid,btn){
+  const s=D.surveys.find(x=>x.id===sid),Q=(s.questions||[]).filter(q=>q.type!=='section'),R=svResp(sid).sort((a,b)=>a.created_at.localeCompare(b.created_at));
+  const t0=btn&&btn.textContent;if(btn){btn.disabled=true;btn.textContent='만드는 중…';}
+  try{
+    const X=await xlsxLib();
+    const B={top:{style:'thin',color:{rgb:'D9D4C8'}},bottom:{style:'thin',color:{rgb:'D9D4C8'}},left:{style:'thin',color:{rgb:'D9D4C8'}},right:{style:'thin',color:{rgb:'D9D4C8'}}};
+    const H={font:{bold:true,color:{rgb:'FFFFFF'},name:'맑은 고딕',sz:10},fill:{fgColor:{rgb:'141414'}},alignment:{wrapText:true,vertical:'center',horizontal:'center'},border:B};
+    const C=(z)=>({font:{name:'맑은 고딕',sz:10},alignment:{wrapText:true,vertical:'top'},border:B,...(z?{fill:{fgColor:{rgb:'F7F4EE'}}}:{})});
+    const head=['#','응답 시각',...(s.ask_name?['이름']:[]),...Q.map(q=>q.title)];
+    const rows=R.map((r,i)=>[i+1,kst(r.created_at),...(s.ask_name?[r.name||'']:[]),...Q.map(q=>svAns((r.answers||{})[q.id]))]);
+    const ws=X.utils.aoa_to_sheet([head,...rows]);
+    head.forEach((_,c)=>{const a=X.utils.encode_cell({r:0,c});ws[a].s=H;rows.forEach((row,r)=>{const b=X.utils.encode_cell({r:r+1,c});if(!ws[b])ws[b]={t:'s',v:''};ws[b].s={...C(r%2),...(c<2?{alignment:{vertical:'top',horizontal:'center'}}:{})};});});
+    ws['!cols']=head.map((h,c)=>c===0?{wch:5}:c===1?{wch:17}:s.ask_name&&c===2?{wch:10}:{wch:Q[c-(s.ask_name?3:2)]&&(Q[c-(s.ask_name?3:2)].type==='long'||Q[c-(s.ask_name?3:2)].type==='short')?48:26});
+    ws['!rows']=[{hpt:42}];ws['!freeze']={xSplit:2,ySplit:1};ws['!views']=[{state:'frozen',xSplit:2,ySplit:1}];ws['!autofilter']={ref:X.utils.encode_range({s:{r:0,c:0},e:{r:rows.length,c:head.length-1}})};
+    const S=[['문항','선택지','응답 수','비율']];
+    Q.filter(q=>q.type==='radio'||q.type==='checkbox').forEach(q=>{const rs=R.filter(r=>{const v=(r.answers||{})[q.id];return v!=null&&v!==''&&!(Array.isArray(v)&&!v.length);});const cnt={};(q.options||[]).forEach(o=>cnt[o]=0);rs.forEach(r=>{const v=r.answers[q.id];(Array.isArray(v)?v:[v]).forEach(x=>cnt[x]=(cnt[x]||0)+1);});
+      Object.entries(cnt).forEach(([o,c],k)=>S.push([k?'':q.title,o,c,rs.length?Math.round(c/rs.length*100)/100:0]));});
+    const ws2=X.utils.aoa_to_sheet(S);
+    S.forEach((row,r)=>row.forEach((_,c)=>{const a=X.utils.encode_cell({r,c});if(!ws2[a])ws2[a]={t:'s',v:''};ws2[a].s=r?{...C(0),...(c===3?{numFmt:'0%'}:{}),...(c===0?{font:{bold:true,name:'맑은 고딕',sz:10}}:{})}:H;}));
+    ws2['!cols']=[{wch:40},{wch:36},{wch:9},{wch:8}];
+    const wb=X.utils.book_new();X.utils.book_append_sheet(wb,ws,'응답');if(S.length>1)X.utils.book_append_sheet(wb,ws2,'객관식 요약');
+    X.writeFile(wb,(s.title||'설문').replace(/[\\/:*?"<>|]/g,'')+'_응답.xlsx');
+  }catch(e){alert(e.message);}
+  if(btn){btn.disabled=false;btn.textContent=t0;}
 }
 function svCsv(sid){
   const s=D.surveys.find(x=>x.id===sid);const Q=(s.questions||[]).filter(q=>q.type!=='section');const R=svResp(sid);
