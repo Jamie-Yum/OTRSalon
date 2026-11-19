@@ -747,6 +747,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 </div>
 <div class="rec-sub on" id="sub-actions">
   <div class="mn-head"><div><h3 class="rec-h">할 일</h3></div><button class="mn-btn" onclick="edit('actions')">+ 할 일 추가</button></div>
+  <div class="key-strip" id="actKey"></div>
   <div class="act-bar" id="actBar"></div>
   <div id="v-actions"></div>
 </div>
@@ -774,8 +775,8 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
   <div class="mn-head"><div><div class="eyebrow">Schedule</div><h2 class="title" style="margin:0">회차 일정</h2></div><button class="mn-btn" onclick="edit('schedule')">+ 회차 추가</button></div>
   <p class="note">여기서 바꾼 내용이 홈페이지 일정 섹션에 바로 반영됩니다. 담당 Host·내부 메모는 홈페이지에 노출되지 않습니다. 날짜가 지난 회차는 홈페이지에서 자동으로 '종료'로 표시됩니다.</p>
   <div class="tbl-wrap"><table class="tbl" id="v-schedule"></table></div>
-  <div class="mn-head" style="margin-top:2.5rem"><h3 class="bd-h" style="margin:0">준비 일정 <small>핵심 마일스톤 · 세부 업무는 운영 기록 › 할 일</small></h3><button class="mn-btn ghost" onclick="edit('milestones')">+ 일정 추가</button></div>
-  <div class="ms-list" id="v-milestones"></div>
+  <div class="mn-head" style="margin-top:2.5rem"><h3 class="bd-h" style="margin:0">당일 시간표 <small>회차별 진행 순서 · '공개'를 켜면 홈페이지에도 보입니다</small></h3></div>
+  <div class="tt-grid" id="v-tt"></div>
   <div class="mn-head" style="margin-top:3.5rem"><div><div class="eyebrow">Speakers</div><h2 class="title" style="margin:0">연사 섭외 현황</h2></div><button class="mn-btn" onclick="edit('speakers')">+ 연사 추가</button></div>
   <div class="kanban" id="v-kanban"></div>
   <h3 class="sub-h">연사 리스트</h3>
@@ -873,6 +874,8 @@ const T={
 const D={};let PW='',cur=null,decCat='전체';
 let actMode={view:'cat',who:'',hide:false};try{Object.assign(actMode,JSON.parse(localStorage.getItem('otr_act')||'{}'))}catch(e){}
 let actDrg=null;
+const isKey=a=>/^\s*★/.test(a.action||''),keyTitle=a=>(a.action||'').replace(/^\s*★\s*/,'');
+async function actStar(id){const a=D.actions.find(x=>x.id===id);if(!a)return;const v=isKey(a)?keyTitle(a):'★ '+a.action.trim();a.action=v;RENDER.actions();await quick('actions',id,{action:v});}
 const actSo=a=>a.sort_order==null?Infinity:a.sort_order;
 function actOrd(a,b){return actSo(a)-actSo(b)||(a.deadline||'0').localeCompare(b.deadline||'0');}
 function actOverRow(e){if(!actDrg)return;const r=e.currentTarget,b=r.getBoundingClientRect(),top=e.clientY<b.top+b.height/2;
@@ -1270,13 +1273,16 @@ const RENDER={
     const dCls=a=>a.status==='완료'||!a.deadline?'':a.deadline<t?'over':a.deadline<=soon?'soon':'';
     const dTxt=a=>a.date_text||(a.deadline?a.deadline.slice(5).replace('-','/'):'—');
     const stSel=a=>`<select class="ast s${Math.max(0,ACT_STATUS.indexOf(a.status))}" onchange="quick('actions','${a.id}',{status:this.value})">${ACT_STATUS.map(o=>`<option ${o===a.status?'selected':''}>${o}</option>`).join('')}</select>`;
+    const K=A.filter(isKey).sort((a,b)=>(a.deadline||'9').localeCompare(b.deadline||'9'));
+    $('actKey').innerHTML=`<div class="key-h"><b>핵심 일정</b><span>할 일 옆 ☆을 누르면 여기에 올라옵니다</span></div>${K.length?`<div class="key-list">${K.map(a=>{const c=dCls(a),st=a.status==='완료'?'s2':c==='over'?'s4':a.status==='진행 중'?'s1':'s0';
+      return `<div class="key ${st}" onclick="edit('actions','${a.id}')"><span class="key-d">${dTxt(a)}<small>${dn(a)}</small></span><b>${esc(keyTitle(a))}</b><span class="key-o">${own(a.owner)}</span><span class="key-s">${a.status==='완료'?'완료':c==='over'?'지연':esc(a.status||'미착수')}</span></div>`}).join('')}</div>`:'<p class="note" style="margin:.4rem 0 0">아직 핵심 일정이 없습니다.</p>'}`;
     const ord=actOrd;
     if(M.view==='owner'){
       $('v-actions').innerHTML=`<div class="owner-grid">${owners.filter(o=>!M.who||o===M.who).map(o=>{
         const X=L.filter(a=>ownersOf(a).includes(o)).sort((a,b)=>(a.status==='완료')-(b.status==='완료')||ord(a,b));
         if(!X.length&&M.who!==o)return '';
         return `<div class="owner-card" ondragover="actOver(event)" ondragleave="this.classList.remove('drop')" ondrop="actDrop(event,'owner','${esc(o)}')"><h4><span class="own" style="--oc:${ownC(o)}">${esc(o)}</span> <small style="color:var(--tl);font-weight:500">· 남은 일 ${X.filter(a=>a.status!=='완료').length}건</small></h4>${X.map(a=>`<div class="act ${a.status==='완료'?'done':''}" data-id="${a.id}" ondragover="actOverRow(event)" draggable="true" ondragstart="actDrag(event,'${a.id}','${esc(o)}')" ondragend="actEnd()"><input type="checkbox" ${a.status==='완료'?'checked':''} onchange="quick('actions','${a.id}',{status:this.checked?'완료':'진행 중'})">
-          <span><span class="act-t" title="클릭해서 바로 수정" onclick="actInline(this,'${a.id}')">${esc(a.action)}</span><button class="act-ed" title="자세히 편집 (담당·날짜·메모)" onclick="edit('actions','${a.id}')">✎</button>${a.category?` <small class="acat">${esc(a.category)}</small>`:''}${a.status==='보류'?' <small style="color:var(--tl)">(보류)</small>':''}</span>
+          <span><span class="act-t" title="클릭해서 바로 수정" onclick="actInline(this,'${a.id}')">${esc(a.action)}</span><button class="act-ed" title="자세히 편집 (담당·날짜·메모)" onclick="edit('actions','${a.id}')">✎</button><button class="act-star ${isKey(a)?'on':''}" title="${isKey(a)?'핵심 일정에서 빼기':'핵심 일정에 올리기'}" onclick="actStar('${a.id}')">${isKey(a)?'★':'☆'}</button>${a.category?` <small class="acat">${esc(a.category)}</small>`:''}${a.status==='보류'?' <small style="color:var(--tl)">(보류)</small>':''}</span>
           <em class="dl ${dCls(a)}" style="font-style:normal">${dTxt(a)}</em></div>`).join('')||'<p style="font-size:.85rem;color:var(--tl)">할 일 없음</p>'}
           <button class="lnk" style="margin-top:.5rem" onclick="edit('actions',null,{owner:'${esc(o)}'})">+ 추가</button></div>`}).join('')}</div>`;
       return;
@@ -1288,10 +1294,11 @@ const RENDER={
       return `<div class="acat-box" ondragover="actOver(event)" ondragleave="this.classList.remove('drop')" ondrop="actDrop(event,'category','${esc(c)}')"><div class="acat-h"><b>${esc(c)}</b><span>${dn_} / ${all.length} 완료</span><i style="--p:${Math.round(dn_/all.length*100)}%"></i><button class="lnk" onclick="edit('actions',null,{category:'${esc(c)}'})">+ 추가</button></div>
       ${X.length?`<table class="tbl act-tbl"><thead><tr><th>날짜</th><th>D-n</th><th>할 일</th><th>담당</th><th>지원 / 승인</th><th>상태</th></tr></thead><tbody>${X.map(a=>`<tr class="${a.status==='완료'?'done':''}" data-id="${a.id}" ondragover="actOverRow(event)" draggable="true" ondragstart="actDrag(event,'${a.id}')" ondragend="actEnd()">
         <td class="nw"><span class="dl ${dCls(a)}">${dTxt(a)}${dCls(a)==='over'?' 지남':''}</span></td><td class="nw"><span class="dn">${dn(a)}</span></td>
-        <td><span class="act-t" title="클릭해서 바로 수정" onclick="actInline(this,'${a.id}')">${esc(a.action)}</span><button class="act-ed" title="자세히 편집 (담당·날짜·메모)" onclick="edit('actions','${a.id}')">✎</button>${a.memo?`<small class="act-m">${esc(a.memo)}</small>`:''}</td>
+        <td><span class="act-t" title="클릭해서 바로 수정" onclick="actInline(this,'${a.id}')">${esc(a.action)}</span><button class="act-ed" title="자세히 편집 (담당·날짜·메모)" onclick="edit('actions','${a.id}')">✎</button><button class="act-star ${isKey(a)?'on':''}" title="${isKey(a)?'핵심 일정에서 빼기':'핵심 일정에 올리기'}" onclick="actStar('${a.id}')">${isKey(a)?'★':'☆'}</button>${a.memo?`<small class="act-m">${esc(a.memo)}</small>`:''}</td>
         <td class="nw">${own(a.owner)}</td><td class="nw" style="color:var(--ts)">${own(a.support)||'—'}</td><td class="nw">${stSel(a)}</td></tr>`).join('')}</tbody></table>`:'<p class="note" style="margin:.4rem 0 0">표시할 할 일이 없습니다.</p>'}</div>`}).join('')||empty('할 일이 없습니다.');
   },
   milestones(){
+    if(!$('v-milestones'))return;
     const t=today(),L=D.milestones.filter(inS).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0)||(a.start_date||'').localeCompare(b.start_date||''));
     $('v-milestones').innerHTML=L.map(m=>{
       const st=m.done?['완료','s2']:m.end_date&&m.end_date<t?['지연','s4']:m.start_date&&m.start_date<=t?['진행 중','s1']:['예정','s0'];
@@ -1329,6 +1336,12 @@ const RENDER={
     const W='일월화수목금토',t=today();
     const L=D.schedule.filter(inS).sort((a,b)=>a.salon_no-b.salon_no);
     if(D.actions)RENDER.actions();
+    {const W2='일월화수목금토',S2=D.schedule.filter(inS).sort((a,b)=>a.salon_no-b.salon_no);
+     $('v-tt').innerHTML=S2.map(r=>{const T=r.timetable||[],d=r.event_date?new Date(r.event_date+'T00:00'):null;
+      return `<div class="tt-card${T.length?'':' empty'}"><div class="tt-ch"><div><small>SESSION 0${r.salon_no}</small><b>${d?`${d.getMonth()+1}/${d.getDate()} (${W2[d.getDay()]})`:(r.year||'')+'.'+(r.month||'')}</b>${[r.time_text,r.place].filter(Boolean).length?`<span>${esc([r.time_text,r.place].filter(Boolean).join(' · '))}</span>`:''}</div>
+        ${T.length?`<label class="tt-pub" title="홈페이지 일정 카드에 표시"><input type="checkbox" ${r.timetable_public?'checked':''} onchange="quick('schedule','${r.id}',{timetable_public:this.checked})"> 공개</label>`:''}</div>
+        ${T.length?`<ol class="tt-view">${T.map(x=>`<li><span>${esc(x.t)||'·'}</span><div><b>${esc(x.title)}</b>${x.note?`<small>${esc(x.note)}</small>`:''}</div></li>`).join('')}</ol>`:'<p class="note" style="margin:.6rem 0">아직 시간표가 없습니다.</p>'}
+        <div class="tt-act"><button class="lnk" onclick="ttOpen('${r.id}')">${T.length?'수정':'+ 작성'}</button>${T.length?`<button class="lnk" onclick="ttImage('${r.id}')">이미지 저장</button>`:''}</div></div>`;}).join('')||empty('회차가 없습니다.');}
     $('v-schedule').innerHTML=`<thead><tr><th>회차</th><th>연·월</th><th>날짜</th><th>시간</th><th>장소</th><th>담당 Host</th><th>상태</th><th>당일 시간표</th><th>홈페이지 안내</th><th></th></tr></thead><tbody>${
       L.map(r=>{const past=r.event_date&&r.event_date<t;const d=r.event_date?new Date(r.event_date+'T00:00'):null;
       return `<tr><td><b>Session 0${r.salon_no}</b></td><td>${r.year||'—'}.${r.month||'—'}</td><td>${d?`${d.getMonth()+1}/${d.getDate()} (${W[d.getDay()]})`:'<span style="color:var(--tl)">미정</span>'}</td><td>${esc(r.time_text)||'—'}</td><td>${esc(r.place)||'—'}</td><td>${esc(r.host)||'—'}</td>
@@ -1508,7 +1521,34 @@ function svReport(sid,picked){
   .bars .b i{display:block;height:12px;border-radius:6px;background:#C9B37E;min-width:2px}.bars .c{white-space:nowrap;font-weight:600}.bars small{color:#8a8478;font-weight:400;margin-left:.2rem}
   .foot{margin-top:2rem;font-size:.75rem;color:#8a8478;display:flex;justify-content:space-between}
   @media print{body{background:#fff}.bar{display:none}.page{margin:0;max-width:none;box-shadow:none;border-radius:0;padding:0}@page{size:A4;margin:16mm 15mm}}
-  </style></head><body>
+  .key-strip{background:var(--wh);border-radius:var(--r-sm);padding:1rem 1.2rem;margin-bottom:1.2rem;box-shadow:0 1px 2px rgba(20,20,20,.06),0 6px 18px rgba(20,20,20,.04)}
+.key-h{display:flex;align-items:baseline;gap:.7rem;margin-bottom:.6rem}.key-h b{font-size:1rem}.key-h span{font-size:.76rem;color:var(--tl)}
+.key-list{display:flex;flex-direction:column;gap:.35rem}
+.key{display:grid;grid-template-columns:6.5rem 1fr auto 3.6rem;gap:.8rem;align-items:center;padding:.55rem .8rem;border-radius:8px;border-left:4px solid var(--sc);background:#FBFAF7;cursor:pointer}
+.key:hover{background:#F4F1EA}
+.key.s0{--sc:#C9C9C9}.key.s1{--sc:#3D6FB0}.key.s2{--sc:#2F7A3A}.key.s4{--sc:#B0473D}
+.key-d{font-size:.82rem;font-weight:700;font-variant-numeric:tabular-nums}.key-d small{margin-left:.4rem;font-weight:600;color:var(--tl);font-size:.72rem}
+.key b{font-size:.9rem;font-weight:600}.key.s2 b{opacity:.5;text-decoration:line-through}
+.key-s{font-size:.74rem;font-weight:700;color:var(--sc);text-align:right}.key.s0 .key-s{color:var(--tl)}
+.act-star{border:0;background:none;cursor:pointer;font-size:.85rem;color:#C9C9C9;padding:0 .2rem;opacity:0;transition:opacity .15s}
+.act-star.on{color:#C9A23E;opacity:1}.act:hover .act-star,.act-tbl tr:hover .act-star{opacity:1}
+@media(hover:none){.act-star{opacity:1}}
+@media(max-width:700px){.key{grid-template-columns:1fr auto}.key-o{display:none}.key-d{grid-column:1/-1}}
+.tt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;margin-top:1rem}
+.tt-card{background:#141414;color:#EDE6D6;border-radius:var(--r-sm);padding:1.1rem 1.2rem;display:flex;flex-direction:column}
+.tt-card.empty{background:var(--wh);color:var(--dk);border:1px dashed var(--bd)}
+.tt-ch{display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;padding-bottom:.7rem;border-bottom:1px solid rgba(201,179,126,.45)}
+.tt-card.empty .tt-ch{border-bottom-color:var(--bd)}
+.tt-ch small{display:block;font-size:.68rem;letter-spacing:.16em;color:#C9B37E;font-weight:700}
+.tt-ch b{display:block;font-size:1.05rem;margin-top:.1rem}.tt-ch span{display:block;font-size:.76rem;opacity:.65}
+.tt-card .tt-pub{color:inherit;margin:0}
+.tt-view{list-style:none;margin:.7rem 0 0;padding:0;display:flex;flex-direction:column;gap:.5rem;flex:1}
+.tt-view li{display:grid;grid-template-columns:3.2rem 1fr;gap:.5rem;font-size:.84rem;line-height:1.45}
+.tt-view li span{color:#C9B37E;font-weight:700;font-variant-numeric:tabular-nums}
+.tt-view li b{font-weight:600;color:#fff}.tt-view li small{display:block;font-size:.74rem;opacity:.55}
+.tt-act{display:flex;gap:1rem;margin-top:.9rem;padding-top:.7rem;border-top:1px solid rgba(237,230,214,.12)}
+.tt-card:not(.empty) .tt-act .lnk{color:#E2CD94}
+</style></head><body>
   <div class="bar"><span>인쇄 창에서 '대상'을 <b>PDF로 저장</b>으로 고르면 PDF 파일이 됩니다.</span><button onclick="print()">인쇄 · PDF 저장</button></div>
   <div class="page"><div class="brand">OFF THE RECORD SALON${picked?' · 연사 전달용':''}</div><h1>${esc(s.title)}</h1>
   <div class="sum"><span>응답 <b>${R.length}명</b></span>${period?`<span>응답 기간 <b>${period}</b></span>`:''}<span>문항 <b>${Q.length}개</b></span>${picked?'<span>★ 고른 답변만</span>':''}<span>출력 <b>${kst(new Date().toISOString())}</b></span></div>
