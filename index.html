@@ -567,6 +567,14 @@ body::after{display:none}
 .sp-card:not(.tbc) .sp-body .lu-when{border-top-color:rgba(201,179,126,.28);color:rgba(237,230,214,.85)}
 .sp-card:not(.tbc):hover{border-color:rgba(201,179,126,.7);box-shadow:0 22px 48px rgba(0,0,0,.28),0 0 0 1px rgba(201,179,126,.25),0 10px 40px rgba(201,179,126,.16)}
 .nav-logo{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.lu-tt{margin-top:.8rem;border-top:1px solid rgba(20,20,20,.1);padding-top:.6rem}
+.lu-tt summary{cursor:pointer;font-size:.8rem;font-weight:600;color:var(--dk);list-style:none;display:flex;align-items:center;gap:.35rem}
+.lu-tt summary::-webkit-details-marker{display:none}
+.lu-tt summary::after{content:'+';font-weight:400;color:#A8843F}.lu-tt[open] summary::after{content:'−'}
+.lu-tt ol{list-style:none;margin:.6rem 0 0;padding:0;display:flex;flex-direction:column;gap:.45rem}
+.lu-tt li{display:grid;grid-template-columns:3.2rem 1fr;gap:.5rem;font-size:.8rem;line-height:1.45}
+.lu-tt li span{font-variant-numeric:tabular-nums;color:#A8843F;font-weight:600}
+.lu-tt li b{font-weight:600;color:var(--dk)}.lu-tt li small{display:block;color:var(--tl);font-size:.74rem}
 </style></head><body>
 
 <nav class="nav" id="nav">
@@ -745,7 +753,7 @@ function renderLineup(){
       <div class="sp-ph">${h&&h.photo_url?`<img src="${esc(h.photo_url)}" alt="">`:''}</div>
       <div class="lu-top"><small>SESSION 0${r.salon_no}${y?' · '+y:''}</small><b>${m?m+'<i>월</i>':'TBA'}</b></div>
       <div class="sp-body">${h?`<h4>${esc(h.name)}</h4><p class="sp-role">${esc(h.role)}</p>${h.field?`<div class="sp-field">${esc(h.field)}</div>`:''}`:'<h4>Coming soon</h4><p class="sp-role">연사 곧 공개</p>'}
-        <div class="lu-when">${when}</div></div></div>`;
+        <div class="lu-when">${when}</div>${Array.isArray(r.timetable)&&r.timetable.length?`<details class="lu-tt"><summary>당일 시간표</summary><ol>${r.timetable.map(x=>`<li><span>${esc(x.t||'')}</span><div><b>${esc(x.title)}</b>${x.note?`<small>${esc(x.note)}</small>`:''}</div></li>`).join('')}</ol></details>`:''}</div></div>`;
   }).join('');
 }
 renderLineup();
