@@ -559,6 +559,11 @@ body::after{display:none}
 .lp{position:fixed;inset:0;z-index:99998;pointer-events:none;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45)}
 .lp circle{fill:none;stroke-width:4}
 .nav-logo{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.closed-box{background:var(--dk);color:var(--cr);border-radius:var(--r);padding:3rem 2.25rem;text-align:center}
+.closed-box .closed-ic{width:52px;height:52px;border-radius:50%;border:1.5px solid rgba(237,230,214,.35);display:flex;align-items:center;justify-content:center;margin:0 auto 1.2rem;font-size:1.1rem;color:#C9B37E}
+.closed-box h3{font-size:1.25rem;font-weight:700;color:#fff}
+.closed-box p{margin:.8rem 0 1.8rem;color:rgba(237,230,214,.7);line-height:1.8}
+.jr-tag{display:inline-block;vertical-align:middle;font-size:.9rem;font-weight:700;letter-spacing:0;padding:.25rem .8rem;border-radius:999px;background:#C9B37E;color:#141414;margin-left:.4rem}
 </style><style>
 .apply-page{min-height:100vh;min-height:100svh;padding-top:calc(68px + 4rem)}
 .nav{background:rgba(20,20,20,.92)}
@@ -588,15 +593,15 @@ body::after{display:none}
 <section class="section apply apply-page" id="apply"><div class="container apply-grid">
   <div>
     <div class="eyebrow">Application</div>
-    <h2 class="title">참가 신청</h2>
-    <p class="desc">초대받은 분만 신청할 수 있습니다.<br>참가가 확정되면 세션마다 연사 소개와 함께 사전 질문을 따로 받습니다.</p>
+    <h2 class="title" id="apTitle">참가 신청</h2>
+    <p class="desc" id="apDesc">초대받은 분만 신청할 수 있습니다.<br>참가가 확정되면 세션마다 연사 소개와 함께 사전 질문을 따로 받습니다.</p>
     <div class="ov">
       <h3 class="ov-h">행사 안내</h3>
       <dl class="ov-list">
         <div><dt>모임</dt><dd>오프더레코드 살롱 · 성장을 꿈꾸는 이들이 모여 질문하고 대화하는 리더십 모임</dd></div>
         <div><dt>형식</dt><dd>세션마다 연사 1명과 초대받은 게스트 18명 내외 · 토요일 아침</dd></div>
         <div><dt>원칙</dt><dd>세션에서 오간 이야기는 외부에 기록하거나 공개하지 않습니다</dd></div>
-        <div><dt>참가권</dt><dd>1 Season Pass · 4회 전체 참여 · 25만원</dd></div>
+        <div><dt>참가권</dt><dd id="apPass">1 Season Pass · 4회 전체 참여 · 25만원</dd></div>
         <div><dt>주최</dt><dd>리피움 — 해내는 사람들의 모임, Since 2014</dd></div>
       </dl>
       <h3 class="ov-h" style="margin-top:2rem">세션 일정</h3>
@@ -609,7 +614,8 @@ body::after{display:none}
     </div>
   </div>
   <div>
-  <form class="form" id="applyForm" novalidate>
+  <div class="closed-box" id="closedBox"><div class="closed-ic">✕</div><h3>Season 1 참가 신청이 마감되었습니다</h3><p>관심 가져 주셔서 감사합니다.<br>다음 시즌 모집 때 다시 안내드리겠습니다.</p><a href="index.html" class="btn light">홈으로 →</a></div>
+  <form class="form" id="applyForm" novalidate style="display:none">
     <div class="form-alert" id="formAlert" role="alert"></div>
     <div class="form-row">
       <div class="field"><label for="f-name">이름 <em>*</em></label><input id="f-name" name="name" required autocomplete="name" placeholder="홍길동"><p class="field-err">이름을 입력해 주세요.</p></div>
@@ -621,7 +627,7 @@ body::after{display:none}
     </div>
     <div class="field"><label for="f-pass">Pass 선택 <em>*</em></label>
       <select id="f-pass" name="pass" required><option value="">선택해 주세요</option><option selected>1 Season (4회권) · 25만원</option></select>
-      <p class="form-hint">1회권은 회차별로 별도 오픈됩니다.</p>
+      <p class="form-hint" id="passHint">1회권은 회차별로 별도 오픈됩니다.</p>
       <p class="field-err">Pass를 선택해 주세요.</p></div>
     <div class="intro-h">자기소개 <span>다른 참가자와 연사에게 공개되지 않으며, 세션 준비에만 활용합니다.</span></div>
     <div class="field"><label for="f-interest">요즘의 관심사 <em>*</em></label><input id="f-interest" name="interest" required maxlength="120" placeholder="예) 조직문화, 첫 리더 역할"><p class="field-err">요즘의 관심사를 적어 주세요.</p></div>
@@ -663,6 +669,21 @@ $$('.faq-q').forEach(q=>q.addEventListener('click',()=>{const o=q.parentElement.
 const SU='https://dvlrzbckneucpvlacdll.supabase.co';
 const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE';
 const esc=t=>(t==null?'':String(t)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+/* ---- 모드: 리피움 주니어 전용(/apply/junior) · 일반(마감 스위치 따름) ---- */
+const JUNIOR=(window.APPLY_MODE||new URLSearchParams(location.search).get('t'))==='junior';
+const JR_PASS='리피움 주니어 (4회권) · 12만원';
+function showForm(){$('#closedBox').style.display='none';$('#applyForm').style.display='';}
+if(JUNIOR){
+  document.title='참가 신청 · 리피움 주니어 — 오프더레코드 살롱';
+  $('#apTitle').innerHTML='참가 신청 <span class="jr-tag">리피움 주니어</span>';
+  $('#apDesc').innerHTML='리피움 주니어 전용 신청 페이지입니다.<br>참가가 확정되면 세션마다 연사 소개와 함께 사전 질문을 따로 받습니다.';
+  $('#apPass').textContent='리피움 주니어 Pass · 4회 전체 참여 · 12만원';
+  $('#f-pass').innerHTML=`<option selected>${JR_PASS}</option>`;$('#passHint').textContent='리피움 주니어 전용 가격입니다.';
+  showForm();
+}else{
+  fetch('https://dvlrzbckneucpvlacdll.supabase.co/rest/v1/rpc/otr_public_settings',{method:'POST',headers:{apikey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE','Content-Type':'application/json'},body:'{}'})
+    .then(r=>r.ok?r.json():{}).then(st=>{if(st&&st.apply&&st.apply.open)showForm();}).catch(()=>{});
+}
 /* ---- 신청 폼 ---- */
 const form=$('#applyForm'),alertBox=$('#formAlert'),submitBtn=$('#submitBtn');
 function field(el){return el.closest('.field');}
