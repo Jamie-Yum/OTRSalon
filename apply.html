@@ -678,7 +678,8 @@ if(JUNIOR){
   $('#apTitle').innerHTML='참가 신청 <span class="jr-tag">리피움 주니어</span>';
   $('#apDesc').innerHTML='리피움 주니어 전용 신청 페이지입니다.<br>참가가 확정되면 세션마다 연사 소개와 함께 사전 질문을 따로 받습니다.';
   $('#apPass').textContent='리피움 주니어 Pass · 4회 전체 참여 · 12만원';
-  $('#f-pass').innerHTML=`<option selected>${JR_PASS}</option>`;$('#passHint').textContent='리피움 주니어 전용 가격입니다.';
+  $('#f-pass').innerHTML=`<option selected>${JR_PASS}</option>`;
+  {const inv=$('#f-inviter');inv.value='리피움 주니어';inv.readOnly=true;inv.tabIndex=-1;field(inv).style.display='none';field(inv).parentElement.style.gridTemplateColumns='1fr';}$('#passHint').textContent='리피움 주니어 전용 가격입니다.';
   showForm();
 }else{
   fetch('https://dvlrzbckneucpvlacdll.supabase.co/rest/v1/rpc/otr_public_settings',{method:'POST',headers:{apikey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE','Content-Type':'application/json'},body:'{}'})
