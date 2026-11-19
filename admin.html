@@ -1540,7 +1540,7 @@ async function svXlsx(sid,btn){
     S.forEach((row,r)=>row.forEach((_,c)=>{const a=X.utils.encode_cell({r,c});if(!ws2[a])ws2[a]={t:'s',v:''};ws2[a].s=r?{...C(0),...(c===3?{numFmt:'0%'}:{}),...(c===0?{font:{bold:true,name:'맑은 고딕',sz:10}}:{})}:H;}));
     ws2['!cols']=[{wch:40},{wch:36},{wch:9},{wch:8}];
     const wb=X.utils.book_new();X.utils.book_append_sheet(wb,ws,'응답');if(S.length>1)X.utils.book_append_sheet(wb,ws2,'객관식 요약');
-    X.writeFile(wb,(s.title||'설문').replace(/[\\/:*?"<>|]/g,'')+'_응답.xlsx');
+    X.writeFile(wb,(s.title||'설문').replace(/[\\/:*?"<>|]/g,'').replace(/\s+/g,' ').trim()+'_응답.xlsx');
   }catch(e){alert(e.message);}
   if(btn){btn.disabled=false;btn.textContent=t0;}
 }
