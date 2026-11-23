@@ -719,6 +719,8 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .tt-row.int{background:#F4F2EE;border-style:dashed}.tt-row.int input:not([type=checkbox]){color:var(--tl)}
 .tt-view li.int>*{opacity:.45}
 .tt-int{font-style:normal;font-size:.64rem;font-weight:700;border:1px solid rgba(237,230,214,.5);border-radius:4px;padding:0 .3rem;margin-left:.35rem;vertical-align:middle;color:#EDE6D6}
+.tt-row .tt-o{margin-top:.3rem;font-size:.8rem}
+.tt-ow{display:block;font-style:normal;font-size:.72rem;color:#C9B37E;opacity:.85;margin-top:.1rem}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
   <h2><span class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span><small>ADMIN</small></h2>
@@ -977,9 +979,9 @@ let ttDraft=null,ttId=null;
 function ttOpen(id){const r=D.schedule.find(x=>x.id===id);ttId=id;ttDraft=JSON.parse(JSON.stringify(r.timetable||[]));if(!ttDraft.length)ttDraft.push({t:'',title:'',note:''});ttRender();$('modal').classList.add('open');}
 function ttRender(){const r=D.schedule.find(x=>x.id===ttId);
   $('mForm').innerHTML=`<h3>Session 0${r.salon_no} 당일 시간표</h3><p class="note" style="margin:-.4rem 0 1rem">시간은 비워 둬도 됩니다. '참가자에게 보이기'를 끈 줄은 TF만 봅니다. 맨 아래 '홈페이지에 공개'를 켜야 홈페이지에 나옵니다.</p>
-  <div class="tt-ed">${ttDraft.map((x,i)=>`<div class="tt-row${ttPub(x)?'':' int'}"><input class="tt-t" value="${esc(x.t)}" placeholder="07:30" oninput="ttDraft[${i}].t=this.value"><div><input value="${esc(x.title)}" placeholder="순서 이름 예) 오프닝" oninput="ttDraft[${i}].title=this.value"><input class="tt-n" value="${esc(x.note)}" placeholder="설명 (선택)" oninput="ttDraft[${i}].note=this.value"><label class="tt-rp"><input type="checkbox" ${ttPub(x)?'checked':''} onchange="ttDraft[${i}].pub=this.checked;this.closest('.tt-row').classList.toggle('int',!this.checked)"> 참가자에게 보이기</label></div>
+  <div class="tt-ed">${ttDraft.map((x,i)=>`<div class="tt-row${ttPub(x)?'':' int'}"><input class="tt-t" value="${esc(x.t)}" placeholder="07:30" oninput="ttDraft[${i}].t=this.value"><div><input value="${esc(x.title)}" placeholder="순서 이름 예) 오프닝" oninput="ttDraft[${i}].title=this.value"><input class="tt-n" value="${esc(x.note)}" placeholder="설명 (선택)" oninput="ttDraft[${i}].note=this.value"><input class="tt-o" value="${esc(x.owner||'')}" list="owNames" placeholder="담당 (홈페이지에 안 보임)" oninput="ttDraft[${i}].owner=this.value"><label class="tt-rp"><input type="checkbox" ${ttPub(x)?'checked':''} onchange="ttDraft[${i}].pub=this.checked;this.closest('.tt-row').classList.toggle('int',!this.checked)"> 참가자에게 보이기</label></div>
     <span class="tt-btn"><button class="ic" title="위로" ${i?'':'disabled'} onclick="ttMove(${i},-1)">↑</button><button class="ic" title="아래로" ${i<ttDraft.length-1?'':'disabled'} onclick="ttMove(${i},1)">↓</button><button class="ic del" title="삭제" onclick="ttDraft.splice(${i},1);ttRender()">✕</button></span></div>`).join('')}</div>
-  <button class="lnk" style="margin-top:.6rem" onclick="ttDraft.push({t:'',title:'',note:''});ttRender()">+ 항목 추가</button>
+  <button class="lnk" style="margin-top:.6rem" onclick="ttDraft.push({t:'',title:'',note:''});ttRender()">+ 항목 추가</button><datalist id="owNames">${OWNERS.filter(o=>o!=='TF 전체').map(o=>`<option value="${esc(o)}">`).join('')}</datalist>
   <label class="chk" style="margin-top:1rem"><input type="checkbox" id="tt_pub" ${r.timetable_public?'checked':''}> 홈페이지에 공개</label>
   <div class="mn-actions"><button class="mn-btn ghost" onclick="ttImage(ttId,ttDraft,1)">참가자용 이미지</button><button class="mn-btn ghost" style="margin-right:auto" onclick="ttImage(ttId,ttDraft)">TF용 이미지</button><button class="mn-btn ghost" onclick="closeModal()">취소</button><button class="mn-btn" id="ttSave" onclick="ttSave()">저장</button></div>`;}
 /* 시간표 → PNG (1080px 폭, 브랜드 카드) */
@@ -991,7 +993,7 @@ async function ttImage(id,draft,pubOnly){
   const W=1080,P=96,c=document.createElement('canvas'),g=c.getContext('2d');g.font='600 32px Pretendard';
   const TX=P+Math.min(360,Math.max(150,Math.max(...L.map(x=>g.measureText(x.t||'·').width))+48)),TW=W-TX-P;
   const wrap=(t,font,w)=>{g.font=font;const out=[];let line='';for(const ch of String(t||'')){if(g.measureText(line+ch).width>w&&line){out.push(line);line=ch.trimStart();}else line+=ch;}if(line)out.push(line);return out;};
-  const rows=L.map(x=>({t:x.t||'',T:wrap(x.title,'600 38px Pretendard',TW),N:x.note?wrap(x.note,'400 26px Pretendard',TW):[]}));
+  const rows=L.map(x=>{const nt=[x.note,!pubOnly&&x.owner?'담당 '+x.owner:''].filter(Boolean).join('  ·  ');return {t:x.t||'',T:wrap(x.title,'600 38px Pretendard',TW),N:nt?wrap(nt,'400 26px Pretendard',TW):[]};});
   rows.forEach(x=>x.h=x.T.length*50+x.N.length*38+(x.N.length?10:0)+56);
   const head=390,foot=150,H=Math.max(1350,head+rows.reduce((a,x)=>a+x.h,0)+foot);
   c.width=W;c.height=H;
@@ -1018,7 +1020,7 @@ async function ttImage(id,draft,pubOnly){
   return c;
 }
 function ttMove(i,d){const j=i+d;[ttDraft[i],ttDraft[j]]=[ttDraft[j],ttDraft[i]];ttRender();}
-async function ttSave(){const L=ttDraft.map(x=>({t:(x.t||'').trim(),title:(x.title||'').trim(),note:(x.note||'').trim(),...(ttPub(x)?{}:{pub:false})})).filter(x=>x.title||x.t);
+async function ttSave(){const L=ttDraft.map(x=>({t:(x.t||'').trim(),title:(x.title||'').trim(),note:(x.note||'').trim(),...((x.owner||'').trim()?{owner:x.owner.trim()}:{}),...(ttPub(x)?{}:{pub:false})})).filter(x=>x.title||x.t);
   $('ttSave').disabled=true;try{await quick('schedule',ttId,{timetable:L,timetable_public:$('tt_pub').checked&&L.length>0});closeModal();}catch(e){$('ttSave').disabled=false;}}
 function actSet(k,v){actMode[k]=v;try{localStorage.setItem('otr_act',JSON.stringify(actMode))}catch(e){}RENDER.actions();}
 async function msgCopy(id,btn){const m=D.messages.find(x=>x.id===id);try{await navigator.clipboard.writeText(m.body)}catch(e){const ta=document.createElement('textarea');ta.value=m.body;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();}btn.textContent='복사됨';setTimeout(()=>btn.textContent='복사',1500);}
@@ -1393,7 +1395,7 @@ const RENDER={
      $('v-tt').innerHTML=S2.map(r=>{const T=r.timetable||[],d=r.event_date?new Date(r.event_date+'T00:00'):null;
       return `<div class="tt-card${T.length?'':' empty'}"><div class="tt-ch"><div><small>SESSION 0${r.salon_no}</small><b>${d?`${d.getMonth()+1}/${d.getDate()} (${W2[d.getDay()]})`:(r.year||'')+'.'+(r.month||'')}</b>${[r.time_text,r.place].filter(Boolean).length?`<span>${esc([r.time_text,r.place].filter(Boolean).join(' · '))}</span>`:''}</div>
         ${T.length?`<label class="tt-pub" title="홈페이지 일정 카드에 표시"><input type="checkbox" ${r.timetable_public?'checked':''} onchange="quick('schedule','${r.id}',{timetable_public:this.checked})"> 공개</label>`:''}</div>
-        ${T.length?`<ol class="tt-view">${T.map(x=>`<li class="${ttPub(x)?'':'int'}"><span>${esc(x.t)||'·'}</span><div><b>${esc(x.title)}</b>${ttPub(x)?'':'<em class="tt-int">TF만</em>'}${x.note?`<small>${esc(x.note)}</small>`:''}</div></li>`).join('')}</ol>`:'<p class="note" style="margin:.6rem 0">아직 시간표가 없습니다.</p>'}
+        ${T.length?`<ol class="tt-view">${T.map(x=>`<li class="${ttPub(x)?'':'int'}"><span>${esc(x.t)||'·'}</span><div><b>${esc(x.title)}</b>${ttPub(x)?'':'<em class="tt-int">TF만</em>'}${x.owner?`<i class="tt-ow">${esc(x.owner)}</i>`:''}${x.note?`<small>${esc(x.note)}</small>`:''}</div></li>`).join('')}</ol>`:'<p class="note" style="margin:.6rem 0">아직 시간표가 없습니다.</p>'}
         <div class="tt-act"><button class="lnk" onclick="ttOpen('${r.id}')">${T.length?'수정':'+ 작성'}</button>${T.length?`<button class="lnk" onclick="ttImage('${r.id}',null,1)">참가자용 이미지</button><button class="lnk" onclick="ttImage('${r.id}')">TF용 이미지</button>`:''}</div></div>`;}).join('')||empty('회차가 없습니다.');}
     $('v-schedule').innerHTML=`<thead><tr><th>회차</th><th>연·월</th><th>날짜</th><th>시간</th><th>장소</th><th>담당 Host</th><th>상태</th><th>당일 시간표</th><th>홈페이지 안내</th><th></th></tr></thead><tbody>${
       L.map(r=>{const past=r.event_date&&r.event_date<t;const d=r.event_date?new Date(r.event_date+'T00:00'):null;
