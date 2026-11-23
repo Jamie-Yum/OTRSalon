@@ -571,9 +571,9 @@ body::after{display:none}
 .lu-tt summary{cursor:pointer;font-size:.8rem;font-weight:600;color:var(--dk);list-style:none;display:flex;align-items:center;gap:.35rem}
 .lu-tt summary::-webkit-details-marker{display:none}
 .lu-tt summary::after{content:'+';font-weight:400;color:#A8843F}.lu-tt[open] summary::after{content:'−'}
-.lu-tt ol{list-style:none;margin:.6rem 0 0;padding:0;display:flex;flex-direction:column;gap:.45rem}
-.lu-tt li{display:grid;grid-template-columns:3.2rem 1fr;gap:.5rem;font-size:.8rem;line-height:1.45}
-.lu-tt li span{font-variant-numeric:tabular-nums;color:#A8843F;font-weight:600}
+.lu-tt ol{list-style:none;margin:.6rem 0 0;padding:0;display:grid;grid-template-columns:max-content 1fr;column-gap:.7rem;row-gap:.45rem}
+.lu-tt li{display:contents}.lu-tt li>*{font-size:.8rem;line-height:1.45;min-width:0}
+.lu-tt li span{font-variant-numeric:tabular-nums;color:#A8843F;font-weight:600;white-space:nowrap}
 .lu-tt li b{font-weight:600;color:var(--dk)}.lu-tt li small{display:block;color:var(--tl);font-size:.74rem}
 </style></head><body>
 

@@ -667,7 +667,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .act-tbl tr.ins-top td{box-shadow:inset 0 3px 0 #3D6FB0}.act-tbl tr.ins-bot td{box-shadow:inset 0 -3px 0 #3D6FB0}
 .tt-pub{display:inline-flex;align-items:center;gap:.25rem;margin-left:.5rem;font-size:.78rem;color:var(--ts)}
 .tt-ed{display:flex;flex-direction:column;gap:.5rem}
-.tt-row{display:grid;grid-template-columns:5rem 1fr auto;gap:.5rem;align-items:start;padding:.6rem;border:1px solid var(--bd);border-radius:10px;background:#fff}
+.tt-row{display:grid;grid-template-columns:7.5rem 1fr auto;gap:.5rem;align-items:start;padding:.6rem;border:1px solid var(--bd);border-radius:10px;background:#fff}
 .tt-row input{width:100%;font:inherit;font-size:.88rem;padding:.45rem .6rem;border:1px solid var(--bd);border-radius:6px;background:#fff}
 .tt-row .tt-t{font-variant-numeric:tabular-nums;text-align:center}
 .tt-row .tt-n{margin-top:.3rem;font-size:.8rem;color:var(--ts)}
@@ -699,9 +699,9 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .tt-ch small{display:block;font-size:.68rem;letter-spacing:.16em;color:#C9B37E;font-weight:700}
 .tt-ch b{display:block;font-size:1.05rem;margin-top:.1rem}.tt-ch span{display:block;font-size:.76rem;opacity:.65}
 .tt-card .tt-pub{color:inherit;margin:0}
-.tt-view{list-style:none;margin:.7rem 0 0;padding:0;display:flex;flex-direction:column;gap:.5rem;flex:1}
-.tt-view li{display:grid;grid-template-columns:3.2rem 1fr;gap:.5rem;font-size:.84rem;line-height:1.45}
-.tt-view li span{color:#C9B37E;font-weight:700;font-variant-numeric:tabular-nums}
+.tt-view{list-style:none;margin:.7rem 0 0;padding:0;display:grid;grid-template-columns:max-content 1fr;column-gap:.8rem;row-gap:.55rem;align-content:start;flex:1}
+.tt-view li{display:contents;font-size:.84rem;line-height:1.45}.tt-view li>*{font-size:.84rem;line-height:1.45;min-width:0}
+.tt-view li span{color:#C9B37E;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
 .tt-view li b{font-weight:600;color:#fff}.tt-view li small{display:block;font-size:.74rem;opacity:.55}
 .tt-act{display:flex;gap:1rem;margin-top:.9rem;padding-top:.7rem;border-top:1px solid rgba(237,230,214,.12)}
 .tt-card:not(.empty) .tt-act .lnk{color:#E2CD94}
@@ -983,7 +983,8 @@ async function ttImage(id,draft){
   const r=D.schedule.find(x=>x.id===id),L=(draft||r.timetable||[]).filter(x=>(x.title||'').trim()||(x.t||'').trim());
   if(!L.length)return alert('시간표 항목이 없습니다.');
   try{await Promise.all(['700 64px Pretendard','600 38px Pretendard','400 26px Pretendard','600 26px "Josefin Sans"'].map(f=>document.fonts.load(f)));}catch(e){}
-  const W=1080,P=96,TX=P+170,TW=W-TX-P,c=document.createElement('canvas'),g=c.getContext('2d');
+  const W=1080,P=96,c=document.createElement('canvas'),g=c.getContext('2d');g.font='600 32px Pretendard';
+  const TX=P+Math.min(360,Math.max(150,Math.max(...L.map(x=>g.measureText(x.t||'·').width))+48)),TW=W-TX-P;
   const wrap=(t,font,w)=>{g.font=font;const out=[];let line='';for(const ch of String(t||'')){if(g.measureText(line+ch).width>w&&line){out.push(line);line=ch.trimStart();}else line+=ch;}if(line)out.push(line);return out;};
   const rows=L.map(x=>({t:x.t||'',T:wrap(x.title,'600 38px Pretendard',TW),N:x.note?wrap(x.note,'400 26px Pretendard',TW):[]}));
   rows.forEach(x=>x.h=x.T.length*50+x.N.length*38+(x.N.length?10:0)+56);
@@ -1002,7 +1003,7 @@ async function ttImage(id,draft){
   g.font='400 28px Pretendard';g.fillStyle='rgba(237,230,214,.65)';if(meta)g.fillText(meta,P,P+212);
   let y=head;g.fillStyle='rgba(201,179,126,.55)';g.fillRect(P,y-1,W-P*2,2);
   rows.forEach((x,i)=>{const top=y+28;
-    g.font='600 34px Pretendard';g.fillStyle='#C9B37E';g.fillText(x.t||'·',P,top+2);
+    g.font='600 32px Pretendard';g.fillStyle='#C9B37E';g.fillText(x.t||'·',P,top+4);
     g.font='600 38px Pretendard';g.fillStyle='#F4EFE4';x.T.forEach((ln,k)=>g.fillText(ln,TX,top+k*50));
     g.font='400 26px Pretendard';g.fillStyle='rgba(237,230,214,.55)';x.N.forEach((ln,k)=>g.fillText(ln,TX,top+x.T.length*50+10+k*38));
     y+=x.h;if(i<rows.length-1){g.fillStyle='rgba(237,230,214,.12)';g.fillRect(TX,y-1,W-TX-P,1);}});
