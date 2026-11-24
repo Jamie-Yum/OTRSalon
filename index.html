@@ -487,7 +487,9 @@ body::after{display:none}
 .sp-card.tbc .lu-top{color:var(--dk)}
 .sp-card.tbc .lu-when{border-top-color:var(--bd);color:var(--tl)}
 .sp-card.tbc .tag{color:var(--dk);border-color:rgba(20,20,20,.3)}
-.sp-card.past{filter:grayscale(1);opacity:.55}.sp-card.past .lu-ttb{display:none}
+.sp-card.past{filter:grayscale(1);opacity:.55}
+.sp-card.later{opacity:.72}.sp-card.later .sp-ph img{filter:saturate(.7) brightness(.85)}
+.sp-card.next{box-shadow:0 0 0 2px #C9B37E,0 14px 34px rgba(20,20,20,.22)}.sp-card.past .lu-ttb{display:none}
 .sp-card.past .lu-top small::after{content:'  ·  종료';color:#EDE6D6}
 @media(max-width:600px){.sp-card{aspect-ratio:auto;min-height:290px}.lu-top{padding:1rem 1rem 0}.lu-top b{font-size:2.1rem}.sp-body .lu-when{font-size:.72rem}}
 
@@ -765,13 +767,14 @@ const esc=t=>(t==null?'':String(t)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt
 let SP=[],SC=[{salon_no:1,year:2026,month:11,status:'모집 중',public_note:'세부 일정 추후 공지'},{salon_no:2,year:2027,month:2,status:'예정',public_note:'시간대 추후 공지'},{salon_no:3,year:2027,month:5,status:'예정',public_note:'시간대 추후 공지'},{salon_no:4,year:2027,month:8,status:'예정',public_note:'시간대 추후 공지'}];
 function renderLineup(){
   const W='일월화수목금토',today=new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+  const nextNo=([...SC].filter(r=>r.event_date&&r.event_date>=today).sort((a,b)=>a.event_date.localeCompare(b.event_date))[0]||{}).salon_no;
   $('#spGrid').innerHTML=[...SC].sort((a,b)=>a.salon_no-b.salon_no).map(r=>{
     const h=SP.find(x=>x.salon_no===r.salon_no);
     const d=r.event_date?new Date(r.event_date+'T00:00'):null;
     const y=d?d.getFullYear():r.year,m=d?d.getMonth()+1:r.month;
     const st=(r.event_date&&r.event_date<today)?'종료':(r.status||'예정');
     const when=d?[`${m}/${d.getDate()} (${W[d.getDay()]})`,r.time_text,r.place].filter(Boolean).map(esc).join(' · '):esc(r.public_note||'일정 추후 공지');
-    return `<div class="sp-card${h?'':' tbc'} split${st==='종료'?' past':''}">
+    return `<div class="sp-card${h?'':' tbc'} split${st==='종료'?' past':r.salon_no===nextNo?' next':' later'}">
       <div class="sp-ph">${h&&h.photo_url?`<img src="${esc(h.photo_url)}" alt="">`:''}</div>
       <div class="lu-top"><small>SESSION 0${r.salon_no}${y?' · '+y:''}</small><b>${m?m+'<i>월</i>':'TBA'}</b></div>
       <div class="sp-body">${h?`<h4>${esc(h.name)}</h4><p class="sp-role">${esc(h.role)}</p>${h.field?`<div class="sp-field">${esc(h.field)}</div>`:''}`:'<h4>Coming soon</h4><p class="sp-role">연사 곧 공개</p>'}
