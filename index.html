@@ -592,8 +592,10 @@ body::after{display:none}
 .sp-card.split::after{display:none}
 .sp-card.split .sp-ph{position:relative;inset:auto;aspect-ratio:4/3.6;flex:none;font-size:4.5rem;overflow:hidden;min-height:0;height:auto}
 .sp-card.split .sp-ph img{object-position:center 18%}
-.sp-card.split .sp-ph::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.55),transparent 38%,transparent 65%,var(--sf))}
-.sp-card.split .lu-top{position:absolute;top:0;left:0;z-index:2}
+.sp-card.split .sp-ph::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(10,10,10,.82) 0%,rgba(10,10,10,.45) 22%,transparent 40%,transparent 65%,var(--sf))}
+.sp-card.split .lu-top{position:absolute;top:0;left:0;z-index:2;padding:.85rem 1.1rem 0;text-shadow:0 1px 6px rgba(0,0,0,.55)}
+.sp-card.split .lu-top small{opacity:1;color:#fff}
+.sp-card.split .lu-top b{font-size:2.3rem;margin-top:.2rem;color:#E2CD94}
 .sp-card.split .sp-body{padding-top:.4rem;display:flex;flex-direction:column}
 .sp-card.split .sp-body{flex:1}
 .sp-card.split .lu-when{margin-top:auto}
