@@ -670,7 +670,7 @@ const SU='https://dvlrzbckneucpvlacdll.supabase.co';
 const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE';
 const esc=t=>(t==null?'':String(t)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 /* ---- 모드: 리피움 주니어 전용(/apply/junior) · 일반(마감 스위치 따름) ---- */
-const JUNIOR=(window.APPLY_MODE||new URLSearchParams(location.search).get('t'))==='junior';
+const MODE=window.APPLY_MODE||new URLSearchParams(location.search).get('t'),JUNIOR=MODE==='junior',LATE=MODE==='late';
 const JR_PASS='리피움 주니어 (4회권) · 12만원';
 function showForm(){$('#closedBox').style.display='none';$('#applyForm').style.display='';}
 if(JUNIOR){
@@ -680,6 +680,9 @@ if(JUNIOR){
   $('#apPass').textContent='리피움 주니어 Pass · 4회 전체 참여 · 12만원';
   $('#f-pass').innerHTML=`<option selected>${JR_PASS}</option>`;
   {const inv=$('#f-inviter');inv.value='리피움 주니어';inv.readOnly=true;inv.tabIndex=-1;field(inv).style.display='none';field(inv).parentElement.style.gridTemplateColumns='1fr';}$('#passHint').textContent='리피움 주니어 전용 가격입니다.';
+  showForm();
+}else if(LATE){
+  $('#apDesc').innerHTML='추가 신청 페이지입니다.<br>참가가 확정되면 세션마다 연사 소개와 함께 사전 질문을 따로 받습니다.';
   showForm();
 }else{
   fetch('https://dvlrzbckneucpvlacdll.supabase.co/rest/v1/rpc/otr_public_settings',{method:'POST',headers:{apikey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE','Content-Type':'application/json'},body:'{}'})
@@ -712,7 +715,7 @@ form.addEventListener('submit',async e=>{
   submitBtn.disabled=true;submitBtn.classList.add('loading');submitBtn.querySelector('.t').textContent='접수 중…';
   const data=Object.fromEntries(new FormData(form).entries());
   try{
-    const r=await fetch(SU+'/rest/v1/rpc/otr_apply',{method:'POST',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:JSON.stringify({name:data.name,phone:data.phone,role:data.role,inviter:data.inviter,pass:data.pass,question:['[요즘 관심사] '+data.interest,'[주요 커리어] '+data.career,'[신청 이유] '+data.why,'[얻어 가고 싶은 것] '+data.want].join('\n\n')})});
+    const r=await fetch(SU+'/rest/v1/rpc/otr_apply',{method:'POST',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:JSON.stringify({name:data.name,phone:data.phone,role:data.role,inviter:data.inviter,pass:data.pass,question:['[요즘 관심사] '+data.interest,'[주요 커리어] '+data.career,'[신청 이유] '+data.why,'[얻어 가고 싶은 것] '+data.want].join('\n\n'),...(LATE?{via:'late'}:{})})});
     if(!r.ok){const j=await r.json().catch(()=>({}));throw new Error(j.message||('HTTP '+r.status));}
     $('#dName').textContent=data.name;$('#dPass').textContent=data.pass;
     form.style.display='none';const done=$('#done');done.classList.add('show');done.focus({preventScroll:true});done.scrollIntoView({behavior:'smooth',block:'center'});

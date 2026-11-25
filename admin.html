@@ -721,6 +721,8 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .tt-int{font-style:normal;font-size:.64rem;font-weight:700;border:1px solid rgba(237,230,214,.5);border-radius:4px;padding:0 .3rem;margin-left:.35rem;vertical-align:middle;color:#EDE6D6}
 .tt-row .tt-o{margin-top:.3rem;font-size:.8rem}
 .tt-ow{display:block;font-style:normal;font-size:.72rem;color:#C9B37E;opacity:.85;margin-top:.1rem}
+.ap-add{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;margin:0 0 .8rem;font-size:.8rem}
+.ap-td .ap-ck{align-items:center;gap:.2rem;margin:0 .2rem}.ap-ck i{font-style:normal;font-size:.72rem;color:var(--ts)}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
   <h2><span class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span><small>ADMIN</small></h2>
@@ -746,6 +748,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
     <button class="lnk" style="color:var(--tl)" onclick="appSel.clear();RENDER.apps()">선택 해제</button>
     <span id="selMsg"></span></div>
   <div class="ap-sum" id="apSum"></div>
+  <div class="ap-add"><button class="mn-btn" onclick="appAdd()">+ 신청자 추가</button><span class="note" style="margin:0">마감 뒤 직접 등록할 때 씁니다. 본인이 직접 쓰게 하려면 추가 신청 링크 <a href="https://off-record.kr/apply/late" target="_blank" style="color:var(--ac)">off-record.kr/apply/late</a> 를 보내세요.</span></div>
   <div class="tbl-wrap"><table class="tbl" id="v-apps"></table></div>
   <div class="mn-head" style="margin-top:3.5rem"><div><div class="eyebrow">Messages</div><h2 class="title" style="margin:0">안내 문자</h2></div><button class="mn-btn" onclick="edit('messages')">+ 문자 추가</button></div>
   <p class="note">참가자 대상 발송은 승인자 컨펌 후 실행합니다. [ ] 부분은 확정 후 기입하세요.</p>
@@ -754,7 +757,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 
 <div class="panel" id="p-site"><section class="section"><div class="container">
   <div class="mn-head"><div><div class="eyebrow">Homepage</div><h2 class="title" style="margin:0">홈페이지 설정</h2></div></div>
-  <div class="site-card apply-sw"><div><h3>참가 신청 받기</h3><p class="note" style="margin:.25rem 0 0">끄면 홈페이지 버튼이 '신청 마감'으로 바뀌고 신청서가 닫힙니다. 리피움 주니어 링크는 항상 열려 있습니다.<br>주니어 신청 링크: <a href="https://off-record.kr/apply/junior" target="_blank" style="color:var(--ac)">off-record.kr/apply/junior</a></p></div>
+  <div class="site-card apply-sw"><div><h3>참가 신청 받기</h3><p class="note" style="margin:.25rem 0 0">끄면 홈페이지 버튼이 '신청 마감'으로 바뀌고 신청서가 닫힙니다. 아래 두 링크는 마감 중에도 열려 있습니다.<br>주니어 신청 링크: <a href="https://off-record.kr/apply/junior" target="_blank" style="color:var(--ac)">off-record.kr/apply/junior</a><br>추가 신청 링크: <a href="https://off-record.kr/apply/late" target="_blank" style="color:var(--ac)">off-record.kr/apply/late</a> <small>(마감 뒤 개별 안내용)</small></p></div>
     <label class="sw"><input type="checkbox" id="applyOpen" onchange="setApplyOpen(this)"><span></span><b id="applyOpenTxt">마감</b></label></div>
   <div class="site-grid">
     <div class="site-card">
@@ -1062,7 +1065,7 @@ function appSelUpd(){const n=appSel.size;$('selN').textContent=n+'명 선택';$(
 async function appCopy(kind){
   const L=(D.apps||[]).filter(r=>appSel.has(r.id));if(!L.length)return;
   const t=kind==='phone'?L.map(r=>r.phone).join('\n'):kind==='namephone'?L.map(r=>`${r.name} ${r.phone}`).join('\n')
-    :['이름\t연락처\t소속/역할\t초대자\t상태\t애프터(S0'+apSess+')',...L.map(r=>[r.name,r.phone,r.role,r.inviter,r.status,(r.after_party||{})[apSess]?'참석':''].join('\t'))].join('\n');
+    :['이름\t연락처\t소속/역할\t초대자\t상태\tS0'+apSess+' 1부\tS0'+apSess+' 2부',...L.map(r=>[r.name,r.phone,r.role,r.inviter,r.status,(r.attend||{})[apSess]?'참석':'',(r.after_party||{})[apSess]?'참석':''].join('\t'))].join('\n');
   try{await navigator.clipboard.writeText(t);}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();}
   $('selMsg').textContent=`${L.length}명 복사됨`;setTimeout(()=>$('selMsg').textContent='',2000);
 }
@@ -1190,11 +1193,21 @@ async function quick(key,id,patch){
 /* 화면별 렌더 */
 const empty=m=>`<div class="mn-empty">${m}</div>`;
 let apSess=(()=>{const t=new Date(Date.now()+9*36e5).toISOString().slice(0,10);const n=(D.schedule||[]).filter(r=>r.event_date&&r.event_date>=t).sort((a,b)=>a.event_date.localeCompare(b.event_date))[0];return n?n.salon_no:1;})();
-async function apSet(id,on){const r=D.apps.find(x=>x.id===id);const ap={...(r.after_party||{})};if(on)ap[apSess]=true;else delete ap[apSess];r.after_party=ap;RENDER.apps();
-  try{await rpc('otr_app_update',{rid:id,new_after_party:ap});}catch(e){alert('저장 실패: '+e.message);await loadApps();}}
-async function apCopy(){const L=(D.apps||[]).filter(r=>inS(r)&&(r.after_party||{})[apSess]&&r.status!=='취소');if(!L.length){$('apMsg').textContent='참석자가 없습니다';return;}
+async function apSet(id,on,k='after_party'){const r=D.apps.find(x=>x.id===id);const ap={...(r[k]||{})};if(on)ap[apSess]=true;else delete ap[apSess];r[k]=ap;RENDER.apps();
+  try{await rpc('otr_app_update',{rid:id,['new_'+k]:ap});}catch(e){alert('저장 실패: '+e.message);await loadApps();}}
+async function apCopy(k='after_party'){const L=(D.apps||[]).filter(r=>inS(r)&&(r[k]||{})[apSess]&&r.status!=='취소');if(!L.length){$('apMsg').textContent='참석자가 없습니다';return;}
   const t=L.map(r=>`${r.name} ${r.phone}`).join('\n');try{await navigator.clipboard.writeText(t);}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();}
   $('apMsg').textContent=`${L.length}명 복사됨`;setTimeout(()=>{const m=$('apMsg');if(m)m.textContent='';},2000);}
+const PASS_OPTS=['1 Season (4회권) · 25만원','리피움 주니어 (4회권) · 12만원'];
+const AF=[{k:'name',l:'이름',req:1,half:1},{k:'phone',l:'연락처',req:1,half:1,ph:'010-0000-0000'},{k:'role',l:'소속 / 역할',half:1},{k:'inviter',l:'초대자',half:1},
+  {k:'pass',l:'Pass',t:'sel',opts:PASS_OPTS,def:PASS_OPTS[0],half:1},{k:'status',l:'상태',t:'sel',opts:['접수','확정','대기'],def:'확정',half:1},{k:'memo',l:'메모',ph:'예) 마감 후 전화로 신청'}];
+function appAdd(){cur={key:'_app',id:null};let h='<h3>신청자 추가</h3><p class="note" style="margin:-.4rem 0 1rem">이름과 연락처만 필수입니다. 저장하면 참가 신청 목록에 바로 추가됩니다.</p>',b=[];
+  AF.forEach(f=>{const x=field(f,null);if(f.half){b.push(x);if(b.length===2){h+=`<div class="mn-row" style="grid-template-columns:1fr 1fr">${b.join('')}</div>`;b=[];}}else h+=x;});
+  h+=`<div class="mn-actions"><button class="mn-btn ghost" onclick="closeModal()">취소</button><button class="mn-btn" id="aSave" onclick="appAddSave()">저장</button></div>`;
+  $('mForm').innerHTML=h;$('modal').classList.add('open');setTimeout(()=>$('f_name').focus(),50);}
+async function appAddSave(){const v={};AF.forEach(f=>v[f.k]=($('f_'+f.k).value||'').trim());if(!v.name||!v.phone)return alert('이름과 연락처를 입력해 주세요.');
+  const b=$('aSave');b.disabled=true;b.textContent='저장 중…';
+  try{await rpc('otr_app_add',v);closeModal();await loadApps();}catch(e){alert('저장 실패: '+e.message);b.disabled=false;b.textContent='저장';}}
 async function appUpdate(id,patch){try{await rpc('otr_app_update',{rid:id,...patch});await loadApps();}catch(e){alert('저장 실패: '+e.message);}}
 async function appMemo(id){const r=D.apps.find(x=>x.id===id);const m=prompt('메모',r.memo||'');if(m===null)return;appUpdate(id,{new_memo:m});}
 async function appDel(id){if(!confirm('이 신청을 삭제할까요? 되돌릴 수 없습니다.'))return;try{await rpc('otr_app_delete',{rid:id});await loadApps();}catch(e){alert('삭제 실패: '+e.message);}}
@@ -1240,16 +1253,16 @@ const RENDER={
     const cnt=all.reduce((o,r)=>{const k=r.pass.split(' (')[0];o[k]=(o[k]||0)+1;return o;},{});
     $('appCount').textContent=all.length?`총 ${all.length}건 · `+Object.entries(cnt).map(([k,v])=>`${k} ${v}`).join(' · ')+(()=>{const b=budget();return ` · 확정 ${b.n}명 · 회비 ${b.inc}만원`})():'';
     if(D.fees)RENDER.fees();
-    {const ap=n=>all.filter(r=>(r.after_party||{})[n]&&r.status!=='취소');
-     $('apSum').innerHTML=`<b>애프터 파티</b>${[1,2,3,4].map(n=>`<button class="${n===apSess?'on':''}" onclick="apSess=${n};RENDER.apps()">S0${n} <em>${ap(n).length}명</em></button>`).join('')}<button class="lnk" onclick="apCopy()">S0${apSess} 참석자 복사</button><span id="apMsg"></span>`;}
+    {const ap=(n,k)=>all.filter(r=>(r[k]||{})[n]&&r.status!=='취소').length;
+     $('apSum').innerHTML=`<b>세션 참석</b>${[1,2,3,4].map(n=>`<button class="${n===apSess?'on':''}" onclick="apSess=${n};RENDER.apps()">S0${n} <em>1부 ${ap(n,'attend')} · 2부 ${ap(n,'after_party')}</em></button>`).join('')}<button class="lnk" onclick="apCopy('attend')">S0${apSess} 1부 명단 복사</button><button class="lnk" onclick="apCopy()">2부 명단 복사</button><span id="apMsg"></span>`;}
     const intro=q=>{const m={};(q||'').split(/\n\s*\n/).forEach(b=>{const x=b.match(/^\[(.+?)\]\s*([\s\S]*)$/);if(x)m[x[1]]=x[2].trim();});return m;};
     const one=t=>`<span class="ellip" title="${esc(t)}">${esc(t)}</span>`;
-    $('v-apps').innerHTML=`<thead><tr><th style="width:34px"><input type="checkbox" id="selAll" onchange="appToggleAll(this.checked)" title="전체 선택"></th><th>접수일</th>${sortTh('name','이름')}<th>소속 / 역할</th><th>연락처</th>${sortTh('inviter','초대자')}${sortTh('status','상태')}<th class="nw ap-th">애프터 <select onchange="apSess=+this.value;RENDER.apps()" title="세션 선택">${[1,2,3,4].map(n=>`<option value="${n}" ${n===apSess?'selected':''}>S0${n}</option>`).join('')}</select></th><th>요즘 관심사</th><th>주요 커리어</th><th></th></tr></thead><tbody>${
+    $('v-apps').innerHTML=`<thead><tr><th style="width:34px"><input type="checkbox" id="selAll" onchange="appToggleAll(this.checked)" title="전체 선택"></th><th>접수일</th>${sortTh('name','이름')}<th>소속 / 역할</th><th>연락처</th>${sortTh('inviter','초대자')}${sortTh('status','상태')}<th class="nw ap-th">참석 <select onchange="apSess=+this.value;RENDER.apps()" title="세션 선택">${[1,2,3,4].map(n=>`<option value="${n}" ${n===apSess?'selected':''}>S0${n}</option>`).join('')}</select></th><th>요즘 관심사</th><th>주요 커리어</th><th></th></tr></thead><tbody>${
       L.map(r=>{const m=intro(r.question);const has=Object.keys(m).length;
       return `<tr class="app-row as${APP_STATUS.indexOf(r.status)}${appSel.has(r.id)?' sel':''}"><td><input type="checkbox" ${appSel.has(r.id)?'checked':''} onchange="appToggle('${r.id}',this.checked);this.closest('tr').classList.toggle('sel',this.checked)"></td><td class="nw" style="color:var(--tl)">${kst(r.created_at).slice(5).replace('-','/')}</td>
       <td class="nw"><b>${esc(r.name)}</b></td><td>${one(r.role)}</td><td class="nw">${esc(r.phone)}</td><td class="nw">${invTag(r.inviter)}</td>
       <td><select class="st-sel" onchange="this.closest('tr').className=this.closest('tr').className.replace(/\bas\d/,'as'+APP_STATUS.indexOf(this.value));appUpdate('${r.id}',{new_status:this.value})">${APP_STATUS.map(o=>`<option ${o===r.status?'selected':''}>${o}</option>`).join('')}</select></td>
-      <td class="ap-td"><label class="ap-ck" title="Session 0${apSess} 애프터 파티 참석"><input type="checkbox" ${(r.after_party||{})[apSess]?'checked':''} onchange="apSet('${r.id}',this.checked)"><span></span></label></td>
+      <td class="ap-td nw">${[['attend','1부'],['after_party','2부']].map(([k,l])=>`<label class="ap-ck" title="Session 0${apSess} ${l} 참석"><input type="checkbox" ${(r[k]||{})[apSess]?'checked':''} onchange="apSet('${r.id}',this.checked,'${k}')"><span></span><i>${l}</i></label>`).join('')}</td>
       <td>${one(has?(m['요즘 관심사']||''):r.question)}</td><td>${one(m['주요 커리어']||m['커리어']||'')}</td>
             <td class="nw"><div class="act-cell"><button class="ic${r.memo?' has':''}" title="${r.memo?'메모: '+esc(r.memo):'메모 추가'}" onclick="appMemo('${r.id}')">${IC.memo}</button><button class="ic" title="자세히 보기" onclick="const d=this.closest('tr').nextElementSibling;d.classList.toggle('open');this.classList.toggle('open',d.classList.contains('open'))">${IC.more}</button><button class="ic del" title="삭제" onclick="appDel('${r.id}')">${IC.del}</button></div></td></tr>
       <tr class="app-detail"><td colspan="11"><div class="app-intro">${has?Object.entries(m).map(([k,v])=>`<div><h6>${esc(k)}</h6><p>${esc(v)}</p></div>`).join(''):`<div><h6>내용</h6><p>${esc(r.question)}</p></div>`}
