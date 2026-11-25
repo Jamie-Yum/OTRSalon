@@ -1,0 +1,57 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>진행 장표 — 오프더레코드 살롱</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@200;300;400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Pretendard',sans-serif;background:#141414;color:#EDE6D6;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2.5rem 1rem;word-break:keep-all}
+.w{width:100%;max-width:880px}
+.wm{font-family:'Inter Tight',sans-serif;font-weight:800;letter-spacing:.02em;word-spacing:-.18em;font-size:.95rem}.wm .the{font-size:.66em}
+.eb{font-family:'Inter Tight',sans-serif;font-size:.8rem;letter-spacing:.22em;color:#C9B37E;margin:2.4rem 0 .6rem;text-transform:uppercase}
+h1{font-size:clamp(1.8rem,5vw,2.6rem);font-weight:700;line-height:1.3}
+.sub{color:rgba(237,230,214,.65);margin-top:.6rem;font-size:.95rem;line-height:1.6}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-top:2.2rem}
+.c{border:1px solid rgba(237,230,214,.16);border-radius:14px;padding:1.3rem 1.4rem;cursor:pointer;background:#1A1A1A;transition:all .2s;text-align:left;color:inherit;font:inherit}
+.c:hover{border-color:#C9B37E;transform:translateY(-2px)}
+.c b{display:block;font-size:1.15rem}.c span{display:block;font-size:.84rem;color:rgba(237,230,214,.6);margin-top:.35rem;line-height:1.55}
+.c i{font-style:normal;font-family:'Inter Tight',sans-serif;color:#C9B37E;font-size:.8rem;letter-spacing:.12em}
+.c[disabled]{opacity:.35;cursor:default;transform:none;border-color:rgba(237,230,214,.16)}
+.tip{margin-top:1.8rem;font-size:.8rem;color:rgba(237,230,214,.45);line-height:1.7}
+.err{color:#E2A39B}
+@media(max-width:620px){.g{grid-template-columns:1fr}}
+</style></head><body>
+<div class="w" id="app"><div class="wm">OFF <span class="the">THE</span> RECORD SALON</div><p class="sub" style="margin-top:2rem">불러오는 중…</p></div>
+<script src="/stage.js?v=5"></script>
+<script>
+const SU='https://dvlrzbckneucpvlacdll.supabase.co',SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE';
+const q=new URLSearchParams(location.search),TOK=q.get('k'),$=id=>document.getElementById(id);
+const esc=t=>(t==null?'':String(t)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const call=(fn,b)=>fetch(SU+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:JSON.stringify(b)}).then(async r=>{const j=await r.json().catch(()=>null);if(!r.ok)throw new Error((j&&j.message)||r.status);return j;});
+let D=null,pdf=null;
+const ctx=k=>({n:D.n,date:D.date,timetable:D.timetable||[],speaker:D.speaker||{},next:D.next,notes:((D.decks[k]||{}).notes)||[]});
+async function openDeck(k){
+  if(k==='welcome')Stage.welcome(ctx('welcome'));
+  else if(k==='farewell')Stage.farewell(ctx('farewell'));
+  else if(k==='qa')Stage.qa(D.decks.qa||{},{speaker:D.speaker&&D.speaker.name?D.speaker.name+' '+(D.speaker.role||'').split(' ').pop():'',label:`SESSION 0${D.n}${D.speaker&&D.speaker.name?' · '+D.speaker.name:''}`});
+  else if(k==='talk'){const b=$('b-talk');if(!pdf&&D.pdf){b.querySelector('span').textContent='PDF를 불러오는 중…';
+      try{const s=await call('otr_share_pdf',{tok:TOK});pdf=new Blob([Uint8Array.from(atob(s),c=>c.charCodeAt(0))],{type:'application/pdf'});}catch(e){alert('PDF를 불러오지 못했습니다: '+e.message);}
+      b.querySelector('span').textContent=DESC.talk;}
+    Stage.talk(ctx('talk'),pdf);}
+}
+const DESC={welcome:'참가자가 입장해 기다리는 동안 띄워 두는 장표',talk:'연사 소개 → 강연 자료 → 질문 세션으로 넘어가는 장표',qa:'미리 받은 질문을 다섯 가지 주제로 묶어 묻고, 주제마다 답변 키워드를 정리',farewell:'감사 인사 · 2부 안내 · 다음 세션 예고'};
+(async()=>{
+  if(!TOK){$('app').innerHTML+='<p class="sub err">링크가 올바르지 않습니다.</p>';return;}
+  try{D=await call('otr_share_get',{tok:TOK});}catch(e){$('app').innerHTML=`<div class="wm">OFF <span class="the">THE</span> RECORD SALON</div><p class="sub err" style="margin-top:2rem">${esc(e.message)}</p>`;return;}
+  const sp=D.speaker||{},qa=((D.decks.qa||{}).cats||[]).filter(c=>c.title).length;
+  const L=[['welcome','① 입장 안내',1],['talk','② 강연',1],['qa','③ 질문',qa>0],['farewell','④ 퇴장 안내',1]];
+  $('app').innerHTML=`<div class="wm">OFF <span class="the">THE</span> RECORD SALON</div>
+  <div class="eb">Season ${D.season} · Session 0${D.n}</div><h1>${sp.name?esc(sp.name)+' '+esc((sp.role||'').split(' ').pop())+'님 세션':'진행 장표'}</h1>
+  <p class="sub">당일 현장 화면에 띄울 장표입니다. 카드를 누르면 실제 화면과 같은 모습으로 열립니다.</p>
+  <div class="g">${L.map(([k,t,ok])=>`<button class="c" id="b-${k}" ${ok?'':'disabled'} onclick="openDeck('${k}')"><i>${k.toUpperCase()}</i><b>${t}</b><span>${ok?DESC[k]:'아직 준비 중입니다'}</span></button>`).join('')}</div>
+  <p class="tip">→ 또는 클릭: 다음 · ← 이전 · M 목차 · F 전체 화면 · Esc 닫기<br>휴대폰에서는 화면 오른쪽을 누르면 다음, 왼쪽을 누르면 이전 장으로 넘어갑니다. 가로로 보면 더 크게 보입니다.<br>이 링크는 공유받은 분만 볼 수 있습니다. 외부로 전달하지 말아 주세요.</p>`;
+  const d=q.get('d');if(d&&L.some(([k,,ok])=>k===d&&ok))openDeck(d);
+})();
+</script>
+</body></html>

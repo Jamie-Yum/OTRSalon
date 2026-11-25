@@ -69,14 +69,16 @@ const css=`
 #stg .nt li::before{content:'';position:absolute;left:0;top:.66em;width:22px;height:4px;background:#C9B37E}
 #stg .hint{position:fixed;right:20px;bottom:16px;z-index:10000;font:13px/1.5 'Pretendard',sans-serif;color:#888;background:rgba(0,0,0,.6);padding:8px 12px;border-radius:8px;opacity:0;transition:opacity .3s;pointer-events:none}
 #stg.mv .hint{opacity:1}
+#stg .x{position:fixed;right:16px;top:14px;z-index:10001;width:44px;height:44px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#EDE6D6;font-size:20px;cursor:pointer;opacity:0;transition:opacity .3s}
+#stg.mv .x{opacity:1}
 `;
 let root,stage,S=[],i=0,step=0,meta={},hideT,loopT;
 function ensure(){if(root)return;const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
-  root=document.createElement('div');root.id='stg';root.innerHTML='<div class="stage"></div><div class="hint">→ 다음 · ← 이전 · M 목차 · 1~9 주제 이동 · F 전체 화면 · Esc 닫기</div>';document.body.appendChild(root);stage=root.querySelector('.stage');
+  root=document.createElement('div');root.id='stg';root.innerHTML='<div class="stage"></div><button class="x" title="닫기 (Esc)">✕</button><div class="hint">→ 다음 · ← 이전 · M 목차 · 1~9 주제 이동 · F 전체 화면 · Esc 닫기</div>';document.body.appendChild(root);stage=root.querySelector('.stage');
   addEventListener('resize',fit);
   document.addEventListener('keydown',key);
-  root.addEventListener('click',e=>{const a=e.target.closest('[data-go]');if(a){go(+a.dataset.go);return;}if(e.clientX<innerWidth*.25)prev();else next();});
-  root.addEventListener('mousemove',()=>{root.classList.add('mv');clearTimeout(hideT);hideT=setTimeout(()=>root.classList.remove('mv'),1800);});}
+  root.addEventListener('click',e=>{if(e.target.closest('.x')){close();return;}const a=e.target.closest('[data-go]');if(a){go(+a.dataset.go);return;}if(e.clientX<innerWidth*.25)prev();else next();});
+  const show=()=>{root.classList.add('mv');clearTimeout(hideT);hideT=setTimeout(()=>root.classList.remove('mv'),2500);};root.addEventListener('mousemove',show);root.addEventListener('touchstart',show,{passive:true});}
 function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform=`translate(${-960*s}px,${-540*s}px) scale(${s})`;}
 const e=t=>(t==null?'':String(t)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const WM='OFF <span class="the">THE</span> RECORD SALON';

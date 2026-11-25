@@ -734,6 +734,10 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .qa-f{display:flex;flex-direction:column;gap:.45rem}.qa-f input,.qa-f textarea{width:100%;padding:.55rem .75rem;border:1px solid var(--bd);border-radius:8px;font:inherit;font-size:.86rem;background:var(--bg);line-height:1.55}
 .qa-f input:first-child{font-weight:700}.qa-2{display:grid;grid-template-columns:1.4fr 1fr;gap:.6rem}.qa-2 label{font-size:.74rem;color:var(--tl);display:flex;flex-direction:column;gap:.2rem}
 @media(max-width:800px){.run-grid,.qa-2{grid-template-columns:1fr}}
+.sh-box{background:var(--wh);border-radius:var(--r-sm);padding:1.2rem 1.4rem;margin-top:1rem;box-shadow:0 1px 2px rgba(20,20,20,.06),0 6px 18px rgba(20,20,20,.04)}
+.sh-list{display:flex;flex-direction:column;gap:.35rem}.sh-row{display:grid;grid-template-columns:8rem 1fr auto auto;gap:.7rem;align-items:center;font-size:.82rem}
+.sh-row code{font-size:.74rem;color:var(--tl);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:var(--bg);padding:.25rem .5rem;border-radius:6px}
+@media(max-width:700px){.sh-row{grid-template-columns:1fr auto auto}.sh-row code{grid-column:1/-1;grid-row:2}}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
   <h2><span class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span><small>ADMIN</small></h2>
@@ -863,7 +867,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 
 <div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="mn-editor" id="mForm"></div></div>
 <footer><p>© 2026 OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON · REPIUM LAB · 내부 공유용</p></footer>
-<script src="stage.js?v=4"></script>
+<script src="stage.js?v=5"></script>
 <script>
 const SU='https://dvlrzbckneucpvlacdll.supabase.co';
 const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE';
@@ -1229,8 +1233,16 @@ async function appAddSave(){const v={};AF.forEach(f=>v[f.k]=($('f_'+f.k).value||
   const b=$('aSave');b.disabled=true;b.textContent='저장 중…';
   try{await rpc('otr_app_add',v);closeModal();await loadApps();}catch(e){alert('저장 실패: '+e.message);b.disabled=false;b.textContent='저장';}}
 /* 진행 장표 */
-let DECKS=[],runSess=null,qaDraft=null,runPdf=null;
-async function loadDecks(){DECKS=await rpc('otr_list',{tbl:'otr_decks'});renderRun();}
+let DECKS=[],FILES=[],SHARES=[],runSess=null,qaDraft=null,talkCache={};
+async function loadDecks(){[DECKS,FILES,SHARES]=await Promise.all([rpc('otr_list',{tbl:'otr_decks'}),rpc('otr_file_meta',{}).catch(()=>[]),rpc('otr_share_list',{}).catch(()=>[])]);renderRun();}
+async function talkUp(file){if(!file)return;if(file.size>15*1048576)return alert('15MB 이하 PDF만 올릴 수 있습니다.');
+  const b64=await new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(',')[1]);r.onerror=no;r.readAsDataURL(file);});
+  try{await rpc('otr_file_put',{season:SEASON,salon:runSess,fkind:'talk',fname:file.name,data:b64});delete talkCache[SEASON+'-'+runSess];await loadDecks();}catch(e){alert('올리기 실패: '+e.message);}}
+async function talkGo(){const k=SEASON+'-'+runSess,b=$('talkGo');let blob=talkCache[k];
+  if(!blob&&FILES.some(x=>(x.season_no||1)===SEASON&&x.salon_no===runSess&&x.kind==='talk')){b.disabled=true;b.textContent='불러오는 중…';
+    try{const d=await rpc('otr_file_get',{season:SEASON,salon:runSess,fkind:'talk'});blob=talkCache[k]=new Blob([Uint8Array.from(atob(d.b64),c=>c.charCodeAt(0))],{type:'application/pdf'});}catch(e){alert('PDF를 불러오지 못했습니다: '+e.message);}
+    b.disabled=false;b.textContent='띄우기';}
+  Stage.talk(runCtx(runSess,'talk'),blob||null);}
 const deckOf=(n,k)=>DECKS.find(d=>(d.season_no||1)===SEASON&&d.salon_no===n&&d.kind===k);
 function runMeta(n){const sp=(D.speakers||[]).find(x=>inS(x)&&x.salon_no===n&&x.status==='확정')||(D.speakers||[]).find(x=>inS(x)&&x.salon_no===n)||{};
   return {speaker:sp.name?sp.name+' '+((sp.role||'').split(' ').pop()||''):'',label:`SESSION 0${n}${sp.name?' · '+sp.name:''}`};}
@@ -1244,6 +1256,15 @@ function notesEdit(kind){const dk=deckOf(runSess,kind);cur={key:'_notes',id:null
   <div class="mn-actions"><button class="mn-btn ghost" onclick="closeModal()">취소</button><button class="mn-btn" id="ntSave" onclick="notesSave('${kind}')">저장</button></div>`;$('modal').classList.add('open');}
 async function notesSave(kind){const b=$('ntSave');b.disabled=true;const dk=deckOf(runSess,kind),notes=$('ntTa').value.split('\n').map(x=>x.trim()).filter(Boolean);
   try{await rpc('otr_save',{tbl:'otr_decks',row_data:{...(dk?{id:dk.id}:{}),season_no:SEASON,salon_no:runSess,kind,data:{notes}}});closeModal();await loadDecks();}catch(e){alert('저장 실패: '+e.message);b.disabled=false;}}
+function shareBox(){const sh=SHARES.find(x=>(x.season_no||1)===SEASON&&x.salon_no===runSess),u=sh?`https://off-record.kr/deck.html?k=${sh.token}`:'';
+  const L=[['','전체 (4개 고르기)'],['welcome','① 입장 안내'],['talk','② 강연'],['qa','③ 질문'],['farewell','④ 퇴장 안내']];
+  return `<div class="sh-box"><div class="qa-h"><h3>공유 링크</h3><span class="note" style="margin:0">로그인 없이 장표만 볼 수 있는 링크입니다. 연사·TF 구성원 확인용. 링크를 아는 사람은 누구나 볼 수 있으니 필요한 분께만 보내 주세요.</span></div>
+  ${sh?`<div class="sh-list">${L.map(([d,l])=>`<div class="sh-row"><b>${l}</b><code>${u}${d?'&d='+d:''}</code><button class="lnk" onclick="shCopy(this,'${u}${d?'&d='+d:''}')">복사</button><a class="lnk" href="${u}${d?'&d='+d:''}" target="_blank">열기</a></div>`).join('')}</div>
+  <button class="lnk" style="margin-top:.6rem;color:#B0473D" onclick="shReset(1)">새 링크로 바꾸기 (지금 링크는 더 이상 열리지 않음)</button>`
+  :`<button class="mn-btn" onclick="shReset()">Session 0${runSess} 공유 링크 만들기</button>`}</div>`;}
+async function shReset(again){if(again&&!confirm('지금 링크는 더 이상 열리지 않습니다. 새 링크로 바꿀까요?'))return;
+  try{await rpc('otr_share_reset',{season:SEASON,salon:runSess});SHARES=await rpc('otr_share_list',{});renderRun();}catch(e){alert('실패: '+e.message);}}
+async function shCopy(b,t){try{await navigator.clipboard.writeText(t);}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();}b.textContent='복사됨';setTimeout(()=>b.textContent='복사',1500);}
 function renderRun(){if(!$('v-run'))return;
   if(runSess==null){const t=new Date(Date.now()+9*36e5).toISOString().slice(0,10);const r=(D.schedule||[]).filter(x=>inS(x)&&x.event_date&&x.event_date>=t).sort((a,b)=>a.event_date.localeCompare(b.event_date))[0];runSess=r?r.salon_no:1;}
   $('runChips').innerHTML=[1,2,3,4].map(n=>`<button class="${n===runSess?'on':''}" onclick="runSess=${n};qaDraft=null;renderRun()">Session 0${n}</button>`).join('');
@@ -1251,10 +1272,10 @@ function renderRun(){if(!$('v-run'))return;
   const card=(t,d,btn)=>`<div class="run-card"><div><h3>${t}</h3><p>${d}</p></div><div class="run-btns">${btn}</div></div>`;
   $('v-run').innerHTML=`<div class="run-grid">
     ${(()=>{const c=runCtx(runSess,'welcome');return card('① 입장 안내',`환영 · ${c.timetable.filter(r=>r.pub!==false).length?'시간표 · ':''}원칙${c.notes.length?` · 안내 ${c.notes.length}줄`:''} — 자동 넘김은 10초 간격으로 반복`,`<button class="mn-btn ghost" onclick="notesEdit('welcome')">안내 문구</button><button class="mn-btn ghost" onclick="Stage.welcome(runCtx(runSess,'welcome'))">띄우기</button><button class="mn-btn" onclick="Stage.welcome(runCtx(runSess,'welcome'),{loop:10000})">자동 넘김</button>`);})()}
-    ${card('② 강연','인트로(연사 소개) → 연사 PDF → 아우트로(질문 세션으로). PDF는 이 컴퓨터에서만 열리고 어디에도 올라가지 않습니다.',`<label class="mn-btn ghost" style="cursor:pointer">PDF 고르기<input type="file" accept="application/pdf" hidden onchange="runPdf=this.files[0]||null;renderRun()"></label><button class="mn-btn" onclick="Stage.talk(runCtx(runSess,'talk'),runPdf)">띄우기</button>`)}${runPdf?`<p class="note" style="grid-column:1/-1;margin:-.4rem 0 0">선택한 PDF: <b>${esc(runPdf.name)}</b></p>`:''}
+    ${(()=>{const f=FILES.find(x=>(x.season_no||1)===SEASON&&x.salon_no===runSess&&x.kind==='talk');return card('② 강연',`인트로(연사 소개) → 연사 PDF → 아우트로(질문 세션으로)<br>${f?`<b style="color:var(--dk)">${esc(f.name)}</b> · ${(f.size/1048576).toFixed(1)}MB`:'아직 PDF가 없습니다'}`,`<label class="mn-btn ghost" style="cursor:pointer">${f?'PDF 바꾸기':'PDF 올리기'}<input type="file" accept="application/pdf" hidden onchange="talkUp(this.files[0])"></label><button class="mn-btn" id="talkGo" onclick="talkGo()">띄우기</button>`);})()}
     ${card('③ 질문',nc?`주제 ${nc}개 · 질문 ${(qa.data.cats||[]).reduce((a,c)=>a+(c.qs||[]).filter(Boolean).length,0)}개 · 주제마다 답변 키워드`:'아직 내용이 없습니다',`<button class="mn-btn ghost" onclick="qaEdit()">편집</button><button class="mn-btn" ${nc?'':'disabled'} onclick="Stage.qa(deckOf(${runSess},'qa').data,runMeta(${runSess}))">띄우기</button>`)}
     ${(()=>{const c=runCtx(runSess,'farewell');return card('④ 퇴장 안내',`감사 인사${c.notes.length?' · 2부 안내':''}${c.next&&c.next.name?` · 다음 세션(${esc(c.next.name)}) 예고`:''}`,`<button class="mn-btn ghost" onclick="notesEdit('farewell')">2부 안내 문구</button><button class="mn-btn" onclick="Stage.farewell(runCtx(runSess,'farewell'))">띄우기</button>`);})()}
-  </div><div id="qaEd"></div>`;
+  </div>${shareBox()}<div id="qaEd"></div>`;
   if(qaDraft)qaRender();}
 function qaEdit(){const qa=deckOf(runSess,'qa');qaDraft=JSON.parse(JSON.stringify((qa&&qa.data.cats)||[]));if(!qaDraft.length)qaDraft.push({title:'',desc:'',qs:[],kw:[]});qaRender();$('qaEd').scrollIntoView({behavior:'smooth',block:'start'});}
 function qaRender(){const L=a=>esc((a||[]).join('\n'));
