@@ -723,6 +723,17 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .tt-ow{display:block;font-style:normal;font-size:.72rem;color:#C9B37E;opacity:.85;margin-top:.1rem}
 .ap-add{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;margin:0 0 .8rem;font-size:.8rem}
 .ap-td .ap-ck{align-items:center;gap:.2rem;margin:0 .2rem}.ap-ck i{font-style:normal;font-size:.72rem;color:var(--ts)}
+.run-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
+.run-card{background:var(--wh);border-radius:var(--r-sm);padding:1.2rem 1.4rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;box-shadow:0 1px 2px rgba(20,20,20,.06),0 6px 18px rgba(20,20,20,.04)}
+.run-card h3{font-size:1.05rem;margin:0}.run-card p{font-size:.82rem;color:var(--tl);margin:.2rem 0 0}
+.run-btns{display:flex;gap:.4rem;flex:none}.run-soon{font-size:.76rem;color:var(--tl);border:1px dashed var(--bd);border-radius:999px;padding:.2rem .7rem}
+.qa-ed{background:var(--wh);border-radius:var(--r-sm);padding:1.4rem;margin-top:1.5rem;box-shadow:0 1px 2px rgba(20,20,20,.06),0 6px 18px rgba(20,20,20,.04)}
+.qa-h{display:flex;align-items:baseline;gap:1rem;flex-wrap:wrap;margin-bottom:1rem}.qa-h h3{margin:0;font-size:1.05rem}
+.qa-cat{display:grid;grid-template-columns:2.6rem 1fr auto;gap:.8rem;padding:1rem 0;border-top:1px solid var(--bd)}
+.qa-no{font-size:1.4rem;font-weight:300;color:#C9B37E;font-family:'Inter Tight',sans-serif}
+.qa-f{display:flex;flex-direction:column;gap:.45rem}.qa-f input,.qa-f textarea{width:100%;padding:.55rem .75rem;border:1px solid var(--bd);border-radius:8px;font:inherit;font-size:.86rem;background:var(--bg);line-height:1.55}
+.qa-f input:first-child{font-weight:700}.qa-2{display:grid;grid-template-columns:1.4fr 1fr;gap:.6rem}.qa-2 label{font-size:.74rem;color:var(--tl);display:flex;flex-direction:column;gap:.2rem}
+@media(max-width:800px){.run-grid,.qa-2{grid-template-columns:1fr}}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
   <h2><span class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span><small>ADMIN</small></h2>
@@ -732,7 +743,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 </div></div>
 <header class="admin-bar"><span><b class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</b><small>ADMIN</small></span>
 <nav class="tabs" id="tabs">
-  <button data-tab="notes" class="on">운영 기록</button><button data-tab="apps">신청</button><button data-tab="surveys">설문</button><button data-tab="speakers">일정·연사</button><button data-tab="fees">예산 관리</button><button data-tab="site">홈페이지</button>
+  <button data-tab="notes" class="on">운영 기록</button><button data-tab="apps">신청</button><button data-tab="surveys">설문</button><button data-tab="speakers">일정·연사</button><button data-tab="fees">예산 관리</button><button data-tab="run">진행</button><button data-tab="site">홈페이지</button>
 </nav><span class="bar-r"><select id="seasonSel" class="season-sel" onchange="setSeason(this.value)" title="시즌 선택"><option value="1">Season 1</option></select><a href="index.html">← 사이트로</a><a href="#" onclick="logout();return false">로그아웃</a></span></header>
 
 <div class="panel" id="p-surveys"><section class="section"><div class="container" id="v-surveys"><div class="mn-empty">불러오는 중…</div></div></section></div>
@@ -753,6 +764,12 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
   <div class="mn-head" style="margin-top:3.5rem"><div><div class="eyebrow">Messages</div><h2 class="title" style="margin:0">안내 문자</h2></div><button class="mn-btn" onclick="edit('messages')">+ 문자 추가</button></div>
   <p class="note">참가자 대상 발송은 승인자 컨펌 후 실행합니다. [ ] 부분은 확정 후 기입하세요.</p>
   <div class="msg-grid" id="v-messages"></div>
+</div></section></div>
+
+<div class="panel" id="p-run"><section class="section"><div class="container">
+  <div class="mn-head"><div><div class="eyebrow">Run</div><h2 class="title" style="margin:0">진행 장표</h2></div><div class="chips" id="runChips"></div></div>
+  <p class="note">세션 당일 프로젝터에 띄우는 장표입니다. '띄우기'를 누르면 전체 화면으로 열립니다. → 다음 · ← 이전 · M 목차 · 숫자 키 주제 이동 · Esc 닫기</p>
+  <div id="v-run"><div class="mn-empty">불러오는 중…</div></div>
 </div></section></div>
 
 <div class="panel" id="p-site"><section class="section"><div class="container">
@@ -846,6 +863,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 
 <div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="mn-editor" id="mForm"></div></div>
 <footer><p>© 2026 OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON · REPIUM LAB · 내부 공유용</p></footer>
+<script src="stage.js?v=4"></script>
 <script>
 const SU='https://dvlrzbckneucpvlacdll.supabase.co';
 const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE';
@@ -1120,15 +1138,17 @@ async function bpSave(btn){
   try{await rpc('otr_save',{tbl:'otr_seasons',row_data:S});bpEdit=false;await load('seasons');}catch(e){alert('저장 실패: '+e.message);btn.disabled=false;}
 }
 function setSeason(v){SEASON=Number(v)||1;try{localStorage.setItem('otr_season',SEASON)}catch(e){}
-  ['apps','speakers','schedule','fees','actions','milestones','messages','checklist'].forEach(k=>{try{if(D[k])RENDER[k]()}catch(e){}});try{if(D.surveys)renderSurveys()}catch(e){}}
+  ['apps','speakers','schedule','fees','actions','milestones','messages','checklist'].forEach(k=>{try{if(D[k])RENDER[k]()}catch(e){}});try{if(D.surveys)renderSurveys()}catch(e){}try{renderRun()}catch(e){}}
 async function loadApps(){D.apps=await rpc('otr_app_list');RENDER.apps();}
 async function loadAll(){
+  loadDecks().catch(e=>{$('v-run').innerHTML='<div class="mn-empty">진행 장표를 불러오지 못했습니다. ('+esc(e.message)+')</div>';});
   loadSite().catch(e=>{$('hMsg').textContent='설정을 불러오지 못했습니다. ('+e.message+')';});
   loadSurveys().catch(e=>{const b=$('v-surveys');if(b)b.innerHTML='<div class="mn-empty">설문을 불러오지 못했습니다. ('+esc(e.message)+')</div>';});
   loadApps().catch(e=>{$('v-apps').innerHTML='<tr><td style="padding:2rem;color:var(--tl)">신청 내역을 불러오지 못했습니다. ('+esc(e.message)+')</td></tr>';});
   await Promise.all(Object.keys(T).map(k=>load(k).catch(e=>{
     const el=$('v-'+k);if(el)el.innerHTML='<div class="mn-empty">데이터를 불러오지 못했습니다. ('+esc(e.message)+')</div>';
   })));
+  try{renderRun()}catch(e){}
 }
 
 function recSub(k){if(!document.getElementById('sub-'+k))k='notes';
@@ -1208,6 +1228,49 @@ function appAdd(){cur={key:'_app',id:null};let h='<h3>신청자 추가</h3><p cl
 async function appAddSave(){const v={};AF.forEach(f=>v[f.k]=($('f_'+f.k).value||'').trim());if(!v.name||!v.phone)return alert('이름과 연락처를 입력해 주세요.');
   const b=$('aSave');b.disabled=true;b.textContent='저장 중…';
   try{await rpc('otr_app_add',v);closeModal();await loadApps();}catch(e){alert('저장 실패: '+e.message);b.disabled=false;b.textContent='저장';}}
+/* 진행 장표 */
+let DECKS=[],runSess=null,qaDraft=null,runPdf=null;
+async function loadDecks(){DECKS=await rpc('otr_list',{tbl:'otr_decks'});renderRun();}
+const deckOf=(n,k)=>DECKS.find(d=>(d.season_no||1)===SEASON&&d.salon_no===n&&d.kind===k);
+function runMeta(n){const sp=(D.speakers||[]).find(x=>inS(x)&&x.salon_no===n&&x.status==='확정')||(D.speakers||[]).find(x=>inS(x)&&x.salon_no===n)||{};
+  return {speaker:sp.name?sp.name+' '+((sp.role||'').split(' ').pop()||''):'',label:`SESSION 0${n}${sp.name?' · '+sp.name:''}`};}
+function runSp(n){const sp=(D.speakers||[]).find(x=>inS(x)&&x.salon_no===n&&x.status==='확정')||(D.speakers||[]).find(x=>inS(x)&&x.salon_no===n);return sp?{name:sp.name,role:sp.role||'',photo:sp.photo_url||''}:{};}
+function runCtx(n,kind){const sc=(D.schedule||[]).find(x=>inS(x)&&x.salon_no===n)||{},nx=(D.schedule||[]).find(x=>inS(x)&&x.salon_no===n+1),dk=deckOf(n,kind);
+  return {n,date:sc.event_date,timetable:sc.timetable||[],speaker:runSp(n),notes:(dk&&dk.data.notes)||[],next:nx?{n:n+1,date:nx.event_date,...runSp(n+1)}:null};}
+const NOTE_HINT={welcome:'예) Wi-Fi : OTR_Salon / 비밀번호 0000\n사진 촬영은 1부 종료 후 함께 진행합니다',farewell:'예) 2부는 같은 층 라운지에서 이어집니다\n불참하시는 분은 입구에서 배웅해 드립니다'};
+function notesEdit(kind){const dk=deckOf(runSess,kind);cur={key:'_notes',id:null};
+  $('mForm').innerHTML=`<h3>Session 0${runSess} ${kind==='welcome'?'입장 안내':'퇴장 · 2부 안내'} 문구</h3><p class="note" style="margin:-.4rem 0 1rem">한 줄에 하나씩 적으면 '${kind==='welcome'?'안내':'2부 네트워킹 안내'}' 장표에 목록으로 나옵니다. 비워 두면 그 장은 빠집니다.</p>
+  <textarea id="ntTa" style="min-height:180px" placeholder="${NOTE_HINT[kind]}">${esc(((dk&&dk.data.notes)||[]).join('\n'))}</textarea>
+  <div class="mn-actions"><button class="mn-btn ghost" onclick="closeModal()">취소</button><button class="mn-btn" id="ntSave" onclick="notesSave('${kind}')">저장</button></div>`;$('modal').classList.add('open');}
+async function notesSave(kind){const b=$('ntSave');b.disabled=true;const dk=deckOf(runSess,kind),notes=$('ntTa').value.split('\n').map(x=>x.trim()).filter(Boolean);
+  try{await rpc('otr_save',{tbl:'otr_decks',row_data:{...(dk?{id:dk.id}:{}),season_no:SEASON,salon_no:runSess,kind,data:{notes}}});closeModal();await loadDecks();}catch(e){alert('저장 실패: '+e.message);b.disabled=false;}}
+function renderRun(){if(!$('v-run'))return;
+  if(runSess==null){const t=new Date(Date.now()+9*36e5).toISOString().slice(0,10);const r=(D.schedule||[]).filter(x=>inS(x)&&x.event_date&&x.event_date>=t).sort((a,b)=>a.event_date.localeCompare(b.event_date))[0];runSess=r?r.salon_no:1;}
+  $('runChips').innerHTML=[1,2,3,4].map(n=>`<button class="${n===runSess?'on':''}" onclick="runSess=${n};qaDraft=null;renderRun()">Session 0${n}</button>`).join('');
+  const qa=deckOf(runSess,'qa'),m=runMeta(runSess),nc=((qa&&qa.data.cats)||[]).filter(c=>c.title).length;
+  const card=(t,d,btn)=>`<div class="run-card"><div><h3>${t}</h3><p>${d}</p></div><div class="run-btns">${btn}</div></div>`;
+  $('v-run').innerHTML=`<div class="run-grid">
+    ${(()=>{const c=runCtx(runSess,'welcome');return card('① 입장 안내',`환영 · ${c.timetable.filter(r=>r.pub!==false).length?'시간표 · ':''}원칙${c.notes.length?` · 안내 ${c.notes.length}줄`:''} — 자동 넘김은 10초 간격으로 반복`,`<button class="mn-btn ghost" onclick="notesEdit('welcome')">안내 문구</button><button class="mn-btn ghost" onclick="Stage.welcome(runCtx(runSess,'welcome'))">띄우기</button><button class="mn-btn" onclick="Stage.welcome(runCtx(runSess,'welcome'),{loop:10000})">자동 넘김</button>`);})()}
+    ${card('② 강연','인트로(연사 소개) → 연사 PDF → 아우트로(질문 세션으로). PDF는 이 컴퓨터에서만 열리고 어디에도 올라가지 않습니다.',`<label class="mn-btn ghost" style="cursor:pointer">PDF 고르기<input type="file" accept="application/pdf" hidden onchange="runPdf=this.files[0]||null;renderRun()"></label><button class="mn-btn" onclick="Stage.talk(runCtx(runSess,'talk'),runPdf)">띄우기</button>`)}${runPdf?`<p class="note" style="grid-column:1/-1;margin:-.4rem 0 0">선택한 PDF: <b>${esc(runPdf.name)}</b></p>`:''}
+    ${card('③ 질문',nc?`주제 ${nc}개 · 질문 ${(qa.data.cats||[]).reduce((a,c)=>a+(c.qs||[]).filter(Boolean).length,0)}개 · 주제마다 답변 키워드`:'아직 내용이 없습니다',`<button class="mn-btn ghost" onclick="qaEdit()">편집</button><button class="mn-btn" ${nc?'':'disabled'} onclick="Stage.qa(deckOf(${runSess},'qa').data,runMeta(${runSess}))">띄우기</button>`)}
+    ${(()=>{const c=runCtx(runSess,'farewell');return card('④ 퇴장 안내',`감사 인사${c.notes.length?' · 2부 안내':''}${c.next&&c.next.name?` · 다음 세션(${esc(c.next.name)}) 예고`:''}`,`<button class="mn-btn ghost" onclick="notesEdit('farewell')">2부 안내 문구</button><button class="mn-btn" onclick="Stage.farewell(runCtx(runSess,'farewell'))">띄우기</button>`);})()}
+  </div><div id="qaEd"></div>`;
+  if(qaDraft)qaRender();}
+function qaEdit(){const qa=deckOf(runSess,'qa');qaDraft=JSON.parse(JSON.stringify((qa&&qa.data.cats)||[]));if(!qaDraft.length)qaDraft.push({title:'',desc:'',qs:[],kw:[]});qaRender();$('qaEd').scrollIntoView({behavior:'smooth',block:'start'});}
+function qaRender(){const L=a=>esc((a||[]).join('\n'));
+  $('qaEd').innerHTML=`<div class="qa-ed"><div class="qa-h"><h3>Session 0${runSess} 질문 덱 편집</h3><span class="note" style="margin:0">질문·키워드는 한 줄에 하나씩. 키워드 뒤에 <b>|</b> 를 넣으면 작은 설명 줄이 붙습니다.</span></div>
+  ${qaDraft.map((c,i)=>`<div class="qa-cat"><div class="qa-no">${String(i+1).padStart(2,'0')}</div><div class="qa-f">
+    <input value="${esc(c.title)}" placeholder="주제 이름 예) 개인 동기·마인드" oninput="qaDraft[${i}].title=this.value">
+    <input value="${esc(c.desc)}" placeholder="주제 설명 한 줄 (표지에 표시)" oninput="qaDraft[${i}].desc=this.value">
+    <div class="qa-2"><label>질문<textarea rows="6" oninput="qaDraft[${i}].qs=this.value.split('\n').map(x=>x.trim()).filter(Boolean)">${L(c.qs)}</textarea></label>
+    <label>연사 답변 키워드<textarea rows="6" oninput="qaDraft[${i}].kw=this.value.split('\n').map(x=>x.trim()).filter(Boolean)">${L(c.kw)}</textarea></label></div></div>
+    <span class="tt-btn"><button class="ic" ${i?'':'disabled'} onclick="qaMove(${i},-1)">↑</button><button class="ic" ${i<qaDraft.length-1?'':'disabled'} onclick="qaMove(${i},1)">↓</button><button class="ic del" onclick="qaDraft.splice(${i},1);qaRender()">✕</button></span></div>`).join('')}
+  <button class="lnk" onclick="qaDraft.push({title:'',desc:'',qs:[],kw:[]});qaRender()">+ 주제 추가</button>
+  <div class="mn-actions"><button class="mn-btn ghost" style="margin-right:auto" onclick="Stage.qa({cats:qaDraft},runMeta(runSess))">미리 띄우기</button><button class="mn-btn ghost" onclick="qaDraft=null;renderRun()">닫기</button><button class="mn-btn" id="qaSave" onclick="qaSave()">저장</button></div></div>`;}
+function qaMove(i,d){const j=i+d;[qaDraft[i],qaDraft[j]]=[qaDraft[j],qaDraft[i]];qaRender();}
+async function qaSave(){const b=$('qaSave');b.disabled=true;b.textContent='저장 중…';const qa=deckOf(runSess,'qa');
+  try{await rpc('otr_save',{tbl:'otr_decks',row_data:{...(qa?{id:qa.id}:{}),season_no:SEASON,salon_no:runSess,kind:'qa',data:{cats:qaDraft}}});qaDraft=null;await loadDecks();}
+  catch(e){alert('저장 실패: '+e.message);b.disabled=false;b.textContent='저장';}}
 async function appUpdate(id,patch){try{await rpc('otr_app_update',{rid:id,...patch});await loadApps();}catch(e){alert('저장 실패: '+e.message);}}
 async function appMemo(id){const r=D.apps.find(x=>x.id===id);const m=prompt('메모',r.memo||'');if(m===null)return;appUpdate(id,{new_memo:m});}
 async function appDel(id){if(!confirm('이 신청을 삭제할까요? 되돌릴 수 없습니다.'))return;try{await rpc('otr_app_delete',{rid:id});await loadApps();}catch(e){alert('삭제 실패: '+e.message);}}

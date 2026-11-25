@@ -3,3 +3,4 @@ otr_plan_docs.sql
 *.pdf
 otr_ops_seed.sql
 preview-*.html
+.claude/
