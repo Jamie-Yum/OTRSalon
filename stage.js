@@ -103,7 +103,7 @@ const css=`
 #stg .x{position:fixed;right:16px;top:14px;z-index:10001;width:44px;height:44px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#EDE6D6;font-size:20px;cursor:pointer;opacity:0;transition:opacity .3s}
 #stg.mv .x{opacity:1}
 `;
-let root,stage,S=[],i=0,step=0,meta={},hideT,loopT;
+let root,stage,S=[],i=0,step=0,meta={},hideT,loopT,opt={};
 function ensure(){if(root)return;const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
   root=document.createElement('div');root.id='stg';root.innerHTML='<div class="stage"></div><button class="x" title="닫기 (Esc)">✕</button><div class="hint">→ 다음 · ← 이전 · M 목차 · 1~9 주제 이동 · F 전체 화면 · Esc 닫기</div>';document.body.appendChild(root);stage=root.querySelector('.stage');
   addEventListener('resize',fit);
@@ -129,15 +129,15 @@ const R={
   pdf:s=>`<div class="sl pdf"></div>`
 };
 function steps(s){return s.t==='kw'?s.items.length:0;}
-function draw(){const s=S[i];stage.innerHTML=R[s.t](s)+`<div class="bar" style="width:${(i+1)/S.length*100}%"></div>`+(s.t==='pdf'?'':`<div class="pg">${i+1} / ${S.length}</div>`);
+function draw(){const s=S[i];stage.innerHTML=R[s.t](s)+`<div class="bar" style="width:${(i+1)/S.length*100}%"></div>`+(s.t==='pdf'?'':`<div class="pg">${i===S.length-1&&opt.nextLabel?`→ ${e(opt.nextLabel)} &nbsp;·&nbsp; `:''}${i+1} / ${S.length}</div>`);
   const sl=stage.querySelector('.sl');if(s.t==='pdf')s.render(sl);
   if(sl.hasAttribute('data-fit'))fitText(sl);
   requestAnimationFrame(()=>{sl.classList.add('on');paint();});}
 function fitText(sl){const els=[...sl.querySelectorAll('h2,li,.raw,.kq div:last-child')];const base=els.map(x=>parseFloat(getComputedStyle(x).fontSize));
   for(let f=1;f>.5&&sl.scrollHeight>sl.clientHeight+2;f-=.05)els.forEach((x,k)=>{if(!x.classList.contains('raw'))x.style.fontSize=base[k]*f+'px';});}
 function paint(){stage.querySelectorAll('.kw li').forEach((li,k)=>li.classList.toggle('on',k<step));}
-function next(){const s=S[i];if(step<steps(s)){step++;paint();return;}if(i<S.length-1){i++;step=0;draw();}}
-function prev(){if(step>0&&S[i].t==='kw'){step--;paint();return;}if(i>0){i--;step=steps(S[i]);draw();}}
+function next(){const s=S[i];if(step<steps(s)){step++;paint();return;}if(i<S.length-1){i++;step=0;draw();}else if(opt.next){clearInterval(loopT);opt.next();}}
+function prev(){if(step>0&&S[i].t==='kw'){step--;paint();return;}if(i>0){i--;step=steps(S[i]);draw();}else if(opt.prev){clearInterval(loopT);opt.prev();}}
 function go(n){if(n<0||n>=S.length)return;i=n;step=0;draw();}
 function key(ev){if(!root||!root.classList.contains('on'))return;const k=ev.key;
   if(['ArrowRight','ArrowDown',' ','PageDown','Enter'].includes(k)){ev.preventDefault();next();}
@@ -189,12 +189,14 @@ function talkSlides(m,doc){const sp=m.speaker||{},L=[];
   L.push({t:'pr',eyebrow:'Next · Q&A',title:`이제, 여러분의 질문으로<br><span class="gold">대화를 이어갑니다</span>`,sub:'미리 보내주신 질문을 다섯 가지 주제로 묶어 연사께 여쭙니다.'});
   return L;}
 window.Stage={
-  async talk(m,file){let doc=null,tk=null;if(file){try{const lib=await pdfLib();tk=lib.getDocument({data:await file.arrayBuffer()});tk.onPassword=(cb,why)=>{const pw=prompt(why===2?'비밀번호가 맞지 않습니다. 다시 입력해 주세요.':'이 PDF는 비밀번호가 필요합니다.');if(pw==null){tk.cancelled=1;tk.destroy();}else cb(pw);};doc=await tk.promise;}catch(err){if(tk&&tk.cancelled)return;return alert('PDF를 열지 못했습니다: '+err.message);}}
-    this.open(talkSlides(m,doc),{label:`SESSION 0${m.n}${m.speaker&&m.speaker.name?' · '+m.speaker.name:''}`});},
-  open(slides,m,o){ensure();clearInterval(loopT);meta=m||{};S=slides;i=0;step=0;root.classList.add('on');fit();draw();root.requestFullscreen?.().catch(()=>{});
+  async talk(m,file,o){let doc=null,tk=null;if(file){try{const lib=await pdfLib();tk=lib.getDocument({data:await file.arrayBuffer()});tk.onPassword=(cb,why)=>{const pw=prompt(why===2?'비밀번호가 맞지 않습니다. 다시 입력해 주세요.':'이 PDF는 비밀번호가 필요합니다.');if(pw==null){tk.cancelled=1;tk.destroy();}else cb(pw);};doc=await tk.promise;}catch(err){if(tk&&tk.cancelled)return;return alert('PDF를 열지 못했습니다: '+err.message);}}
+    this.open(talkSlides(m,doc),{label:`SESSION 0${m.n}${m.speaker&&m.speaker.name?' · '+m.speaker.name:''}`},o);},
+  open(slides,m,o){ensure();clearInterval(loopT);opt=o||{};meta=m||{};S=slides;i=opt.atEnd?slides.length-1:0;step=opt.atEnd?steps(S[i]):0;const was=root.classList.contains('on');root.classList.add('on');fit();draw();if(!was&&!document.fullscreenElement)root.requestFullscreen?.().catch(()=>{});
     if(o&&o.loop&&S.length>1)loopT=setInterval(()=>{i=(i+1)%S.length;step=0;draw();},o.loop);},
   welcome(m,o){this.open(welcomeSlides(m),{label:`SESSION 0${m.n}`},o);},
   farewell(m,o){this.open(farewellSlides(m),{label:`SESSION 0${m.n}`},o);},
-  qa(d,m){if(!(d.cats||[]).some(c=>c.title))return alert('질문 덱 내용이 없습니다.');this.open(qaSlides(d,m||{}),m);}
+  qa(d,m,o){if(!(d.cats||[]).some(c=>c.title))return alert('질문 덱 내용이 없습니다.');this.open(qaSlides(d,m||{}),m,o);},
+  /* 4개 덱 잇기: list=[{label,run(o)}], 마지막 장 → 다음 덱, 첫 장 ← 이전 덱 */
+  chain(list,k,atEnd){const go=(j,end)=>{const it=list[j];if(!it)return;it.run({atEnd:end,loop:it.loop,nextLabel:list[j+1]&&list[j+1].label,next:list[j+1]?()=>go(j+1,false):null,prev:j>0?()=>go(j-1,true):null});};go(k||0,!!atEnd);}
 };
 })();
