@@ -31,6 +31,22 @@ const css=`
 #stg .q .qn{font-family:'Inter Tight',sans-serif;font-size:34px;color:#C9B37E;letter-spacing:.08em}
 #stg .q h2{font-size:84px;font-weight:700;line-height:1.35;margin:36px 0 0;letter-spacing:-.015em;max-width:1560px}
 #stg .q h2{display:flex;gap:.35em}#stg .q h2::before{content:'Q.';flex:none;color:#C9B37E;font-family:'Inter Tight',sans-serif;font-weight:300}
+#stg .q .raw{list-style:none;padding:0;margin:56px 0 0;display:grid;gap:18px;max-width:1560px;font-size:30px}
+#stg .q.has-raw h2{font-size:68px}
+#stg .raw li{position:relative;padding-left:44px;line-height:1.55;color:rgba(237,230,214,.62)}
+#stg .raw li::before{content:'“';position:absolute;left:0;top:-.12em;font-family:'Inter Tight',sans-serif;font-size:1.9em;color:#C9B37E;opacity:.7;line-height:1}
+#stg .qa2{padding-top:150px;padding-bottom:110px}
+#stg .qa2 .hd{display:flex;align-items:baseline;gap:28px}
+#stg .qa2 .hd b{font-family:'Inter Tight',sans-serif;font-size:64px;font-weight:200;color:#C9B37E;line-height:1}
+#stg .qa2 .hd h2{font-size:52px;font-weight:700;margin:0}
+#stg .qa2 .cols{display:grid;grid-template-columns:1.15fr 1fr;gap:80px;margin-top:48px;font-size:1px}
+#stg .qa2 .cols.solo{grid-template-columns:1fr}
+#stg .qa2 .sh{font-family:'Inter Tight',sans-serif;font-size:22px;letter-spacing:.2em;color:#C9B37E;margin-bottom:22px;text-transform:uppercase}
+#stg .qa2 ol.core{list-style:none;padding:0;margin:0;display:grid;gap:26px;counter-reset:q}
+#stg .qa2 ol.core li{counter-increment:q;font-size:38px;font-weight:600;line-height:1.42;padding-left:64px;position:relative}
+#stg .qa2 ol.core li::before{content:'Q' counter(q);position:absolute;left:0;top:.18em;font-family:'Inter Tight',sans-serif;font-size:.62em;font-weight:400;color:#C9B37E}
+#stg .qa2 .raw{list-style:none;padding:0;margin:0;display:grid;gap:18px;font-size:24px}
+#stg .qa2 .rc{border-left:1px solid rgba(237,230,214,.14);padding-left:56px}
 #stg .kw{justify-content:center}
 #stg .kw h2{font-size:56px;font-weight:700;margin:20px 0 56px}
 #stg .kw ul{list-style:none;padding:0;margin:0;display:grid;gap:26px}
@@ -94,7 +110,8 @@ const R={
   title:s=>`<div class="sl ttl">${top()}<div class="eb">${e(s.eyebrow)}</div><h1>${s.title}</h1>${s.sub?`<p>${s.sub}</p>`:''}</div>`,
   agenda:s=>`<div class="sl ag">${top()}<div class="eb">${e(s.eyebrow||'Topics')}</div><h2>${e(s.title||'오늘의 다섯 가지 주제')}</h2><ol>${s.cats.map((c,k)=>`<li data-go="${c.at}" class="${s.cur!=null&&k<s.cur?'dn':''}"><b>${String(k+1).padStart(2,'0')}</b><span>${e(c.title)}</span></li>`).join('')}</ol></div>`,
   cover:s=>`<div class="sl cv">${top()}<div class="no">${String(s.n).padStart(2,'0')}</div><h2>${e(s.title)}</h2>${s.desc?`<p>${e(s.desc)}</p>`:''}</div>`,
-  q:s=>`<div class="sl q">${top()}<div class="qn">${String(s.n).padStart(2,'0')} · ${e(s.cat)} &nbsp;—&nbsp; ${s.qi} / ${s.qn}</div><h2><span>${e(s.text)}</span></h2></div>`,
+  q:s=>`<div class="sl q${(s.raw||[]).length?' has-raw':''}" data-fit>${top()}<div class="qn">${String(s.n).padStart(2,'0')} · ${e(s.cat)} &nbsp;—&nbsp; ${s.qi} / ${s.qn}</div><h2><span>${e(s.text)}</span></h2>${(s.raw||[]).length?`<ul class="raw">${s.raw.map(x=>`<li>${e(x)}</li>`).join('')}</ul>`:''}</div>`,
+  qall:s=>`<div class="sl qa2" data-fit>${top()}<div class="hd"><b>${String(s.n).padStart(2,'0')}</b><h2>${e(s.cat)}</h2></div><div class="cols ${s.raw.length?'':'solo'}"><div><div class="sh">Questions</div><ol class="core">${s.qs.map(x=>`<li>${e(x)}</li>`).join('')}</ol></div>${s.raw.length?`<div class="rc"><div class="sh">참가자 여러분이 보내주신 질문</div><ul class="raw">${s.raw.map(x=>`<li>${e(x)}</li>`).join('')}</ul></div>`:''}</div></div>`,
   kw:s=>`<div class="sl kw">${top()}<div class="eb">${String(s.n).padStart(2,'0')} · Keywords</div><h2>${e(s.cat)}</h2><ul class="${s.items.length>5?'many':''}">${s.items.map(x=>{const [a,b]=String(x).split('|');return `<li>${e(a.trim())}${b?`<small>${e(b.trim())}</small>`:''}</li>`}).join('')}</ul></div>`,
   hero:s=>`<div class="sl hero">${top()}${s.photo?`<div class="ph" style="background-image:url('${e(s.photo)}')"></div>`:''}<div class="eb">${e(s.eyebrow||'')}</div><div class="wmb" style="margin-top:28px">OFF <span class="the">THE</span><br>RECORD SALON</div><div class="ss">${e(s.ss||'')}</div>${s.name?`<div class="who"><b>${e(s.name)}</b><span>${e(s.role||'')}</span></div>`:''}</div>`,
   brand:s=>`<div class="sl brand"><div class="bw">OFF <span class="the">THE</span> RECORD SALON</div><div class="ln"></div><div class="ss">${e(s.ss||'')}</div>${s.wh?`<div class="wh">${e(s.wh)}</div>`:''}</div>`,
@@ -106,7 +123,10 @@ const R={
 function steps(s){return s.t==='kw'?s.items.length:0;}
 function draw(){const s=S[i];stage.innerHTML=R[s.t](s)+`<div class="bar" style="width:${(i+1)/S.length*100}%"></div>`+(s.t==='pdf'?'':`<div class="pg">${i+1} / ${S.length}</div>`);
   const sl=stage.querySelector('.sl');if(s.t==='pdf')s.render(sl);
+  if(sl.hasAttribute('data-fit'))fitText(sl);
   requestAnimationFrame(()=>{sl.classList.add('on');paint();});}
+function fitText(sl){const els=[...sl.querySelectorAll('h2,li,.raw')];const base=els.map(x=>parseFloat(getComputedStyle(x).fontSize));
+  for(let f=1;f>.5&&sl.scrollHeight>sl.clientHeight+2;f-=.05)els.forEach((x,k)=>{if(!x.classList.contains('raw'))x.style.fontSize=base[k]*f+'px';});}
 function paint(){stage.querySelectorAll('.kw li').forEach((li,k)=>li.classList.toggle('on',k<step));}
 function next(){const s=S[i];if(step<steps(s)){step++;paint();return;}if(i<S.length-1){i++;step=0;draw();}}
 function prev(){if(step>0&&S[i].t==='kw'){step--;paint();return;}if(i>0){i--;step=steps(S[i]);draw();}}
@@ -119,13 +139,18 @@ function key(ev){if(!root||!root.classList.contains('on'))return;const k=ev.key;
   else if(k==='m'||k==='M'||k==='Home'){const a=S.findIndex(s=>s.t==='agenda');if(a>=0)go(a);}
   else if(/^[1-9]$/.test(k)){const c=S.findIndex(s=>s.t==='cover'&&s.n===+k);if(c>=0)go(c);}}
 function close(){clearInterval(loopT);if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});root.classList.remove('on');stage.innerHTML='';}
-/* 질문 덱: data = {cats:[{title,desc,qs:[],kw:[]}]} */
+/* 질문 덱: data = {mode:'all'|'one', cats:[{title,desc,qs:[],kw:[]}]} · qs 중 '↳'로 시작하는 줄 = 위 질문의 참가자 원래 질문 */
+const RAW=/^\s*(↳|>)\s*/;
+function parseQs(lines){const out=[];(lines||[]).filter(Boolean).forEach(l=>{if(RAW.test(l)){if(out.length)out[out.length-1].raw.push(l.replace(RAW,''));}else out.push({q:l.trim(),raw:[]});});return out;}
+function uniqRaw(list){const key=t=>t.replace(/[^0-9A-Za-z가-힣]/g,'').slice(0,10),m=new Map();
+  list.forEach(t=>{const k=key(t),c=t.replace(/\s*\(…\)\s*/g,' … ').trim();if(!m.has(k)||c.length>m.get(k).length)m.set(k,c);});return [...m.values()];}
 function qaSlides(d,m){const L=[],cats=(d.cats||[]).filter(c=>c.title);
   L.push({t:'title',eyebrow:'Q&A Session',title:`질문에서 시작하는<br><span class="gold">대화</span>`,sub:`참가자 여러분이 미리 보내주신 질문을<br>다섯 가지 주제로 묶었습니다.`});
   const ag={t:'agenda',cats:cats.map(c=>({title:c.title}))};L.push(ag);
   cats.forEach((c,k)=>{ag.cats[k].at=L.length;const n=k+1;
     L.push({t:'cover',n,title:c.title,desc:c.desc});
-    const qs=(c.qs||[]).filter(Boolean);qs.forEach((q,j)=>L.push({t:'q',n,cat:c.title,qi:j+1,qn:qs.length,text:q}));
+    const qs=parseQs(c.qs);if(d.mode==='one')qs.forEach((x,j)=>L.push({t:'q',n,cat:c.title,qi:j+1,qn:qs.length,text:x.q,raw:uniqRaw(x.raw)}));
+    else if(qs.length)L.push({t:'qall',n,cat:c.title,qs:qs.map(x=>x.q),raw:uniqRaw(qs.flatMap(x=>x.raw))});
     const kw=(c.kw||[]).filter(Boolean);if(kw.length)L.push({t:'kw',n,cat:c.title,items:kw});
     if(k<cats.length-1)L.push({...ag,cur:k+1});});
   L.push({t:'title',eyebrow:'Thank you',title:`오늘의 질문은<br><span class="gold">이 자리에</span> 남겨 둡니다`,sub:m.speaker?`${e(m.speaker)}님, 솔직한 이야기 감사합니다.`:''});
