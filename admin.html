@@ -786,7 +786,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
   <div class="ap-sum" id="apSum"></div>
   <div class="ap-add"><button class="mn-btn" onclick="appAdd()">+ 신청자 추가</button><span class="note" style="margin:0">마감 뒤 직접 등록할 때 씁니다. 본인이 직접 쓰게 하려면 추가 신청 링크 <a href="https://off-record.kr/apply/late" target="_blank" style="color:var(--ac)">off-record.kr/apply/late</a> 를 보내세요.</span></div>
   <div class="tbl-wrap"><table class="tbl" id="v-apps"></table></div>
-  <div class="mn-head" style="margin-top:3.5rem"><div><div class="eyebrow">Members</div><h2 class="title" style="margin:0">기획단 · 리피움 멤버</h2></div><button class="mn-btn" onclick="tagOpen()">명찰 만들기</button></div>
+  <div class="mn-head" style="margin-top:3.5rem"><div><div class="eyebrow">Members</div><h2 class="title" style="margin:0">살롱 운영멤버 · 리피움 멤버</h2></div><button class="mn-btn" onclick="tagOpen()">명찰 만들기</button></div>
   <p class="note">신청서로 들어오지 않는 분들입니다. 칸을 누르면 바로 고칠 수 있고, 다른 곳을 누르면 저장됩니다. 참석 체크는 위 '세션 참석'에서 고른 세션 기준입니다.</p>
   <div id="v-members"></div>
   <div class="mn-head" style="margin-top:3.5rem"><div><div class="eyebrow">Messages</div><h2 class="title" style="margin:0">안내 문자</h2></div><button class="mn-btn" onclick="edit('messages')">+ 문자 추가</button></div>
@@ -1169,7 +1169,7 @@ function setSeason(v){SEASON=Number(v)||1;try{localStorage.setItem('otr_season',
   ['apps','speakers','schedule','fees','actions','milestones','messages','checklist'].forEach(k=>{try{if(D[k])RENDER[k]()}catch(e){}});try{if(D.surveys)renderSurveys()}catch(e){}try{renderRun()}catch(e){}}
 let MB=[];
 async function loadMembers(){MB=await rpc('otr_list',{tbl:'otr_members'});renderMembers();}
-const MB_G=[['운영','기획단'],['리피움','리피움 멤버']],MB_PH={name:'이름',role:'소속 / 직함',phone:'010-0000-0000',memo:'메모'};
+const MB_G=[['운영','살롱 운영멤버'],['리피움','리피움 멤버']],MB_PH={name:'이름',role:'소속 / 직함',phone:'010-0000-0000',memo:'메모'};
 function renderMembers(){const el=$('v-members');if(!el)return;const L=MB.filter(inS).sort((a,b)=>(a.sort||0)-(b.sort||0)||a.created_at.localeCompare(b.created_at));
   el.innerHTML=MB_G.map(([g,t])=>{const R=L.filter(r=>r.grp===g),c=k=>R.filter(r=>(r[k]||{})[apSess]).length;
   return `<div class="mb-g"><div class="mb-h"><h3>${t}<small>${R.length}명 · S0${apSess} 1부 ${c('attend')} · 2부 ${c('after_party')}</small></h3><button class="mn-btn ghost" onclick="mbAdd('${g}')">+ 추가</button></div>
@@ -1188,7 +1188,7 @@ async function mbDel(id){const r=MB.find(x=>x.id===id);if(!confirm(`${r.name||'�
   try{await rpc('otr_delete',{tbl:'otr_members',rid:id});await loadMembers();}catch(e){alert('삭제 실패: '+e.message);}}
 /* 명찰 80×100mm · A4 가로 한 장에 6개 */
 let TAGS=[],tagBlank=0;
-const TAG_G={'참가자':'참가자','운영':'기획단','리피움':'리피움'};
+const TAG_G={'참가자':'참가자','운영':'살롱 운영멤버','리피움':'리피움'};
 function tagOpen(){const n=apSess,apps=(D.apps||[]).filter(inS).filter(r=>r.status==='확정'&&(/Season|4회/.test(r.pass||'')||r.salon_no===n)).sort((a,b)=>a.name.localeCompare(b.name,'ko'));
   const mem=MB.filter(inS).filter(r=>(r.name||'').trim()).sort((a,b)=>(a.sort||0)-(b.sort||0));
   const pre=(L,r)=>L.some(x=>(x.attend||{})[n])?!!(r.attend||{})[n]:true;
