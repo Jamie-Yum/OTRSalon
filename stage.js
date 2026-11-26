@@ -18,7 +18,7 @@ const css=`
 #stg .ttl p{font-size:40px;margin-top:40px;color:rgba(237,230,214,.7);line-height:1.5}
 #stg .ag{justify-content:center}
 #stg .ag h2{font-size:64px;font-weight:700;margin:24px 0 56px}
-#stg .ag ol{list-style:none;display:grid;grid-template-columns:repeat(5,1fr);gap:28px;padding:0;margin:0}
+#stg .ag ol{list-style:none;display:grid;grid-template-columns:repeat(var(--n,5),1fr);gap:28px;padding:0;margin:0}
 #stg .ag li{border-top:3px solid #C9B37E;padding-top:28px;cursor:pointer}
 #stg .ag li b{display:block;font-family:'Inter Tight',sans-serif;font-size:72px;font-weight:300;color:#C9B37E;line-height:1}
 #stg .ag li span{display:block;font-size:36px;font-weight:600;margin-top:24px;line-height:1.35}
@@ -189,18 +189,48 @@ const css=`
 #stg.print .pp{position:relative;width:1920px;height:1080px;overflow:hidden;background:#141414;page-break-after:always;break-after:page;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 #stg.print .pp .sl{opacity:1;transition:none}
 #stg.print .pp .kw li{opacity:1;transform:none}
+/* 현장 질의응답 */
+#stg .lv{flex-direction:row;gap:96px;padding-top:180px}
+#stg .lv .lv-l{width:560px;flex:none;display:flex;flex-direction:column}
+#stg .lv h2{font-size:88px;font-weight:700;line-height:1.2;margin:20px 0 26px}
+#stg .lv .lv-l p{font-size:30px;line-height:1.6;color:rgba(237,230,214,.7)}
+#stg .lv .lv-qr{margin-top:46px;width:320px;height:320px;background:#fff;border-radius:18px;padding:22px}
+#stg .lv .lv-qr svg{width:100%;height:100%;display:block}
+#stg .lv .lv-u{margin-top:18px;font-family:'Inter Tight',sans-serif;font-size:22px;color:rgba(237,230,214,.5)}
+#stg .lv .lv-r{flex:1;display:flex;flex-direction:column;min-width:0}
+#stg .lv .lv-h{display:flex;justify-content:space-between;align-items:center;font-size:24px;color:rgba(237,230,214,.55);border-bottom:1px solid rgba(237,230,214,.18);padding-bottom:22px}
+#stg .lv-st{display:flex;align-items:center;gap:14px}
+#stg .lv-st::before{content:'';width:12px;height:12px;border-radius:50%;background:rgba(237,230,214,.35)}
+#stg .lv-st.on{color:#E2CD94}#stg .lv-st.on::before{background:#C9B37E;animation:lvp 1.6s infinite}
+@keyframes lvp{0%{box-shadow:0 0 0 0 rgba(201,179,126,.6)}100%{box-shadow:0 0 0 14px rgba(201,179,126,0)}}
+#stg .lv-qs{list-style:none;margin:0;padding:0;overflow:hidden;flex:1}
+#stg .lv-qs li{padding:26px 150px 26px 0;border-bottom:1px solid rgba(237,230,214,.1);font-size:32px;line-height:1.5;cursor:pointer;position:relative}
+#stg .lv-qs li p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#stg .lv-qs li:hover p{color:#E2CD94}
+#stg .lv-qs li.new{animation:lvn 1.4s ease}
+@keyframes lvn{from{background:rgba(201,179,126,.28);transform:translateX(24px);opacity:0}to{background:transparent;transform:none;opacity:1}}
+#stg .lv-qs li.empty{color:rgba(237,230,214,.35);cursor:default;border:0;padding-top:64px}
+#stg .lv-qs li button{position:absolute;right:0;top:50%;transform:translateY(-50%);display:none;background:#141414;border:1px solid rgba(237,230,214,.3);color:#EDE6D6;border-radius:999px;padding:8px 20px;font:inherit;font-size:18px;cursor:pointer}
+#stg.mv .lv-qs li:hover button{display:block}
+#stg .lv-spot{position:absolute;inset:0;background:rgba(11,11,11,.97);display:flex;flex-direction:column;justify-content:center;padding:150px 220px;z-index:5;cursor:pointer}
+#stg .lv-spot .eb{margin-bottom:40px}
+#stg .lv-spot div{font-size:64px;font-weight:700;line-height:1.45}
+#stg .ag li.lvi b{color:#E2CD94}
 #stg .hint{position:fixed;right:20px;bottom:16px;z-index:10000;font:13px/1.5 'Pretendard',sans-serif;color:#888;background:rgba(0,0,0,.6);padding:8px 12px;border-radius:8px;opacity:0;transition:opacity .3s;pointer-events:none}
 #stg.mv .hint{opacity:1}
 #stg .x{position:fixed;right:16px;top:14px;z-index:10001;width:44px;height:44px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#EDE6D6;font-size:20px;cursor:pointer;opacity:0;transition:opacity .3s}
 #stg.mv .x{opacity:1}
 `;
-let root,stage,S=[],i=0,step=0,meta={},hideT,loopT,opt={};
+let root,stage,S=[],i=0,step=0,meta={},hideT,loopT,liveT,opt={};
 let cssOn=0;function ensureCss(){if(cssOn)return;cssOn=1;const st=document.createElement('style');st.textContent=css+css.replace(/\/\*P\*\/[\s\S]*?\/\*\/P\*\//,'').replace(/#stg/g,'.stgt')+'.stgt{position:relative!important;inset:auto!important;z-index:auto!important;display:block!important;cursor:default!important;overflow:hidden;background:#141414}.stgt .stage{left:0!important;top:0!important;transform-origin:0 0}';document.head.appendChild(st);}
 function ensure(){if(root)return;ensureCss();
-  root=document.createElement('div');root.id='stg';root.innerHTML='<div class="stage"></div><button class="x" title="닫기 (Esc)">✕</button><div class="hint">→ 다음 · ← 이전 · M 목차 · 1~9 주제 이동 · F 전체 화면 · Esc 닫기</div>';document.body.appendChild(root);stage=root.querySelector('.stage');
+  root=document.createElement('div');root.id='stg';root.innerHTML='<div class="stage"></div><button class="x" title="닫기 (Esc)">✕</button><div class="hint">→ 다음 · ← 이전 · M 목차 · 1~9 주제 이동 · Q 현장 질문 · F 전체 화면 · Esc 닫기</div>';document.body.appendChild(root);stage=root.querySelector('.stage');
   addEventListener('resize',fit);
   document.addEventListener('keydown',key);
-  root.addEventListener('click',e=>{if(e.target.closest('.x')){close();return;}const a=e.target.closest('[data-go]');if(a){go(+a.dataset.go);return;}if(e.clientX<innerWidth*.25)prev();else next();});
+  root.addEventListener('click',e=>{if(e.target.closest('.x')){close();return;}
+    const hd=e.target.closest('[data-hide]');if(hd){const pv=opt.live;if(pv&&pv.hide)pv.hide(hd.dataset.hide).then(()=>hd.closest('li').remove()).catch(er=>alert('실패: '+er.message));return;}
+    const sp=e.target.closest('.lv-spot');if(sp){sp.remove();return;}
+    const lq=e.target.closest('.lv-qs li[data-id]');if(lq){spot(lq.querySelector('p').textContent);return;}const a=e.target.closest('[data-go]');if(a){go(+a.dataset.go);return;}if(e.clientX<innerWidth*.25)prev();else next();});
   const show=()=>{root.classList.add('mv');clearTimeout(hideT);hideT=setTimeout(()=>root.classList.remove('mv'),2500);};root.addEventListener('mousemove',show);root.addEventListener('touchstart',show,{passive:true});}
 function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform=`translate(${-960*s}px,${-540*s}px) scale(${s})`;}
 const e=t=>(t==null?'':String(t)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -208,7 +238,7 @@ const WM='OFF <span class="the">THE</span> RECORD SALON';
 function top(){return `<div class="top"><span class="wm">${WM}</span><span>${e(meta.label||'')}</span></div>`;}
 const R={
   title:s=>`<div class="sl ttl">${top()}<div class="eb">${e(s.eyebrow)}</div><h1>${s.title}</h1>${s.sub?`<p>${s.sub}</p>`:''}</div>`,
-  agenda:s=>`<div class="sl ag v-${s.v||'cols'}">${top()}<div class="eb">${e(s.eyebrow||'Topics')}</div><h2>${e(s.title||'오늘의 다섯 가지 주제')}</h2><ol>${s.cats.map((c,k)=>`<li data-go="${c.at}" class="${s.cur!=null&&k<s.cur?'dn':''}${s.cur!=null&&k===s.cur?' nx':''}"><b>${String(k+1).padStart(2,'0')}</b>${s.v==='path'?'<i></i>':''}<span>${e(c.title)}</span>${c.key?`<em>${e(c.key)}</em>`:''}</li>`).join('')}</ol></div>`,
+  agenda:s=>`<div class="sl ag v-${s.v||'cols'}">${top()}<div class="eb">${e(s.eyebrow||'Topics')}</div><h2>${e(s.title||'오늘의 다섯 가지 주제')}</h2><ol style="--n:${s.cats.length}">${s.cats.map((c,k)=>`<li data-go="${c.at}" class="${s.cur!=null&&k<s.cur?'dn':''}${s.cur!=null&&k===s.cur?' nx':''}${c.live?' lvi':''}"><b>${String(k+1).padStart(2,'0')}</b>${s.v==='path'?'<i></i>':''}<span>${e(c.title)}</span>${c.key?`<em>${e(c.key)}</em>`:''}</li>`).join('')}</ol></div>`,
   cover:s=>`<div class="sl cv${s.key?' hk':''}" data-fit>${top()}<div class="no">${String(s.n).padStart(2,'0')}</div><h2>${e(s.title)}</h2>${s.key?`<div class="kq"><div class="eb">Key Question</div><div>${e(s.key)}</div></div>`:s.desc?`<p>${e(s.desc)}</p>`:''}</div>`,
   q:s=>`<div class="sl q${(s.raw||[]).length?' has-raw':''}" data-fit>${top()}<div class="qn"><span class="nm">${String(s.n).padStart(2,'0')} · </span>${e(s.cat)} &nbsp;—&nbsp; ${s.qi} / ${s.qn}</div><h2><span>${e(s.text)}</span></h2>${(s.raw||[]).length?`<ul class="raw">${s.raw.map(x=>`<li>${e(x)}</li>`).join('')}</ul>`:''}</div>`,
   qall:s=>`<div class="sl qa2" data-fit>${top()}<div class="hd"><b>${String(s.n).padStart(2,'0')}</b><h2>${e(s.cat)}</h2></div>${s.key?`<div class="kqs">${e(s.key)}</div>`:''}<div class="cols ${s.raw.length&&s.qs.length?'':'solo'}${s.qs.length?'':' rawonly'}">${s.qs.length?`<div><div class="sh">Questions</div><ol class="core">${s.qs.map(x=>`<li>${e(x)}</li>`).join('')}</ol></div>`:''}${s.raw.length?`<div class="${s.qs.length?'rc':''}"><div class="sh">참가자 여러분이 보내주신 질문</div><ul class="raw">${s.raw.map(x=>`<li>${e(x)}</li>`).join('')}</ul></div>`:''}</div></div>`,
@@ -218,11 +248,12 @@ const R={
   tt:s=>`<div class="sl tt">${top()}<div class="eb">Timetable</div><h2>${e(s.title||'오늘의 진행 순서')}</h2><ol class="${s.rows.length>8?'dense':''}">${s.rows.map(r=>`<li><span>${e(r.t||'·')}</span><b>${e(r.title)}${r.note?`<small>${e(r.note)}</small>`:''}</b></li>`).join('')}</ol></div>`,
   pr:s=>`<div class="sl pr">${top()}<div class="eb">${e(s.eyebrow||'')}</div><h2>${s.title}</h2>${s.sub?`<p>${s.sub}</p>`:''}</div>`,
   nt:s=>`<div class="sl nt">${top()}<div class="eb">${e(s.eyebrow||'Notice')}</div><h2>${e(s.title)}</h2><ul>${s.items.map(x=>`<li>${e(x)}</li>`).join('')}</ul></div>`,
-  pdf:s=>`<div class="sl pdf"></div>`
+  pdf:s=>`<div class="sl pdf"></div>`,
+  live:s=>`<div class="sl lv">${top()}<div class="lv-l"><div class="eb">Open Q&amp;A</div><h2>현장 질의응답</h2><p>휴대폰 카메라로 QR을 찍어<br>궁금한 것을 자유롭게 남겨 주세요.<br>이름 없이 보내집니다.</p><div class="lv-qr"></div><div class="lv-u"></div></div><div class="lv-r"><div class="lv-h"><span class="lv-st">질문 받기 전</span><span class="lv-n"></span></div><ul class="lv-qs"><li class="empty">첫 질문을 기다리고 있습니다</li></ul></div></div>`
 };
 function steps(s){return s.t==='kw'?s.items.length:0;}
 function draw(){const s=S[i];stage.innerHTML=R[s.t](s)+`<div class="bar" style="width:${(i+1)/S.length*100}%"></div>`+(s.t==='pdf'?'':`<div class="pg">${i===S.length-1&&opt.nextLabel?`→ ${e(opt.nextLabel)} &nbsp;·&nbsp; `:''}${i+1} / ${S.length}</div>`);
-  const sl=stage.querySelector('.sl');if(s.t==='pdf')s.render(sl);
+  clearInterval(liveT);const sl=stage.querySelector('.sl');if(s.t==='pdf')s.render(sl);if(s.t==='live')liveRun(sl,opt.live);
   if(sl.hasAttribute('data-fit'))fitText(sl);
   requestAnimationFrame(()=>{sl.classList.add('on');paint();});}
 function fitText(sl){const els=[...sl.querySelectorAll('h2,li,.raw,.kq div:last-child')];const base=els.map(x=>parseFloat(getComputedStyle(x).fontSize));
@@ -234,11 +265,25 @@ function go(n){if(n<0||n>=S.length)return;i=n;step=0;draw();}
 function key(ev){if(!root||!root.classList.contains('on'))return;const k=ev.key;
   if(['ArrowRight','ArrowDown',' ','PageDown','Enter'].includes(k)){ev.preventDefault();next();}
   else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(k)){ev.preventDefault();prev();}
-  else if(k==='Escape'){close();}
+  else if(k==='Escape'){const sp=stage.querySelector('.lv-spot');sp?sp.remove():close();}
+  else if(k==='q'||k==='Q'){const c=S.findIndex(s=>s.t==='live');if(c>=0)go(c);}
   else if(k==='f'||k==='F'){document.fullscreenElement?document.exitFullscreen():root.requestFullscreen().catch(()=>{});}
   else if(k==='m'||k==='M'||k==='Home'){const a=S.findIndex(s=>s.t==='agenda');if(a>=0)go(a);}
   else if(/^[1-9]$/.test(k)){const c=S.findIndex(s=>s.t==='cover'&&s.n===+k);if(c>=0)go(c);}}
-function close(){clearInterval(loopT);if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});root.classList.remove('on');stage.innerHTML='';}
+function close(){clearInterval(loopT);clearInterval(liveT);if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});root.classList.remove('on');stage.innerHTML='';}
+/* 현장 질의응답: pv = {get()→{url,open,qs:[{id,body,hidden}]}, start()?, hide(id)?} */
+const QRJS='https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js';
+function qrLib(){return window.qrcode?Promise.resolve(window.qrcode):new Promise((ok,no)=>{const sc=document.createElement('script');sc.src=QRJS;sc.onload=()=>ok(window.qrcode);sc.onerror=()=>no(new Error('QR'));document.head.appendChild(sc);});}
+async function qrSvg(t){try{const q=(await qrLib())(0,'M');q.addData(t);q.make();return q.createSvgTag({cellSize:8,margin:0,scalable:true});}catch(er){return '';}}
+function liveList(sl,d,pv){const qs=(d.qs||[]).filter(x=>!x.hidden),box=sl.querySelector('.lv-qs'),seen=new Set([...box.querySelectorAll('li[data-id]')].map(x=>x.dataset.id)),first=!box.dataset.ok;box.dataset.ok=1;
+  box.innerHTML=qs.length?qs.slice(0,8).map(x=>`<li data-id="${e(x.id)}" class="${!first&&!seen.has(x.id)?'new':''}"><p>${e(x.body)}</p>${pv.hide?`<button data-hide="${e(x.id)}">숨기기</button>`:''}</li>`).join(''):'<li class="empty">첫 질문을 기다리고 있습니다</li>';
+  sl.querySelector('.lv-n').textContent=qs.length?`질문 ${qs.length}개`:'';const st=sl.querySelector('.lv-st');st.className='lv-st'+(d.open?' on':'');st.textContent=d.open?'질문 받는 중':'질문 받기 전';}
+async function liveRun(sl,pv,once){if(!pv)return;let d;
+  try{if(!once&&pv.start)await pv.start();d=await pv.get();}catch(er){sl.querySelector('.lv-qs').innerHTML=`<li class="empty">질문을 불러오지 못했습니다 (${e(er.message)})</li>`;return;}
+  if(d.url){sl.querySelector('.lv-qr').innerHTML=await qrSvg(d.url);sl.querySelector('.lv-u').textContent=d.url.replace(/^https?:\/\//,'');}
+  liveList(sl,d,pv);if(once)return;
+  liveT=setInterval(async()=>{if(!sl.isConnected)return clearInterval(liveT);try{liveList(sl,await pv.get(),pv);}catch(er){}},4000);}
+function spot(t){const d=document.createElement('div');d.className='lv-spot';d.innerHTML=`<div class="eb">Question</div><div>${e(t)}</div>`;stage.querySelector('.sl').appendChild(d);}
 /* 질문 덱: data = {mode:'all'|'one', cats:[{title,desc,qs:[],kw:[]}]} · qs 중 '↳'로 시작하는 줄 = 위 질문의 참가자 원래 질문 */
 const RAW=/^\s*(↳|>)\s*/;
 function parseQs(lines){const out=[];(lines||[]).filter(Boolean).forEach(l=>{if(RAW.test(l)){if(out.length)out[out.length-1].raw.push(l.replace(RAW,''));}else out.push({q:l.trim(),raw:[]});});return out;}
@@ -246,14 +291,15 @@ function uniqRaw(list){const key=t=>t.replace(/[^0-9A-Za-z가-힣]/g,'').slice(0
   list.forEach(t=>{const k=key(t),c=t.replace(/\s*\(…\)\s*/g,' … ').trim();if(!m.has(k)||c.length>m.get(k).length)m.set(k,c);});return [...m.values()];}
 function qaSlides(d,m){const L=[],cats=(d.cats||[]).filter(c=>c.title);
   L.push({t:'title',eyebrow:'Q&A Session',title:`질문에서 시작하는<br><span class="gold">대화</span>`,sub:`참가자 여러분이 미리 보내주신 질문을<br>다섯 가지 주제로 묶었습니다.`});
-  const ag={t:'agenda',v:d.agenda||'cols',cats:cats.map(c=>({title:c.title,key:d.showKey!==false?c.key:''}))};L.push(ag);
+  const live=d.showLive!==false,ag={t:'agenda',v:d.agenda||'cols',cats:cats.map(c=>({title:c.title,key:d.showKey!==false?c.key:''}))};if(live){ag.cats.push({title:'현장 질의응답',key:'궁금한 것을 자유롭게 물어보세요',live:1});ag.title=`${['','한','두','세','네','다섯','여섯','일곱','여덟','아홉'][cats.length]||cats.length} 가지 주제와 현장 질의응답`;}L.push(ag);
   cats.forEach((c,k)=>{ag.cats[k].at=L.length;const n=k+1;
     const key=d.showKey!==false?c.key:'';L.push({t:'cover',n,title:c.title,desc:c.desc,key});
     const qs=parseQs(c.qs),showQ=d.showCore!==false,showR=d.showRaw!==false;
     if(d.mode==='one')qs.forEach((x,j)=>L.push({t:'q',n,cat:c.title,qi:j+1,qn:qs.length,text:x.q,raw:showR?uniqRaw(x.raw):[]}));
     else{const core=showQ?qs.map(x=>x.q):[],raw=showR?uniqRaw(qs.flatMap(x=>x.raw)):[];if(core.length||raw.length)L.push({t:'qall',n,cat:c.title,key,qs:core,raw});}
     const kw=(c.kw||[]).filter(Boolean);if(kw.length)L.push({t:'kw',n,cat:c.title,items:kw});
-    if(k<cats.length-1)L.push({...ag,cur:k+1});});
+    if(k<cats.length-1||live)L.push({...ag,cur:k+1});});
+  if(live){ag.cats[cats.length].at=L.length;L.push({t:'live'});}
   L.push({t:'title',eyebrow:'Thank you',title:`오늘의 질문은<br><span class="gold">이 자리에</span> 남겨 둡니다`,sub:m.speaker?`${e(m.speaker)}님, 솔직한 이야기 감사합니다.`:''});
   return L;}
 /* 입장·퇴장: m = {n, speaker:{name,role,photo}, date, timetable:[], notes:[], next:{n,name,role,date}} */
@@ -283,10 +329,10 @@ function talkSlides(m,doc){const sp=m.speaker||{},L=[];
 async function printParts(parts,title){ensure();clearInterval(loopT);
   if(document.fullscreenElement)await document.exitFullscreen().catch(()=>{});
   root.classList.add('on','print');stage.innerHTML='';stage.style.transform='none';
-  const jobs=[];
+  const jobs=[];clearInterval(liveT);
   for(const p of parts){const keep=meta;meta=p.meta||{};
     for(const sl of p.slides){const pp=document.createElement('div');pp.className='pp'+(p.nonum?' nonum':'');pp.innerHTML=R[sl.t](sl);stage.appendChild(pp);
-      const el=pp.querySelector('.sl');el.classList.add('on');if(el.hasAttribute('data-fit'))fitText(el);if(sl.t==='pdf')jobs.push(sl.render(el));}
+      const el=pp.querySelector('.sl');el.classList.add('on');if(el.hasAttribute('data-fit'))fitText(el);if(sl.t==='pdf')jobs.push(sl.render(el));if(sl.t==='live')jobs.push(liveRun(el,p.live,1));}
     meta=keep;}
   await Promise.all(jobs);await (document.fonts?document.fonts.ready:Promise.resolve());
   await Promise.all([...stage.querySelectorAll('img')].map(im=>im.complete?0:new Promise(r=>{im.onload=im.onerror=r;})));

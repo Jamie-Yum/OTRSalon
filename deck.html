@@ -26,13 +26,14 @@ h1{font-size:clamp(1.8rem,5vw,2.6rem);font-weight:700;line-height:1.3}
 @media(max-width:620px){.g{grid-template-columns:1fr}}
 </style></head><body>
 <div class="w" id="app"><div class="wm">OFF <span class="the">THE</span> RECORD SALON</div><p class="sub" style="margin-top:2rem">불러오는 중…</p></div>
-<script src="/stage.js?v=17"></script>
+<script src="/stage.js?v=18"></script>
 <script>
 const SU='https://dvlrzbckneucpvlacdll.supabase.co',SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE';
 const q=new URLSearchParams(location.search),TOK=q.get('k'),$=id=>document.getElementById(id);
 const esc=t=>(t==null?'':String(t)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const call=(fn,b)=>fetch(SU+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:JSON.stringify(b)}).then(async r=>{const j=await r.json().catch(()=>null);if(!r.ok)throw new Error((j&&j.message)||r.status);return j;});
 let D=null,pdf=null;
+const LIVE={get:async()=>{const d=await call('otr_live_share',{tok:TOK});return {...d,url:d.code?'https://off-record.kr/ask.html?c='+d.code:''};}};
 const ctx=k=>({n:D.n,date:D.date,timetable:D.timetable||[],speaker:D.speaker||{},next:D.next,notes:((D.decks[k]||{}).notes)||[]});
 async function talkPdf(){const b=$('b-talk');if(!pdf&&D.pdf){b.querySelector('span').textContent='PDF를 불러오는 중…';
     try{const s=await call('otr_share_pdf',{tok:TOK});pdf=new Blob([Uint8Array.from(atob(s),c=>c.charCodeAt(0))],{type:'application/pdf'});}catch(e){alert('PDF를 불러오지 못했습니다: '+e.message);}
@@ -44,13 +45,13 @@ async function savePdf(which){const parts=[],lab={label:`SESSION 0${D.n}`},NM={w
   for(const k of which==='all'?['welcome','talk','qa','farewell']:[which]){
     if(k==='welcome')parts.push({slides:Stage.slides.welcome(ctx('welcome')),meta:lab});
     if(k==='farewell')parts.push({slides:Stage.slides.farewell(ctx('farewell')),meta:lab});
-    if(k==='qa'&&((D.decks.qa||{}).cats||[]).some(c=>c.title))parts.push({slides:Stage.slides.qa(D.decks.qa,META()),meta:META(),nonum:D.decks.qa.showNum===false});
+    if(k==='qa'&&((D.decks.qa||{}).cats||[]).some(c=>c.title))parts.push({slides:Stage.slides.qa(D.decks.qa,META()),meta:META(),nonum:D.decks.qa.showNum===false,live:LIVE});
     if(k==='talk'){const b=await talkPdf();let doc=null;if(b){doc=await Stage.loadPdf(b);if(doc===false)return;}parts.push({slides:Stage.slides.talk(ctx('talk'),doc),meta:{label:META().label}});}}
   Stage.print(parts,`오프더레코드살롱_S${D.season}-0${D.n}_${which==='all'?'전체장표':NM[which]}`);}
 function openDeck(k){const meta={speaker:D.speaker&&D.speaker.name?D.speaker.name+' '+(D.speaker.role||'').split(' ').pop():'',label:`SESSION 0${D.n}${D.speaker&&D.speaker.name?' · '+D.speaker.name:''}`};
   const hasQa=((D.decks.qa||{}).cats||[]).some(c=>c.title),skip=o=>{const f=o.atEnd?o.prev:o.next;if(f)f();};
   Stage.chain([{label:'① 입장 안내',run:o=>Stage.welcome(ctx('welcome'),o)},{label:'② 강연',run:o=>talk(o)},
-    {label:'③ 질문',run:o=>hasQa?Stage.qa(D.decks.qa,meta,o):skip(o)},{label:'④ 퇴장 안내',run:o=>Stage.farewell(ctx('farewell'),o)}],['welcome','talk','qa','farewell'].indexOf(k));}
+    {label:'③ 질문',run:o=>hasQa?Stage.qa(D.decks.qa,meta,{...o,live:LIVE}):skip(o)},{label:'④ 퇴장 안내',run:o=>Stage.farewell(ctx('farewell'),o)}],['welcome','talk','qa','farewell'].indexOf(k));}
 const DESC={welcome:'참가자가 입장해 기다리는 동안 띄워 두는 장표',talk:'연사 소개 → 강연 자료 → 질문 세션으로 넘어가는 장표',qa:'미리 받은 질문을 다섯 가지 주제로 묶어 묻고, 주제마다 답변 키워드를 정리',farewell:'감사 인사 · 2부 안내 · 다음 세션 예고'};
 (async()=>{
   if(!TOK){$('app').innerHTML+='<p class="sub err">링크가 올바르지 않습니다.</p>';return;}
