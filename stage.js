@@ -89,11 +89,50 @@ const css=`
 #stg .qa2 .raw{list-style:none;padding:0;margin:0;display:grid;gap:18px;font-size:24px}
 #stg .qa2 .rc{border-left:1px solid rgba(237,230,214,.14);padding-left:56px}
 #stg .qa2 .cols.rawonly .raw{font-size:34px;gap:26px}
+#stg .ag li em{display:none;font-style:normal}
+#stg .ag.v-list li em,#stg .ag.v-big li em{display:block}
+/* ── 번호 없음 ── 빈자리를 Key Question·골드 선으로 채움 */
 #stg .nonum .ag li b,#stg .nonum .cv .no,#stg .nonum .qa2 .hd b,#stg .nonum .nm{display:none}
-#stg .nonum .ag.v-cards li{justify-content:flex-end;height:260px}#stg .nonum .ag.v-big li{padding-top:40px;height:auto}
-#stg .nonum .ag.v-path li i{margin-top:0}#stg .nonum .ag.v-path ol::before{top:15px}
-#stg .nonum .ag.v-list li{grid-template-columns:560px 1fr}
-#stg .nonum .cv.hk h2{margin-top:0}
+#stg .nonum .ag li em{display:block;font-size:24px;line-height:1.55;color:rgba(237,230,214,.58);margin-top:22px}
+#stg .nonum .ag li.nx em{color:rgba(237,230,214,.85)}
+/* A 기본 */
+#stg .nonum .ag.v-cols li{padding-top:40px;border-top-width:4px}
+#stg .nonum .ag.v-cols li span{font-size:40px;margin-top:0}
+#stg .nonum .ag.v-cols li.nx{border-top-color:#E2CD94}
+#stg .nonum .ag.v-cols li.nx span{color:#E2CD94}
+/* B 목록형 */
+#stg .nonum .ag.v-list li{grid-template-columns:24px 600px 1fr;padding:24px 0}
+#stg .nonum .ag.v-list li::before{content:'';width:10px;height:10px;border-radius:50%;background:rgba(201,179,126,.5);justify-self:center}
+#stg .nonum .ag.v-list li.nx::before{background:#E2CD94;box-shadow:0 0 0 8px rgba(201,179,126,.18)}
+#stg .nonum .ag.v-list li span{font-size:44px}
+#stg .nonum .ag.v-list li em{margin:0;font-size:27px}
+/* C 카드형 */
+#stg .nonum .ag.v-cards li{height:470px;justify-content:flex-start;padding-top:46px}
+#stg .nonum .ag.v-cards li::before{content:'';display:block;width:48px;height:4px;background:#C9B37E;margin-bottom:34px}
+#stg .nonum .ag.v-cards li.nx::before{background:#141414}
+#stg .nonum .ag.v-cards li span{font-size:40px;line-height:1.3}
+#stg .nonum .ag.v-cards li em{margin-top:auto;font-size:23px}
+#stg .nonum .ag.v-cards li.nx em{color:rgba(20,20,20,.72)}
+/* D 여정형 */
+#stg .nonum .ag.v-path ol::before{top:21px}
+#stg .nonum .ag.v-path li i{margin-top:6px}
+#stg .nonum .ag.v-path li.nx i{margin-top:0}
+#stg .nonum .ag.v-path li span{font-size:38px;margin-top:46px}
+#stg .nonum .ag.v-path li em{padding:0 22px;font-size:23px}
+#stg .nonum .ag.v-path li.dn em{opacity:.4}
+/* E 큰 숫자형 → 세로 선 + 큰 제목 */
+#stg .nonum .ag.v-big li{height:520px;padding-top:0;justify-content:flex-start}
+#stg .nonum .ag.v-big li span{font-size:42px;line-height:1.28;padding-top:30px;border-top:4px solid #C9B37E;display:block;width:100%}
+#stg .nonum .ag.v-big li:not(:first-child){padding-left:34px}
+#stg .nonum .ag.v-big li.nx span{color:#E2CD94;border-top-color:#E2CD94}
+/* 표지 */
+#stg .nonum .cv h2::before,#stg .nonum .qa2 .hd h2::before{content:'';display:block;width:90px;height:5px;background:#C9B37E;margin-bottom:44px}
+#stg .nonum .cv h2{font-size:120px;margin-top:0}
+#stg .nonum .cv.hk h2{font-size:60px;margin-top:0}
+#stg .nonum .cv.hk .kq{margin-top:72px}
+#stg .nonum .cv.hk .kq div:last-child{font-size:96px}
+/* 질문 장 머리 */
+#stg .nonum .qa2 .hd h2::before{width:60px;height:4px;margin-bottom:26px}
 #stg .kw{justify-content:center}
 #stg .kw h2{font-size:56px;font-weight:700;margin:20px 0 56px}
 #stg .kw ul{list-style:none;padding:0;margin:0;display:grid;gap:26px}
@@ -155,7 +194,7 @@ const WM='OFF <span class="the">THE</span> RECORD SALON';
 function top(){return `<div class="top"><span class="wm">${WM}</span><span>${e(meta.label||'')}</span></div>`;}
 const R={
   title:s=>`<div class="sl ttl">${top()}<div class="eb">${e(s.eyebrow)}</div><h1>${s.title}</h1>${s.sub?`<p>${s.sub}</p>`:''}</div>`,
-  agenda:s=>`<div class="sl ag v-${s.v||'cols'}">${top()}<div class="eb">${e(s.eyebrow||'Topics')}</div><h2>${e(s.title||'오늘의 다섯 가지 주제')}</h2><ol>${s.cats.map((c,k)=>`<li data-go="${c.at}" class="${s.cur!=null&&k<s.cur?'dn':''}${s.cur!=null&&k===s.cur?' nx':''}"><b>${String(k+1).padStart(2,'0')}</b>${s.v==='path'?'<i></i>':''}<span>${e(c.title)}</span>${(s.v==='list'||s.v==='big')&&c.key?`<em>${e(c.key)}</em>`:''}</li>`).join('')}</ol></div>`,
+  agenda:s=>`<div class="sl ag v-${s.v||'cols'}">${top()}<div class="eb">${e(s.eyebrow||'Topics')}</div><h2>${e(s.title||'오늘의 다섯 가지 주제')}</h2><ol>${s.cats.map((c,k)=>`<li data-go="${c.at}" class="${s.cur!=null&&k<s.cur?'dn':''}${s.cur!=null&&k===s.cur?' nx':''}"><b>${String(k+1).padStart(2,'0')}</b>${s.v==='path'?'<i></i>':''}<span>${e(c.title)}</span>${c.key?`<em>${e(c.key)}</em>`:''}</li>`).join('')}</ol></div>`,
   cover:s=>`<div class="sl cv${s.key?' hk':''}" data-fit>${top()}<div class="no">${String(s.n).padStart(2,'0')}</div><h2>${e(s.title)}</h2>${s.key?`<div class="kq"><div class="eb">Key Question</div><div>${e(s.key)}</div></div>`:s.desc?`<p>${e(s.desc)}</p>`:''}</div>`,
   q:s=>`<div class="sl q${(s.raw||[]).length?' has-raw':''}" data-fit>${top()}<div class="qn"><span class="nm">${String(s.n).padStart(2,'0')} · </span>${e(s.cat)} &nbsp;—&nbsp; ${s.qi} / ${s.qn}</div><h2><span>${e(s.text)}</span></h2>${(s.raw||[]).length?`<ul class="raw">${s.raw.map(x=>`<li>${e(x)}</li>`).join('')}</ul>`:''}</div>`,
   qall:s=>`<div class="sl qa2" data-fit>${top()}<div class="hd"><b>${String(s.n).padStart(2,'0')}</b><h2>${e(s.cat)}</h2></div>${s.key?`<div class="kqs">${e(s.key)}</div>`:''}<div class="cols ${s.raw.length&&s.qs.length?'':'solo'}${s.qs.length?'':' rawonly'}">${s.qs.length?`<div><div class="sh">Questions</div><ol class="core">${s.qs.map(x=>`<li>${e(x)}</li>`).join('')}</ol></div>`:''}${s.raw.length?`<div class="${s.qs.length?'rc':''}"><div class="sh">참가자 여러분이 보내주신 질문</div><ul class="raw">${s.raw.map(x=>`<li>${e(x)}</li>`).join('')}</ul></div>`:''}</div></div>`,
