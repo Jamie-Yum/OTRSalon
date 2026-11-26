@@ -739,6 +739,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .sh-row code{font-size:.74rem;color:var(--tl);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:var(--bg);padding:.25rem .5rem;border-radius:6px}
 @media(max-width:700px){.sh-row{grid-template-columns:1fr auto auto}.sh-row code{grid-column:1/-1;grid-row:2}}
 .qa-f .qa-kq{border-color:#C9B37E;background:#FBF8F1;font-weight:600}
+.qa-ag{font-size:.84rem;display:inline-flex;align-items:center;gap:.4rem}.qa-ag select{font:inherit;padding:.3rem .5rem;border:1px solid var(--bd);border-radius:8px;background:#fff}
 .qa-opt{display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;margin:0 0 .6rem}.qa-opt .chk{font-size:.84rem}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
@@ -869,7 +870,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 
 <div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="mn-editor" id="mForm"></div></div>
 <footer><p>© 2026 OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON · REPIUM LAB · 내부 공유용</p></footer>
-<script src="stage.js?v=12"></script>
+<script src="stage.js?v=13"></script>
 <script>
 const SU='https://dvlrzbckneucpvlacdll.supabase.co';
 const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE';
@@ -1235,7 +1236,7 @@ async function appAddSave(){const v={};AF.forEach(f=>v[f.k]=($('f_'+f.k).value||
   const b=$('aSave');b.disabled=true;b.textContent='저장 중…';
   try{await rpc('otr_app_add',v);closeModal();await loadApps();}catch(e){alert('저장 실패: '+e.message);b.disabled=false;b.textContent='저장';}}
 /* 진행 장표 */
-let DECKS=[],FILES=[],SHARES=[],runSess=null,qaDraft=null,qaMode='all',qaShow={key:true,core:true,raw:true},talkCache={};
+let DECKS=[],FILES=[],SHARES=[],runSess=null,qaDraft=null,qaMode='all',qaShow={key:true,core:true,raw:true},qaAg='cols',talkCache={};
 async function loadDecks(){[DECKS,FILES,SHARES]=await Promise.all([rpc('otr_list',{tbl:'otr_decks'}),rpc('otr_file_meta',{}).catch(()=>[]),rpc('otr_share_list',{}).catch(()=>[])]);renderRun();}
 async function talkUp(file){if(!file)return;if(file.size>15*1048576)return alert('15MB 이하 PDF만 올릴 수 있습니다.');
   const b64=await new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(',')[1]);r.onerror=no;r.readAsDataURL(file);});
@@ -1284,10 +1285,11 @@ function renderRun(){if(!$('v-run'))return;
     ${(()=>{const c=runCtx(runSess,'farewell');return card('④ 퇴장 안내',`감사 인사${c.notes.length?' · 2부 안내':''}${c.next&&c.next.name?` · 다음 세션(${esc(c.next.name)}) 예고`:''}`,`<button class="mn-btn ghost" onclick="notesEdit('farewell')">2부 안내 문구</button><button class="mn-btn" onclick="runChain(3)">띄우기</button>`);})()}
   </div>${shareBox()}<div id="qaEd"></div>`;
   if(qaDraft)qaRender();}
-function qaEdit(){const qa=deckOf(runSess,'qa');qaMode=(qa&&qa.data.mode)||'all';qaShow={key:!qa||qa.data.showKey!==false,core:!qa||qa.data.showCore!==false,raw:!qa||qa.data.showRaw!==false};qaDraft=JSON.parse(JSON.stringify((qa&&qa.data.cats)||[]));if(!qaDraft.length)qaDraft.push({title:'',desc:'',qs:[],kw:[]});qaRender();$('qaEd').scrollIntoView({behavior:'smooth',block:'start'});}
+function qaEdit(){const qa=deckOf(runSess,'qa');qaMode=(qa&&qa.data.mode)||'all';qaAg=(qa&&qa.data.agenda)||'cols';qaShow={key:!qa||qa.data.showKey!==false,core:!qa||qa.data.showCore!==false,raw:!qa||qa.data.showRaw!==false};qaDraft=JSON.parse(JSON.stringify((qa&&qa.data.cats)||[]));if(!qaDraft.length)qaDraft.push({title:'',desc:'',qs:[],kw:[]});qaRender();$('qaEd').scrollIntoView({behavior:'smooth',block:'start'});}
 function qaRender(){const L=a=>esc((a||[]).join('\n'));
   $('qaEd').innerHTML=`<div class="qa-ed"><div class="qa-h"><h3>Session 0${runSess} 질문 덱 편집</h3><span class="note" style="margin:0">질문·키워드는 한 줄에 하나씩. 질문 아래 <b>↳</b> 로 시작하는 줄은 참가자 원래 질문으로 작게 붙습니다. 키워드 뒤에 <b>|</b> 를 넣으면 작은 설명 줄이 붙습니다.</span></div>
   <div class="qa-opt"><div class="seg">${[['all','주제별 한 장에 모두'],['one','질문마다 한 장씩']].map(([v,l])=>`<button class="${qaMode===v?'on':''}" onclick="qaMode='${v}';qaRender()">${l}</button>`).join('')}</div>
+  <label class="qa-ag">목차 디자인 <select onchange="qaAg=this.value">${[['cols','A 기본 (5칸)'],['list','B 목록형 (Key Question 함께)'],['cards','C 카드형'],['path','D 여정형 (점·선)'],['big','E 큰 숫자형']].map(([v,l])=>`<option value="${v}" ${qaAg===v?'selected':''}>${l}</option>`).join('')}</select></label>
   <label class="chk"><input type="checkbox" ${qaShow.key?'checked':''} onchange="qaShow.key=this.checked"> Key Question 보이기</label>
   <label class="chk"><input type="checkbox" ${qaShow.core||qaMode==='one'?'checked':''} ${qaMode==='one'?'disabled':''} onchange="if(!this.checked&&!qaShow.raw){this.checked=true;return alert('둘 중 하나는 보여야 합니다.');}qaShow.core=this.checked"> Questions 보이기</label>
   <label class="chk"><input type="checkbox" ${qaShow.raw?'checked':''} onchange="if(!this.checked&&!qaShow.core&&qaMode==='all'){this.checked=true;return alert('둘 중 하나는 보여야 합니다.');}qaShow.raw=this.checked"> 참가자 원래 질문 보이기</label></div>
@@ -1299,10 +1301,10 @@ function qaRender(){const L=a=>esc((a||[]).join('\n'));
     <label>연사 답변 키워드<textarea rows="9" oninput="qaDraft[${i}].kw=this.value.split('\n').map(x=>x.trim()).filter(Boolean)">${L(c.kw)}</textarea></label></div></div>
     <span class="tt-btn"><button class="ic" ${i?'':'disabled'} onclick="qaMove(${i},-1)">↑</button><button class="ic" ${i<qaDraft.length-1?'':'disabled'} onclick="qaMove(${i},1)">↓</button><button class="ic del" onclick="qaDraft.splice(${i},1);qaRender()">✕</button></span></div>`).join('')}
   <button class="lnk" onclick="qaDraft.push({title:'',desc:'',qs:[],kw:[]});qaRender()">+ 주제 추가</button>
-  <div class="mn-actions"><button class="mn-btn ghost" style="margin-right:auto" onclick="Stage.qa({mode:qaMode,showKey:qaShow.key,showCore:qaShow.core,showRaw:qaShow.raw,cats:qaDraft},runMeta(runSess))">미리 띄우기</button><button class="mn-btn ghost" onclick="qaDraft=null;renderRun()">닫기</button><button class="mn-btn" id="qaSave" onclick="qaSave()">저장</button></div></div>`;}
+  <div class="mn-actions"><button class="mn-btn ghost" style="margin-right:auto" onclick="Stage.qa({mode:qaMode,agenda:qaAg,showKey:qaShow.key,showCore:qaShow.core,showRaw:qaShow.raw,cats:qaDraft},runMeta(runSess))">미리 띄우기</button><button class="mn-btn ghost" onclick="qaDraft=null;renderRun()">닫기</button><button class="mn-btn" id="qaSave" onclick="qaSave()">저장</button></div></div>`;}
 function qaMove(i,d){const j=i+d;[qaDraft[i],qaDraft[j]]=[qaDraft[j],qaDraft[i]];qaRender();}
 async function qaSave(){const b=$('qaSave');b.disabled=true;b.textContent='저장 중…';const qa=deckOf(runSess,'qa');
-  try{await rpc('otr_save',{tbl:'otr_decks',row_data:{...(qa?{id:qa.id}:{}),season_no:SEASON,salon_no:runSess,kind:'qa',data:{mode:qaMode,showKey:qaShow.key,showCore:qaShow.core,showRaw:qaShow.raw,cats:qaDraft}}});qaDraft=null;await loadDecks();}
+  try{await rpc('otr_save',{tbl:'otr_decks',row_data:{...(qa?{id:qa.id}:{}),season_no:SEASON,salon_no:runSess,kind:'qa',data:{mode:qaMode,agenda:qaAg,showKey:qaShow.key,showCore:qaShow.core,showRaw:qaShow.raw,cats:qaDraft}}});qaDraft=null;await loadDecks();}
   catch(e){alert('저장 실패: '+e.message);b.disabled=false;b.textContent='저장';}}
 async function appUpdate(id,patch){try{await rpc('otr_app_update',{rid:id,...patch});await loadApps();}catch(e){alert('저장 실패: '+e.message);}}
 async function appMemo(id){const r=D.apps.find(x=>x.id===id);const m=prompt('메모',r.memo||'');if(m===null)return;appUpdate(id,{new_memo:m});}

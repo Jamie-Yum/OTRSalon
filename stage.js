@@ -23,6 +23,40 @@ const css=`
 #stg .ag li b{display:block;font-family:'Inter Tight',sans-serif;font-size:72px;font-weight:300;color:#C9B37E;line-height:1}
 #stg .ag li span{display:block;font-size:36px;font-weight:600;margin-top:24px;line-height:1.35}
 #stg .ag li.dn{opacity:.35}
+#stg .ag li.nx b{color:#E2CD94}
+/* 목차 B: 목록형 (Key Question 함께) */
+#stg .ag.v-list h2{margin-bottom:36px}
+#stg .ag.v-list ol{grid-template-columns:1fr;gap:0}
+#stg .ag.v-list li{display:grid;grid-template-columns:130px 560px 1fr;align-items:center;gap:40px;border-top:1px solid rgba(237,230,214,.16);padding:24px 0}
+#stg .ag.v-list li:last-child{border-bottom:1px solid rgba(237,230,214,.16)}
+#stg .ag.v-list li b{font-size:58px;font-weight:200}
+#stg .ag.v-list li span{margin:0;font-size:40px;font-weight:700}
+#stg .ag.v-list li em{font-style:normal;font-size:27px;line-height:1.5;color:rgba(237,230,214,.62)}
+#stg .ag.v-list li.nx{background:linear-gradient(to right,rgba(201,179,126,.12),transparent 70%)}
+/* 목차 C: 카드형 */
+#stg .ag.v-cards ol{gap:24px}
+#stg .ag.v-cards li{border:0;background:#1E1E1E;border-radius:24px;padding:40px 34px;height:440px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+#stg .ag.v-cards li b{font-size:170px;font-weight:700;color:transparent;-webkit-text-stroke:2px #C9B37E;line-height:.9;letter-spacing:-.03em}
+#stg .ag.v-cards li span{font-size:38px;margin:0}
+#stg .ag.v-cards li.nx{background:#C9B37E;color:#141414}#stg .ag.v-cards li.nx b{-webkit-text-stroke:2px #141414}
+/* 목차 D: 여정형 (선 위의 점) */
+#stg .ag.v-path ol{position:relative;gap:0;margin-top:40px}
+#stg .ag.v-path ol::before{content:'';position:absolute;left:10%;right:10%;top:150px;height:2px;background:rgba(237,230,214,.2)}
+#stg .ag.v-path li{border:0;padding:0;text-align:center;position:relative}
+#stg .ag.v-path li b{font-size:84px;font-weight:200}
+#stg .ag.v-path li i{display:block;width:30px;height:30px;border-radius:50%;margin:36px auto 0;background:#141414;border:3px solid #C9B37E;position:relative;z-index:1}
+#stg .ag.v-path li.dn{opacity:1}#stg .ag.v-path li.dn i{background:#C9B37E}#stg .ag.v-path li.dn span,#stg .ag.v-path li.dn b{opacity:.4}
+#stg .ag.v-path li.nx i{width:44px;height:44px;margin-top:29px;box-shadow:0 0 0 12px rgba(201,179,126,.18)}
+#stg .ag.v-path li span{font-size:36px;margin-top:40px;padding:0 18px}
+/* 목차 E: 큰 숫자 배경형 */
+#stg .ag.v-big ol{gap:0}
+#stg .ag.v-big li{border:0;border-left:1px solid rgba(237,230,214,.14);padding:170px 30px 0;height:440px;display:flex;flex-direction:column;justify-content:flex-start;position:relative;overflow:hidden}
+#stg .ag.v-big li:first-child{border-left:0;padding-left:0}#stg .ag.v-big li.dn{opacity:.4}
+#stg .ag.v-big li b{position:absolute;top:0;left:22px;font-size:180px;font-weight:800;color:rgba(201,179,126,.12);line-height:.8;letter-spacing:-.05em}
+#stg .ag.v-big li:first-child b{left:-8px}
+#stg .ag.v-big li span{font-size:36px;margin:0;position:relative}
+#stg .ag.v-big li em{font-style:normal;display:block;font-size:22px;line-height:1.5;color:rgba(237,230,214,.55);margin-top:18px;position:relative}
+#stg .ag.v-big li.nx b{color:rgba(201,179,126,.4)}
 #stg .cv{justify-content:center}
 #stg .cv .no{font-family:'Inter Tight',sans-serif;font-size:220px;font-weight:200;color:#C9B37E;line-height:.85;letter-spacing:-.04em}
 #stg .cv h2{font-size:104px;font-weight:700;margin:48px 0 0;letter-spacing:-.02em}
@@ -116,7 +150,7 @@ const WM='OFF <span class="the">THE</span> RECORD SALON';
 function top(){return `<div class="top"><span class="wm">${WM}</span><span>${e(meta.label||'')}</span></div>`;}
 const R={
   title:s=>`<div class="sl ttl">${top()}<div class="eb">${e(s.eyebrow)}</div><h1>${s.title}</h1>${s.sub?`<p>${s.sub}</p>`:''}</div>`,
-  agenda:s=>`<div class="sl ag">${top()}<div class="eb">${e(s.eyebrow||'Topics')}</div><h2>${e(s.title||'오늘의 다섯 가지 주제')}</h2><ol>${s.cats.map((c,k)=>`<li data-go="${c.at}" class="${s.cur!=null&&k<s.cur?'dn':''}"><b>${String(k+1).padStart(2,'0')}</b><span>${e(c.title)}</span></li>`).join('')}</ol></div>`,
+  agenda:s=>`<div class="sl ag v-${s.v||'cols'}">${top()}<div class="eb">${e(s.eyebrow||'Topics')}</div><h2>${e(s.title||'오늘의 다섯 가지 주제')}</h2><ol>${s.cats.map((c,k)=>`<li data-go="${c.at}" class="${s.cur!=null&&k<s.cur?'dn':''}${s.cur!=null&&k===s.cur?' nx':''}"><b>${String(k+1).padStart(2,'0')}</b>${s.v==='path'?'<i></i>':''}<span>${e(c.title)}</span>${(s.v==='list'||s.v==='big')&&c.key?`<em>${e(c.key)}</em>`:''}</li>`).join('')}</ol></div>`,
   cover:s=>`<div class="sl cv${s.key?' hk':''}" data-fit>${top()}<div class="no">${String(s.n).padStart(2,'0')}</div><h2>${e(s.title)}</h2>${s.key?`<div class="kq"><div class="eb">Key Question</div><div>${e(s.key)}</div></div>`:s.desc?`<p>${e(s.desc)}</p>`:''}</div>`,
   q:s=>`<div class="sl q${(s.raw||[]).length?' has-raw':''}" data-fit>${top()}<div class="qn">${String(s.n).padStart(2,'0')} · ${e(s.cat)} &nbsp;—&nbsp; ${s.qi} / ${s.qn}</div><h2><span>${e(s.text)}</span></h2>${(s.raw||[]).length?`<ul class="raw">${s.raw.map(x=>`<li>${e(x)}</li>`).join('')}</ul>`:''}</div>`,
   qall:s=>`<div class="sl qa2" data-fit>${top()}<div class="hd"><b>${String(s.n).padStart(2,'0')}</b><h2>${e(s.cat)}</h2></div>${s.key?`<div class="kqs">${e(s.key)}</div>`:''}<div class="cols ${s.raw.length&&s.qs.length?'':'solo'}${s.qs.length?'':' rawonly'}">${s.qs.length?`<div><div class="sh">Questions</div><ol class="core">${s.qs.map(x=>`<li>${e(x)}</li>`).join('')}</ol></div>`:''}${s.raw.length?`<div class="${s.qs.length?'rc':''}"><div class="sh">참가자 여러분이 보내주신 질문</div><ul class="raw">${s.raw.map(x=>`<li>${e(x)}</li>`).join('')}</ul></div>`:''}</div></div>`,
@@ -154,7 +188,7 @@ function uniqRaw(list){const key=t=>t.replace(/[^0-9A-Za-z가-힣]/g,'').slice(0
   list.forEach(t=>{const k=key(t),c=t.replace(/\s*\(…\)\s*/g,' … ').trim();if(!m.has(k)||c.length>m.get(k).length)m.set(k,c);});return [...m.values()];}
 function qaSlides(d,m){const L=[],cats=(d.cats||[]).filter(c=>c.title);
   L.push({t:'title',eyebrow:'Q&A Session',title:`질문에서 시작하는<br><span class="gold">대화</span>`,sub:`참가자 여러분이 미리 보내주신 질문을<br>다섯 가지 주제로 묶었습니다.`});
-  const ag={t:'agenda',cats:cats.map(c=>({title:c.title}))};L.push(ag);
+  const ag={t:'agenda',v:d.agenda||'cols',cats:cats.map(c=>({title:c.title,key:d.showKey!==false?c.key:''}))};L.push(ag);
   cats.forEach((c,k)=>{ag.cats[k].at=L.length;const n=k+1;
     const key=d.showKey!==false?c.key:'';L.push({t:'cover',n,title:c.title,desc:c.desc,key});
     const qs=parseQs(c.qs),showQ=d.showCore!==false,showR=d.showRaw!==false;
