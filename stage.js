@@ -176,6 +176,18 @@ const css=`
 #stg .nt ul{list-style:none;padding:0;margin:0;display:grid;gap:30px}
 #stg .nt li{font-size:46px;line-height:1.4;padding-left:56px;position:relative}
 #stg .nt li::before{content:'';position:absolute;left:0;top:.66em;width:22px;height:4px;background:#C9B37E}
+@media print{
+  @page{size:1920px 1080px;margin:0}
+  body.stg-printing>*:not(#stg){display:none!important}
+  body.stg-printing{background:#141414!important;margin:0!important;padding:0!important;display:block!important;min-height:0!important}
+  #stg.print{position:static!important;display:block!important;background:none}
+  #stg.print .x,#stg.print .hint{display:none!important}
+}
+#stg.print{cursor:default}
+#stg.print .stage{position:static;transform:none!important;width:1920px;height:auto;background:none}
+#stg.print .pp{position:relative;width:1920px;height:1080px;overflow:hidden;background:#141414;page-break-after:always;break-after:page;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+#stg.print .pp .sl{opacity:1;transition:none}
+#stg.print .pp .kw li{opacity:1;transform:none}
 #stg .hint{position:fixed;right:20px;bottom:16px;z-index:10000;font:13px/1.5 'Pretendard',sans-serif;color:#888;background:rgba(0,0,0,.6);padding:8px 12px;border-radius:8px;opacity:0;transition:opacity .3s;pointer-events:none}
 #stg.mv .hint{opacity:1}
 #stg .x{position:fixed;right:16px;top:14px;z-index:10001;width:44px;height:44px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#EDE6D6;font-size:20px;cursor:pointer;opacity:0;transition:opacity .3s}
@@ -259,15 +271,31 @@ function farewellSlides(m){const sp=m.speaker||{},L=[];
 const PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
 function pdfLib(){return window.pdfjsLib?Promise.resolve(window.pdfjsLib):new Promise((ok,no)=>{const sc=document.createElement('script');sc.src=PDFJS+'pdf.min.js';
   sc.onload=()=>{pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+'pdf.worker.min.js';ok(pdfjsLib);};sc.onerror=()=>no(new Error('PDF 뷰어를 불러오지 못했습니다'));document.head.appendChild(sc);});}
-function pageSlide(doc,n){return {t:'pdf',render(sl){doc.getPage(n).then(pg=>{const v0=pg.getViewport({scale:1}),sc=Math.min(1920/v0.width,1080/v0.height)*1.5,v=pg.getViewport({scale:sc});
-  const c=document.createElement('canvas');c.width=v.width;c.height=v.height;c.style.width=v.width/1.5+'px';c.style.height=v.height/1.5+'px';sl.appendChild(c);pg.render({canvasContext:c.getContext('2d'),viewport:v});});}};}
+function pageSlide(doc,n){return {t:'pdf',render(sl){return doc.getPage(n).then(pg=>{const v0=pg.getViewport({scale:1}),sc=Math.min(1920/v0.width,1080/v0.height)*1.5,v=pg.getViewport({scale:sc});
+  const c=document.createElement('canvas');c.width=v.width;c.height=v.height;c.style.width=v.width/1.5+'px';c.style.height=v.height/1.5+'px';sl.appendChild(c);return pg.render({canvasContext:c.getContext('2d'),viewport:v}).promise;});}};}
 function talkSlides(m,doc){const sp=m.speaker||{},L=[];
   L.push({t:'hero',eyebrow:'Part 1 · Talk',ss:`Season 1 · Session 0${m.n}`,name:sp.name,role:sp.role,photo:sp.photo});
   if(doc)for(let k=1;k<=doc.numPages;k++)L.push(pageSlide(doc,k));
   L.push({t:'pr',eyebrow:'Next · Q&A',title:`이제, 여러분의 질문으로<br><span class="gold">대화를 이어갑니다</span>`,sub:'미리 보내주신 질문을 다섯 가지 주제로 묶어 연사께 여쭙니다.'});
   return L;}
+async function printParts(parts,title){ensure();clearInterval(loopT);
+  if(document.fullscreenElement)await document.exitFullscreen().catch(()=>{});
+  root.classList.add('on','print');stage.innerHTML='';stage.style.transform='none';
+  const jobs=[];
+  for(const p of parts){const keep=meta;meta=p.meta||{};
+    for(const sl of p.slides){const pp=document.createElement('div');pp.className='pp'+(p.nonum?' nonum':'');pp.innerHTML=R[sl.t](sl);stage.appendChild(pp);
+      const el=pp.querySelector('.sl');el.classList.add('on');if(el.hasAttribute('data-fit'))fitText(el);if(sl.t==='pdf')jobs.push(sl.render(el));}
+    meta=keep;}
+  await Promise.all(jobs);await (document.fonts?document.fonts.ready:Promise.resolve());
+  await Promise.all([...stage.querySelectorAll('img')].map(im=>im.complete?0:new Promise(r=>{im.onload=im.onerror=r;})));
+  const t0=document.title;document.title=title||t0;document.body.classList.add('stg-printing');
+  const done=()=>{document.body.classList.remove('stg-printing');document.title=t0;root.classList.remove('on','print');stage.innerHTML='';fit();removeEventListener('afterprint',done);};
+  addEventListener('afterprint',done);setTimeout(()=>print(),300);}
 window.Stage={
-  async talk(m,file,o){let doc=null,tk=null;if(file){try{const lib=await pdfLib();tk=lib.getDocument({data:await file.arrayBuffer()});tk.onPassword=(cb,why)=>{const pw=prompt(why===2?'비밀번호가 맞지 않습니다. 다시 입력해 주세요.':'이 PDF는 비밀번호가 필요합니다.');if(pw==null){tk.cancelled=1;tk.destroy();}else cb(pw);};doc=await tk.promise;}catch(err){if(tk&&tk.cancelled)return;return alert('PDF를 열지 못했습니다: '+err.message);}}
+  slides:{welcome:m=>welcomeSlides(m),farewell:m=>farewellSlides(m),qa:(d,m)=>qaSlides(d,m||{}),talk:(m,doc)=>talkSlides(m,doc)},
+  print:printParts,
+  async loadPdf(file){let tk=null;try{const lib=await pdfLib();tk=lib.getDocument({data:await file.arrayBuffer()});tk.onPassword=(cb,why)=>{const pw=prompt(why===2?'비밀번호가 맞지 않습니다. 다시 입력해 주세요.':'이 PDF는 비밀번호가 필요합니다.');if(pw==null){tk.cancelled=1;tk.destroy();}else cb(pw);};return await tk.promise;}catch(err){if(tk&&tk.cancelled)return false;alert('PDF를 열지 못했습니다: '+err.message);return false;}},
+  async talk(m,file,o){let doc=null;if(file){doc=await this.loadPdf(file);if(doc===false)return;}
     this.open(talkSlides(m,doc),{label:`SESSION 0${m.n}${m.speaker&&m.speaker.name?' · '+m.speaker.name:''}`},o);},
   open(slides,m,o){ensure();clearInterval(loopT);opt=o||{};meta=m||{};S=slides;i=opt.atEnd?slides.length-1:0;step=opt.atEnd?steps(S[i]):0;stage.classList.toggle('nonum',!!opt.nonum);const was=root.classList.contains('on');root.classList.add('on');fit();draw();if(!was&&!document.fullscreenElement)root.requestFullscreen?.().catch(()=>{});
     if(o&&o.loop&&S.length>1)loopT=setInterval(()=>{i=(i+1)%S.length;step=0;draw();},o.loop);},

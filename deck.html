@@ -20,10 +20,13 @@ h1{font-size:clamp(1.8rem,5vw,2.6rem);font-weight:700;line-height:1.3}
 .c[disabled]{opacity:.35;cursor:default;transform:none;border-color:rgba(237,230,214,.16)}
 .tip{margin-top:1.8rem;font-size:.8rem;color:rgba(237,230,214,.45);line-height:1.7}
 .err{color:#E2A39B}
+.pdfbar{margin-top:1.2rem;font-size:.82rem;color:rgba(237,230,214,.6);display:flex;flex-wrap:wrap;align-items:center;gap:.4rem}
+.pdfbar button{background:none;border:1px solid rgba(237,230,214,.25);color:#EDE6D6;border-radius:999px;padding:.3rem .8rem;font:inherit;font-size:.8rem;cursor:pointer}.pdfbar button:hover{border-color:#C9B37E}
+.pdfbar small{width:100%;font-size:.74rem;color:rgba(237,230,214,.4)}
 @media(max-width:620px){.g{grid-template-columns:1fr}}
 </style></head><body>
 <div class="w" id="app"><div class="wm">OFF <span class="the">THE</span> RECORD SALON</div><p class="sub" style="margin-top:2rem">불러오는 중…</p></div>
-<script src="/stage.js?v=15"></script>
+<script src="/stage.js?v=16"></script>
 <script>
 const SU='https://dvlrzbckneucpvlacdll.supabase.co',SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE';
 const q=new URLSearchParams(location.search),TOK=q.get('k'),$=id=>document.getElementById(id);
@@ -31,10 +34,19 @@ const esc=t=>(t==null?'':String(t)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt
 const call=(fn,b)=>fetch(SU+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'},body:JSON.stringify(b)}).then(async r=>{const j=await r.json().catch(()=>null);if(!r.ok)throw new Error((j&&j.message)||r.status);return j;});
 let D=null,pdf=null;
 const ctx=k=>({n:D.n,date:D.date,timetable:D.timetable||[],speaker:D.speaker||{},next:D.next,notes:((D.decks[k]||{}).notes)||[]});
-async function talk(o){const b=$('b-talk');if(!pdf&&D.pdf){b.querySelector('span').textContent='PDF를 불러오는 중…';
+async function talkPdf(){const b=$('b-talk');if(!pdf&&D.pdf){b.querySelector('span').textContent='PDF를 불러오는 중…';
     try{const s=await call('otr_share_pdf',{tok:TOK});pdf=new Blob([Uint8Array.from(atob(s),c=>c.charCodeAt(0))],{type:'application/pdf'});}catch(e){alert('PDF를 불러오지 못했습니다: '+e.message);}
     b.querySelector('span').textContent=DESC.talk;}
-  Stage.talk(ctx('talk'),pdf,o);}
+  return pdf;}
+async function talk(o){Stage.talk(ctx('talk'),await talkPdf(),o);}
+const META=()=>({speaker:D.speaker&&D.speaker.name?D.speaker.name+' '+(D.speaker.role||'').split(' ').pop():'',label:`SESSION 0${D.n}${D.speaker&&D.speaker.name?' · '+D.speaker.name:''}`});
+async function savePdf(which){const parts=[],lab={label:`SESSION 0${D.n}`},NM={welcome:'입장안내',talk:'강연',qa:'질문',farewell:'퇴장안내'};
+  for(const k of which==='all'?['welcome','talk','qa','farewell']:[which]){
+    if(k==='welcome')parts.push({slides:Stage.slides.welcome(ctx('welcome')),meta:lab});
+    if(k==='farewell')parts.push({slides:Stage.slides.farewell(ctx('farewell')),meta:lab});
+    if(k==='qa'&&((D.decks.qa||{}).cats||[]).some(c=>c.title))parts.push({slides:Stage.slides.qa(D.decks.qa,META()),meta:META(),nonum:D.decks.qa.showNum===false});
+    if(k==='talk'){const b=await talkPdf();let doc=null;if(b){doc=await Stage.loadPdf(b);if(doc===false)return;}parts.push({slides:Stage.slides.talk(ctx('talk'),doc),meta:{label:META().label}});}}
+  Stage.print(parts,`오프더레코드살롱_S${D.season}-0${D.n}_${which==='all'?'전체장표':NM[which]}`);}
 function openDeck(k){const meta={speaker:D.speaker&&D.speaker.name?D.speaker.name+' '+(D.speaker.role||'').split(' ').pop():'',label:`SESSION 0${D.n}${D.speaker&&D.speaker.name?' · '+D.speaker.name:''}`};
   const hasQa=((D.decks.qa||{}).cats||[]).some(c=>c.title),skip=o=>{const f=o.atEnd?o.prev:o.next;if(f)f();};
   Stage.chain([{label:'① 입장 안내',run:o=>Stage.welcome(ctx('welcome'),o)},{label:'② 강연',run:o=>talk(o)},
@@ -49,6 +61,7 @@ const DESC={welcome:'참가자가 입장해 기다리는 동안 띄워 두는 �
   <div class="eb">Season ${D.season} · Session 0${D.n}</div><h1>${sp.name?esc(sp.name)+' '+esc((sp.role||'').split(' ').pop())+'님 세션':'진행 장표'}</h1>
   <p class="sub">당일 현장 화면에 띄울 장표입니다. 카드를 누르면 실제 화면과 같은 모습으로 열립니다.</p>
   <div class="g">${L.map(([k,t,ok])=>`<button class="c" id="b-${k}" ${ok?'':'disabled'} onclick="openDeck('${k}')"><i>${k.toUpperCase()}</i><b>${t}</b><span>${ok?DESC[k]:'아직 준비 중입니다'}</span></button>`).join('')}</div>
+  <div class="pdfbar">PDF로 저장 : ${L.filter(x=>x[2]).map(([k,t])=>`<button onclick="savePdf('${k}')">${t}</button>`).join('')}<button onclick="savePdf('all')">전체 한 파일</button><small>인쇄 창에서 대상을 'PDF로 저장'으로 고르세요.</small></div>
   <p class="tip">→ 또는 클릭: 다음 (마지막 장에서는 다음 순서로 이어짐) · ← 이전 · M 목차 · F 전체 화면 · Esc 닫기<br>휴대폰에서는 화면 오른쪽을 누르면 다음, 왼쪽을 누르면 이전 장으로 넘어갑니다. 가로로 보면 더 크게 보입니다.<br>이 링크는 공유받은 분만 볼 수 있습니다. 외부로 전달하지 말아 주세요.</p>`;
   const d=q.get('d');if(d&&L.some(([k,,ok])=>k===d&&ok))openDeck(d);
 })();
