@@ -755,10 +755,21 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .lv-q span{color:#999;font-size:.8rem;padding-top:.1rem}.lv-q p{line-height:1.55;white-space:pre-wrap}.lv-q.hid p{opacity:.4;text-decoration:line-through}
 .mb-g{margin-top:1.4rem}.mb-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}.mb-h h3{font-size:1rem}.mb-h small{font-weight:400;color:var(--tl);margin-left:.4rem;font-size:.82rem}
 .mb-in{width:100%;border:1px solid transparent;background:none;font:inherit;padding:.3rem .4rem;border-radius:6px;min-width:6rem}.mb-in:hover{border-color:var(--ln,#e5e0d5)}.mb-in:focus{border-color:var(--ac,#C9B37E);background:#fff;outline:none}
-.tg-g{margin:.9rem 0 .3rem;font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:.6rem}.tg-g button{font-size:.78rem}
-.tg-r{display:grid;grid-template-columns:1.4rem 5.5rem 1fr;gap:.5rem;align-items:center;padding:.15rem 0;font-size:.88rem}.tg-r input[type=text]{border:1px solid var(--ln,#e5e0d5);border-radius:6px;padding:.25rem .45rem;font:inherit;font-size:.84rem}
-.tg-list{max-height:48vh;overflow:auto;border-top:1px solid var(--ln,#e5e0d5);border-bottom:1px solid var(--ln,#e5e0d5);padding:.2rem 0 .6rem}
-.tg-pv{display:flex;gap:.6rem;flex-wrap:wrap;margin:.4rem 0 1rem}.tg-pv iframe{border:0;width:153px;height:191px;box-shadow:0 1px 6px rgba(0,0,0,.15)}
+.modal .mn-editor.wide{max-width:1180px}
+.tg-wrap{display:grid;grid-template-columns:170px 1fr;gap:1.5rem;align-items:start}
+.tg-pv{display:flex;flex-direction:column;gap:.6rem;position:sticky;top:0}.tg-pv iframe{border:0;width:153px;height:191px;box-shadow:0 1px 6px rgba(0,0,0,.15);background:#fff}
+.tg-list{max-height:62vh;overflow:auto;border:1px solid var(--ln,#e5e0d5);border-radius:8px;background:var(--wh)}
+.tg-tb{width:100%;border-collapse:collapse;font-size:.88rem}
+.tg-tb th{position:sticky;top:0;z-index:1;background:#F4F3EF;text-align:left;font-size:.72rem;letter-spacing:.06em;color:var(--tl);font-weight:700;padding:.5rem .7rem;border-bottom:1px solid var(--ln,#e5e0d5)}
+.tg-tb td{padding:.3rem .7rem;border-bottom:1px solid #efece5;vertical-align:middle;white-space:nowrap}
+.tg-tb tr:hover td{background:#faf8f3}.tg-tb tr.off td{color:var(--tl)}
+.tg-tb td.g{background:#F4F3EF;font-weight:700;padding:.55rem .7rem;white-space:normal}.tg-tb td.g .lnk{margin-left:.5rem;font-size:.78rem}
+.tg-tb td.g i{display:inline-block;width:.7rem;height:.7rem;border-radius:2px;margin-right:.4rem;vertical-align:-1px}
+.tg-tb input[type=checkbox]{width:1.05rem;height:1.05rem;cursor:pointer}
+.tg-tb td.nm{font-weight:700}.tg-tb td.ps{color:#A8843F;font-size:.8rem}
+.tg-tb td.rl{width:46%}.mn-editor .tg-tb input[type=text]{width:100%;border:1px solid transparent;border-radius:6px;padding:.3rem .5rem;font:inherit;font-size:.86rem;background:transparent}
+.mn-editor .tg-tb input[type=text]:hover{border-color:var(--ln,#e5e0d5)}.mn-editor .tg-tb input[type=text]:focus{border-color:var(--ac);background:#fff;outline:0}
+@media(max-width:900px){.tg-wrap{grid-template-columns:1fr}.tg-pv{flex-direction:row;flex-wrap:wrap;position:static}.tg-list{max-height:50vh}}
 .mb-lg{display:inline-flex;align-items:center;gap:.35rem;font-size:.82rem;font-weight:600;margin-right:.9rem}.mb-lg::before{content:'';width:10px;height:10px;border-radius:50%;background:var(--g)}
 .tbl select.mb-gs{border:0;border-radius:999px;padding:.3rem .7rem;font:inherit;font-size:.8rem;font-weight:600;color:#fff;background:var(--g);cursor:pointer}
 .tbl select.mb-gs option{color:#141414;background:#fff}
@@ -1209,14 +1220,14 @@ function tagOpen(){const n=apSess,apps=(D.apps||[]).filter(inS).filter(r=>r.stat
   const pre=(L,r)=>L.some(x=>(x.attend||{})[n])?!!(r.attend||{})[n]:true;
   const sps=(D.speakers||[]).filter(x=>inS(x)&&x.salon_no&&(x.name||'').trim()).sort((a,b)=>(a.salon_no-b.salon_no)||((a.status==='확정')-(b.status==='확정'))).filter((x,i,A)=>A.findIndex(y=>y.salon_no===x.salon_no&&y.status==='확정')<0||x.status==='확정');
   TAGS=[...sps.map(x=>({g:'연사',name:x.name,role:x.role||'',post:'Session 0'+x.salon_no,on:x.salon_no===n})),...apps.map(r=>({g:'참가자',name:r.name,role:r.role||'',on:pre(apps,r)})),...TAG_K.slice(2).flatMap(g=>mem.filter(r=>r.grp===g).map(r=>({g,name:r.name,post:r.post||'',role:r.role||'',on:pre(mem,r)})))];
-  cur={key:'_tag',id:null};tagRender();$('modal').classList.add('open');}
+  cur={key:'_tag',id:null};$('mForm').classList.add('wide');tagRender();$('modal').classList.add('open');}
 function tagRender(){const n=apSess,on=TAGS.filter(t=>t.on).length+tagBlank;
   $('mForm').innerHTML=`<h3>Session 0${n} 명찰 <small style="font-weight:400;color:var(--tl)">80×100mm · A4 가로 한 장에 6개</small></h3>
   <p class="note" style="margin:-.4rem 0 .6rem">세션은 명단 탭의 '세션 참석'에서 고른 세션입니다. 연사는 시즌 전체 4명이 보이며 이 세션 연사만 미리 체크되어 있습니다. 1부 참석 체크가 있으면 체크한 분만, 하나도 없으면 전원이 미리 골라져 있습니다. 소속·직함은 명찰에만 쓰이도록 여기서 고칠 수 있습니다.</p>
-  <div class="tg-pv">${TAG_K.map(g=>{const t=TAGS.find(x=>x.g===g);return t?`<iframe srcdoc="${esc(tagDoc([t],1))}"></iframe>`:'';}).join('')}</div>
-  <div class="tg-list">${TAG_K.map(g=>{const L=TAGS.map((t,i)=>[t,i]).filter(([t])=>t.g===g);if(!L.length)return '';
-    return `<div class="tg-g">${TAG_G[g]} ${L.filter(([t])=>t.on).length}/${L.length}<button class="lnk" onclick="TAGS.forEach(t=>{if(t.g==='${g}')t.on=true});tagRender()">모두</button><button class="lnk" onclick="TAGS.forEach(t=>{if(t.g==='${g}')t.on=false});tagRender()">해제</button></div>`+
-    L.map(([t,i])=>`<label class="tg-r"><input type="checkbox" ${t.on?'checked':''} onchange="TAGS[${i}].on=this.checked;tagRender()"><b>${esc(t.name)}${t.post?`<small style="display:block;font-weight:400;color:#A8843F;font-size:.72rem">${esc(t.post)}</small>`:''}</b><input type="text" value="${esc(t.role)}" placeholder="소속 / 직함" onchange="TAGS[${i}].role=this.value.trim()"></label>`).join('');}).join('')}</div>
+  <div class="tg-wrap"><div class="tg-pv">${TAG_K.map(g=>{const t=TAGS.find(x=>x.g===g);return t?`<iframe srcdoc="${esc(tagDoc([t],1))}"></iframe>`:'';}).join('')}</div>
+  <div class="tg-list"><table class="tg-tb"><thead><tr><th style="width:2rem"><input type="checkbox" ${TAGS.every(t=>t.on)?'checked':''} title="전체" onchange="const v=this.checked;TAGS.forEach(t=>t.on=v);tagRender()"></th><th>이름</th><th>구분 · 비고</th><th>소속 / 직함 (명찰에 인쇄)</th></tr></thead><tbody>${TAG_K.map(g=>{const L=TAGS.map((t,i)=>[t,i]).filter(([t])=>t.g===g);if(!L.length)return '';
+    return `<tr><td class="g" colspan="4"><i style="background:${{'연사':'#7A2E2E','참가자':'#141414','리피움':'#5F7466','리피움운영':'#C9B37E','운영':'#3D5A80'}[g]}"></i>${TAG_G[g]} <span style="font-weight:400;color:var(--tl)">${L.filter(([t])=>t.on).length}/${L.length}</span><button class="lnk" onclick="TAGS.forEach(t=>{if(t.g==='${g}')t.on=true});tagRender()">모두</button><button class="lnk" onclick="TAGS.forEach(t=>{if(t.g==='${g}')t.on=false});tagRender()">해제</button></td></tr>`+
+    L.map(([t,i])=>`<tr class="${t.on?'':'off'}"><td><input type="checkbox" ${t.on?'checked':''} onchange="TAGS[${i}].on=this.checked;tagRender()"></td><td class="nm">${esc(t.name)}</td><td class="ps">${esc(t.post||'')}</td><td class="rl"><input type="text" value="${esc(t.role)}" placeholder="소속 / 직함" onchange="TAGS[${i}].role=this.value.trim()"></td></tr>`).join('');}).join('')}</tbody></table></div></div>
   <div style="margin-top:.8rem;font-size:.88rem">빈 명찰 (현장 추가용) <input type="number" min="0" max="40" value="${tagBlank}" style="width:4rem;margin-left:.4rem" onchange="tagBlank=Math.max(0,Math.min(40,+this.value||0));tagRender()"> 장</div>
   <div class="mn-actions"><span class="note" style="margin:0 auto 0 0">총 ${on}장 · A4 ${Math.ceil(on/6)||0}장</span><button class="mn-btn ghost" onclick="closeModal()">닫기</button><button class="mn-btn" ${on?'':'disabled'} onclick="tagPrint()">PDF로 저장 · 인쇄</button></div>`;}
 function tagDoc(list,one){const n=apSess,fs=t=>{const l=[...t].length;return l<=3?50:l===4?40:l<=6?30:22;},rs=t=>{const l=[...t].length;return l<=16?20:l<=26?16:13;};
@@ -1289,7 +1300,7 @@ function edit(key,id,preset){
   html+=`<div class="mn-actions">${id?`<button class="mn-btn danger" style="margin-right:auto" onclick="del()">삭제</button>`:''}<button class="mn-btn ghost" onclick="closeModal()">취소</button><button class="mn-btn" id="mSave" onclick="save()">저장</button></div>`;
   $('mForm').innerHTML=html;$('modal').classList.add('open');
 }
-function closeModal(){$('modal').classList.remove('open');cur=null;}
+function closeModal(){$('modal').classList.remove('open');$('mForm').classList.remove('wide');cur=null;}
 async function put(key,row){await rpc('otr_save',{tbl:T[key].tbl,row_data:row});await load(key);}
 async function save(){
   const t=T[cur.key],row={};
