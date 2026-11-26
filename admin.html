@@ -772,7 +772,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 </div></div>
 <header class="admin-bar"><span><b class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</b><small>ADMIN</small></span>
 <nav class="tabs" id="tabs">
-  <button data-tab="notes" class="on">운영 기록</button><button data-tab="apps">신청</button><button data-tab="surveys">설문</button><button data-tab="speakers">일정·연사</button><button data-tab="fees">예산 관리</button><button data-tab="run">진행</button><button data-tab="site">홈페이지</button>
+  <button data-tab="notes" class="on">운영 기록</button><button data-tab="apps">명단</button><button data-tab="surveys">설문</button><button data-tab="speakers">일정·연사</button><button data-tab="fees">예산 관리</button><button data-tab="run">진행</button><button data-tab="site">홈페이지</button>
 </nav><span class="bar-r"><select id="seasonSel" class="season-sel" onchange="setSeason(this.value)" title="시즌 선택"><option value="1">Season 1</option></select><a href="index.html">← 사이트로</a><a href="#" onclick="logout();return false">로그아웃</a></span></header>
 
 <div class="panel" id="p-surveys"><section class="section"><div class="container" id="v-surveys"><div class="mn-empty">불러오는 중…</div></div></section></div>
@@ -1193,15 +1193,16 @@ async function mbDel(id){const r=MB.find(x=>x.id===id);if(!confirm(`${r.name||'�
   try{await rpc('otr_delete',{tbl:'otr_members',rid:id});await loadMembers();}catch(e){alert('삭제 실패: '+e.message);}}
 /* 명찰 80×100mm · A4 가로 한 장에 6개 */
 let TAGS=[],tagBlank=0;
-const TAG_G={'참가자':'참가자','리피움':'리피움','리피움운영':'리피움 · 살롱 운영멤버','운영':'살롱 운영멤버'},TAG_K=['참가자','리피움운영','운영','리피움'];
+const TAG_G={'연사':'연사','참가자':'참가자','리피움':'리피움','리피움운영':'리피움 · 살롱 운영멤버','운영':'살롱 운영멤버'},TAG_K=['연사','참가자','리피움운영','운영','리피움'];
 function tagOpen(){const n=apSess,apps=(D.apps||[]).filter(inS).filter(r=>r.status==='확정'&&(/Season|4회/.test(r.pass||'')||r.salon_no===n)).sort((a,b)=>a.name.localeCompare(b.name,'ko'));
   const mem=MB.filter(inS).filter(r=>(r.name||'').trim()).sort((a,b)=>(a.sort||0)-(b.sort||0));
   const pre=(L,r)=>L.some(x=>(x.attend||{})[n])?!!(r.attend||{})[n]:true;
-  TAGS=[...apps.map(r=>({g:'참가자',name:r.name,role:r.role||'',on:pre(apps,r)})),...TAG_K.slice(1).flatMap(g=>mem.filter(r=>r.grp===g).map(r=>({g,name:r.name,role:r.role||'',on:pre(mem,r)})))];
+  const sp=runSp(n);
+  TAGS=[...(sp.name?[{g:'연사',name:sp.name,role:sp.role||'',on:true}]:[]),...apps.map(r=>({g:'참가자',name:r.name,role:r.role||'',on:pre(apps,r)})),...TAG_K.slice(2).flatMap(g=>mem.filter(r=>r.grp===g).map(r=>({g,name:r.name,role:r.role||'',on:pre(mem,r)})))];
   cur={key:'_tag',id:null};tagRender();$('modal').classList.add('open');}
 function tagRender(){const n=apSess,on=TAGS.filter(t=>t.on).length+tagBlank;
   $('mForm').innerHTML=`<h3>Session 0${n} 명찰 <small style="font-weight:400;color:var(--tl)">80×100mm · A4 가로 한 장에 6개</small></h3>
-  <p class="note" style="margin:-.4rem 0 .6rem">세션은 신청 화면의 '세션 참석'에서 고른 세션입니다. 1부 참석 체크가 있으면 체크한 분만, 하나도 없으면 전원이 미리 골라져 있습니다. 소속·직함은 명찰에만 쓰이도록 여기서 고칠 수 있습니다.</p>
+  <p class="note" style="margin:-.4rem 0 .6rem">세션은 명단 탭의 '세션 참석'에서 고른 세션입니다. 1부 참석 체크가 있으면 체크한 분만, 하나도 없으면 전원이 미리 골라져 있습니다. 소속·직함은 명찰에만 쓰이도록 여기서 고칠 수 있습니다.</p>
   <div class="tg-pv">${TAG_K.map(g=>{const t=TAGS.find(x=>x.g===g);return t?`<iframe srcdoc="${esc(tagDoc([t],1))}"></iframe>`:'';}).join('')}</div>
   <div class="tg-list">${TAG_K.map(g=>{const L=TAGS.map((t,i)=>[t,i]).filter(([t])=>t.g===g);if(!L.length)return '';
     return `<div class="tg-g">${TAG_G[g]} ${L.filter(([t])=>t.on).length}/${L.length}<button class="lnk" onclick="TAGS.forEach(t=>{if(t.g==='${g}')t.on=true});tagRender()">모두</button><button class="lnk" onclick="TAGS.forEach(t=>{if(t.g==='${g}')t.on=false});tagRender()">해제</button></div>`+
@@ -1223,7 +1224,7 @@ function tagDoc(list,one){const n=apSess,fs=t=>{const l=[...t].length;return l<=
 .nm{font-weight:800;letter-spacing:.06em;line-height:1.15}.rl{font-size:10pt;color:#555;margin-top:3mm;line-height:1.4;max-height:4.2em;overflow:hidden}
 .ft{height:15mm;display:flex;flex-direction:column;justify-content:center;gap:1mm;padding:0 7mm;font-family:'Inter Tight','Pretendard',sans-serif}
 .ft b{font-family:'Pretendard',sans-serif;font-size:10pt;font-weight:700;letter-spacing:.08em}.ft span{font-size:6.5pt;letter-spacing:.16em;text-transform:uppercase;opacity:.85}
-.g-참가자 .ft{background:#141414;color:#C9B37E}.g-리피움 .ft{background:#5F7466;color:#fff}.g-리피움운영 .ft{background:#C9B37E;color:#141414}.g-운영 .ft{background:#3D5A80;color:#fff}
+.g-연사 .ft{background:#7A2E2E;color:#fff}.g-참가자 .ft{background:#141414;color:#C9B37E}.g-리피움 .ft{background:#5F7466;color:#fff}.g-리피움운영 .ft{background:#C9B37E;color:#141414}.g-운영 .ft{background:#3D5A80;color:#fff}
 ${one?'.t{zoom:.5;outline:0}':''}
 @media print{body{background:#fff}.pg{margin:0}}</style></head><body>${one?card(list[0]):pages.map(p=>`<div class="pg">${p.map(card).join('')}</div>`).join('')}</body></html>`;}
 function tagPrint(){const list=[...TAGS.filter(t=>t.on),...Array.from({length:tagBlank},()=>({g:'참가자',name:'',role:''}))];
@@ -1530,7 +1531,7 @@ const RENDER={
       <td class="nw">${r.refunded?'<s>'+won(B.fee(r))+'</s>':won(B.fee(r))}${isJr(r)?' <small style="color:var(--tl)">주니어</small>':''}</td>
       <td><input type="date" value="${r.paid_date||''}" onchange="appUpdate('${r.id}',{new_paid_date:this.value})"></td>
       <td><input type="checkbox" ${r.refunded?'checked':''} onchange="appUpdate('${r.id}',{new_refunded:this.checked})"></td></tr>`).join('')
-      ||'<tr><td colspan="7" style="text-align:center;color:var(--tl);padding:2rem">확정(입금 완료)된 참가자가 없습니다. 신청 탭에서 상태를 확정으로 바꾸면 여기에 나타납니다.</td></tr>'
+      ||'<tr><td colspan="7" style="text-align:center;color:var(--tl);padding:2rem">확정(입금 완료)된 참가자가 없습니다. 명단 탭에서 상태를 확정으로 바꾸면 여기에 나타납니다.</td></tr>'
     }</tbody>`;
     const L=B.fees.sort((a,b)=>(a.salon_no||9)-(b.salon_no||9)||b.created_at.localeCompare(a.created_at));
     const sum=k=>L.filter(r=>r.status!=='보류').reduce((t,r)=>t+(r[k]||0),0);
