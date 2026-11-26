@@ -1207,12 +1207,12 @@ const TAG_G={'연사':'연사','참가자':'참가자','리피움':'리피움','
 function tagOpen(){const n=apSess,apps=(D.apps||[]).filter(inS).filter(r=>r.status==='확정'&&(/Season|4회/.test(r.pass||'')||r.salon_no===n)).sort((a,b)=>a.name.localeCompare(b.name,'ko'));
   const mem=MB.filter(inS).filter(r=>(r.name||'').trim()).sort((a,b)=>(a.sort||0)-(b.sort||0));
   const pre=(L,r)=>L.some(x=>(x.attend||{})[n])?!!(r.attend||{})[n]:true;
-  const sp=runSp(n);
-  TAGS=[...(sp.name?[{g:'연사',name:sp.name,role:sp.role||'',on:true}]:[]),...apps.map(r=>({g:'참가자',name:r.name,role:r.role||'',on:pre(apps,r)})),...TAG_K.slice(2).flatMap(g=>mem.filter(r=>r.grp===g).map(r=>({g,name:r.name,post:r.post||'',role:r.role||'',on:pre(mem,r)})))];
+  const sps=(D.speakers||[]).filter(x=>inS(x)&&x.salon_no&&(x.name||'').trim()).sort((a,b)=>(a.salon_no-b.salon_no)||((a.status==='확정')-(b.status==='확정'))).filter((x,i,A)=>A.findIndex(y=>y.salon_no===x.salon_no&&y.status==='확정')<0||x.status==='확정');
+  TAGS=[...sps.map(x=>({g:'연사',name:x.name,role:x.role||'',post:'Session 0'+x.salon_no,on:x.salon_no===n})),...apps.map(r=>({g:'참가자',name:r.name,role:r.role||'',on:pre(apps,r)})),...TAG_K.slice(2).flatMap(g=>mem.filter(r=>r.grp===g).map(r=>({g,name:r.name,post:r.post||'',role:r.role||'',on:pre(mem,r)})))];
   cur={key:'_tag',id:null};tagRender();$('modal').classList.add('open');}
 function tagRender(){const n=apSess,on=TAGS.filter(t=>t.on).length+tagBlank;
   $('mForm').innerHTML=`<h3>Session 0${n} 명찰 <small style="font-weight:400;color:var(--tl)">80×100mm · A4 가로 한 장에 6개</small></h3>
-  <p class="note" style="margin:-.4rem 0 .6rem">세션은 명단 탭의 '세션 참석'에서 고른 세션입니다. 1부 참석 체크가 있으면 체크한 분만, 하나도 없으면 전원이 미리 골라져 있습니다. 소속·직함은 명찰에만 쓰이도록 여기서 고칠 수 있습니다.</p>
+  <p class="note" style="margin:-.4rem 0 .6rem">세션은 명단 탭의 '세션 참석'에서 고른 세션입니다. 연사는 시즌 전체 4명이 보이며 이 세션 연사만 미리 체크되어 있습니다. 1부 참석 체크가 있으면 체크한 분만, 하나도 없으면 전원이 미리 골라져 있습니다. 소속·직함은 명찰에만 쓰이도록 여기서 고칠 수 있습니다.</p>
   <div class="tg-pv">${TAG_K.map(g=>{const t=TAGS.find(x=>x.g===g);return t?`<iframe srcdoc="${esc(tagDoc([t],1))}"></iframe>`:'';}).join('')}</div>
   <div class="tg-list">${TAG_K.map(g=>{const L=TAGS.map((t,i)=>[t,i]).filter(([t])=>t.g===g);if(!L.length)return '';
     return `<div class="tg-g">${TAG_G[g]} ${L.filter(([t])=>t.on).length}/${L.length}<button class="lnk" onclick="TAGS.forEach(t=>{if(t.g==='${g}')t.on=true});tagRender()">모두</button><button class="lnk" onclick="TAGS.forEach(t=>{if(t.g==='${g}')t.on=false});tagRender()">해제</button></div>`+
@@ -1220,7 +1220,7 @@ function tagRender(){const n=apSess,on=TAGS.filter(t=>t.on).length+tagBlank;
   <div style="margin-top:.8rem;font-size:.88rem">빈 명찰 (현장 추가용) <input type="number" min="0" max="40" value="${tagBlank}" style="width:4rem;margin-left:.4rem" onchange="tagBlank=Math.max(0,Math.min(40,+this.value||0));tagRender()"> 장</div>
   <div class="mn-actions"><span class="note" style="margin:0 auto 0 0">총 ${on}장 · A4 ${Math.ceil(on/6)||0}장</span><button class="mn-btn ghost" onclick="closeModal()">닫기</button><button class="mn-btn" ${on?'':'disabled'} onclick="tagPrint()">PDF로 저장 · 인쇄</button></div>`;}
 function tagDoc(list,one){const n=apSess,fs=t=>{const l=[...t].length;return l<=3?50:l===4?40:l<=6?30:22;},rs=t=>{const l=[...t].length;return l<=16?20:l<=26?16:13;};
-  const card=t=>`<div class="t g-${t.g}"><div class="hd">OFF <span class="the">THE</span> RECORD SALON</div><div class="bd">${t.post?`<div class="ps">${esc(t.post)}</div>`:''}<div class="nm" style="font-size:${fs(t.name)}pt">${esc(t.name)||'&nbsp;'}</div><div class="rl" style="font-size:${rs(t.role||'')}pt">${esc(t.role)||'&nbsp;'}</div></div><div class="ft"><b>${TAG_G[t.g]}</b><span>Season ${SEASON} · Session 0${n}</span></div></div>`;
+  const card=t=>`<div class="t g-${t.g}"><div class="hd">OFF <span class="the">THE</span> RECORD SALON</div><div class="bd">${t.post&&t.g!=='연사'?`<div class="ps">${esc(t.post)}</div>`:''}<div class="nm" style="font-size:${fs(t.name)}pt">${esc(t.name)||'&nbsp;'}</div><div class="rl" style="font-size:${rs(t.role||'')}pt">${esc(t.role)||'&nbsp;'}</div></div><div class="ft"><b>${TAG_G[t.g]}</b><span>Season ${SEASON} · Session 0${n}</span></div></div>`;
   const pages=[];for(let i=0;i<list.length;i+=6)pages.push(list.slice(i,i+6));
   return `<!doctype html><html><head><meta charset="utf-8"><title>오프더레코드살롱_S${SEASON}-0${n}_명찰</title>
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;800&display=swap" rel="stylesheet">
