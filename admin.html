@@ -265,6 +265,7 @@ footer p{font-size:.76rem;color:rgba(255,255,255,.25);letter-spacing:.04em;text-
 .tbl tr:last-child td{border-bottom:none}
 .tbl tfoot td{font-weight:700;background:var(--bg)}
 .tbl select{font:inherit;font-size:.82rem;padding:.25rem .4rem;border:1px solid var(--bd);border-radius:6px;background:var(--wh)}
+.role-ed{cursor:text;border-bottom:1px dashed transparent}.role-ed:hover{border-bottom-color:var(--ac)}
 .lnk{background:none;border:none;color:var(--ac);font:inherit;font-size:.82rem;font-weight:600;cursor:pointer}
 .kanban{display:grid;grid-template-columns:repeat(5,minmax(170px,1fr));gap:.75rem;margin-top:1.5rem;overflow-x:auto}
 .kcol{background:rgba(20,20,20,.04);border-radius:var(--r-sm);padding:.75rem;min-height:120px}
@@ -1452,6 +1453,7 @@ async function qaSave(){const b=$('qaSave');b.disabled=true;b.textContent='저�
   try{await rpc('otr_save',{tbl:'otr_decks',row_data:{...(qa?{id:qa.id}:{}),season_no:SEASON,salon_no:runSess,kind:'qa',data:{mode:qaMode,agenda:qaAg,showNum:qaShow.num,showKey:qaShow.key,showCore:qaShow.core,showRaw:qaShow.raw,cats:qaDraft}}});qaDraft=null;await loadDecks();}
   catch(e){alert('저장 실패: '+e.message);b.disabled=false;b.textContent='저장';}}
 async function appUpdate(id,patch){try{await rpc('otr_app_update',{rid:id,...patch});await loadApps();}catch(e){alert('저장 실패: '+e.message);}}
+async function appRole(id){const r=D.apps.find(x=>x.id===id);const v=prompt(r.name+' 님의 소속 / 역할',r.role||'');if(v===null||v.trim()===(r.role||''))return;appUpdate(id,{new_role:v.trim()});}
 async function appMemo(id){const r=D.apps.find(x=>x.id===id);const m=prompt('메모',r.memo||'');if(m===null)return;appUpdate(id,{new_memo:m});}
 async function appDel(id){if(!confirm('이 신청을 삭제할까요? 되돌릴 수 없습니다.'))return;try{await rpc('otr_app_delete',{rid:id});await loadApps();}catch(e){alert('삭제 실패: '+e.message);}}
 function appCsv(){
@@ -1503,7 +1505,7 @@ const RENDER={
     $('v-apps').innerHTML=`<thead><tr><th style="width:34px"><input type="checkbox" id="selAll" onchange="appToggleAll(this.checked)" title="전체 선택"></th><th>접수일</th>${sortTh('name','이름')}<th>소속 / 역할</th><th>연락처</th>${sortTh('inviter','초대자')}${sortTh('status','상태')}<th class="nw ap-th">참석 <select onchange="apSess=+this.value;RENDER.apps()" title="세션 선택">${[1,2,3,4].map(n=>`<option value="${n}" ${n===apSess?'selected':''}>S0${n}</option>`).join('')}</select></th><th>요즘 관심사</th><th>주요 커리어</th><th></th></tr></thead><tbody>${
       L.map(r=>{const m=intro(r.question);const has=Object.keys(m).length;
       return `<tr class="app-row as${APP_STATUS.indexOf(r.status)}${appSel.has(r.id)?' sel':''}"><td><input type="checkbox" ${appSel.has(r.id)?'checked':''} onchange="appToggle('${r.id}',this.checked);this.closest('tr').classList.toggle('sel',this.checked)"></td><td class="nw" style="color:var(--tl)">${kst(r.created_at).slice(5).replace('-','/')}</td>
-      <td class="nw"><b>${esc(r.name)}</b></td><td>${one(r.role)}</td><td class="nw">${esc(r.phone)}</td><td class="nw">${invTag(r.inviter)}</td>
+      <td class="nw"><b>${esc(r.name)}</b></td><td><span class="ellip role-ed" title="${esc(r.role)} · 클릭해서 수정" onclick="appRole('${r.id}')">${esc(r.role)||'<i style="color:var(--tl)">소속 입력</i>'}</span></td><td class="nw">${esc(r.phone)}</td><td class="nw">${invTag(r.inviter)}</td>
       <td><select class="st-sel" onchange="this.closest('tr').className=this.closest('tr').className.replace(/\bas\d/,'as'+APP_STATUS.indexOf(this.value));appUpdate('${r.id}',{new_status:this.value})">${APP_STATUS.map(o=>`<option ${o===r.status?'selected':''}>${o}</option>`).join('')}</select></td>
       <td class="ap-td nw">${[['attend','1부'],['after_party','2부']].map(([k,l])=>`<label class="ap-ck" title="Session 0${apSess} ${l} 참석"><input type="checkbox" ${(r[k]||{})[apSess]?'checked':''} onchange="apSet('${r.id}',this.checked,'${k}')"><span></span><i>${l}</i></label>`).join('')}</td>
       <td>${one(has?(m['요즘 관심사']||''):r.question)}</td><td>${one(m['주요 커리어']||m['커리어']||'')}</td>
