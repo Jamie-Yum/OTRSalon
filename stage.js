@@ -47,6 +47,7 @@ const css=`
 #stg .qa2 ol.core li::before{content:'Q' counter(q);position:absolute;left:0;top:.18em;font-family:'Inter Tight',sans-serif;font-size:.62em;font-weight:400;color:#C9B37E}
 #stg .qa2 .raw{list-style:none;padding:0;margin:0;display:grid;gap:18px;font-size:24px}
 #stg .qa2 .rc{border-left:1px solid rgba(237,230,214,.14);padding-left:56px}
+#stg .qa2 .cols.rawonly .raw{font-size:34px;gap:26px}
 #stg .kw{justify-content:center}
 #stg .kw h2{font-size:56px;font-weight:700;margin:20px 0 56px}
 #stg .kw ul{list-style:none;padding:0;margin:0;display:grid;gap:26px}
@@ -111,7 +112,7 @@ const R={
   agenda:s=>`<div class="sl ag">${top()}<div class="eb">${e(s.eyebrow||'Topics')}</div><h2>${e(s.title||'오늘의 다섯 가지 주제')}</h2><ol>${s.cats.map((c,k)=>`<li data-go="${c.at}" class="${s.cur!=null&&k<s.cur?'dn':''}"><b>${String(k+1).padStart(2,'0')}</b><span>${e(c.title)}</span></li>`).join('')}</ol></div>`,
   cover:s=>`<div class="sl cv">${top()}<div class="no">${String(s.n).padStart(2,'0')}</div><h2>${e(s.title)}</h2>${s.desc?`<p>${e(s.desc)}</p>`:''}</div>`,
   q:s=>`<div class="sl q${(s.raw||[]).length?' has-raw':''}" data-fit>${top()}<div class="qn">${String(s.n).padStart(2,'0')} · ${e(s.cat)} &nbsp;—&nbsp; ${s.qi} / ${s.qn}</div><h2><span>${e(s.text)}</span></h2>${(s.raw||[]).length?`<ul class="raw">${s.raw.map(x=>`<li>${e(x)}</li>`).join('')}</ul>`:''}</div>`,
-  qall:s=>`<div class="sl qa2" data-fit>${top()}<div class="hd"><b>${String(s.n).padStart(2,'0')}</b><h2>${e(s.cat)}</h2></div><div class="cols ${s.raw.length?'':'solo'}"><div><div class="sh">Questions</div><ol class="core">${s.qs.map(x=>`<li>${e(x)}</li>`).join('')}</ol></div>${s.raw.length?`<div class="rc"><div class="sh">참가자 여러분이 보내주신 질문</div><ul class="raw">${s.raw.map(x=>`<li>${e(x)}</li>`).join('')}</ul></div>`:''}</div></div>`,
+  qall:s=>`<div class="sl qa2" data-fit>${top()}<div class="hd"><b>${String(s.n).padStart(2,'0')}</b><h2>${e(s.cat)}</h2></div><div class="cols ${s.raw.length&&s.qs.length?'':'solo'}${s.qs.length?'':' rawonly'}">${s.qs.length?`<div><div class="sh">Questions</div><ol class="core">${s.qs.map(x=>`<li>${e(x)}</li>`).join('')}</ol></div>`:''}${s.raw.length?`<div class="${s.qs.length?'rc':''}"><div class="sh">참가자 여러분이 보내주신 질문</div><ul class="raw">${s.raw.map(x=>`<li>${e(x)}</li>`).join('')}</ul></div>`:''}</div></div>`,
   kw:s=>`<div class="sl kw">${top()}<div class="eb">${String(s.n).padStart(2,'0')} · Keywords</div><h2>${e(s.cat)}</h2><ul class="${s.items.length>5?'many':''}">${s.items.map(x=>{const [a,b]=String(x).split('|');return `<li>${e(a.trim())}${b?`<small>${e(b.trim())}</small>`:''}</li>`}).join('')}</ul></div>`,
   hero:s=>`<div class="sl hero">${top()}${s.photo?`<div class="ph" style="background-image:url('${e(s.photo)}')"></div>`:''}<div class="eb">${e(s.eyebrow||'')}</div><div class="wmb" style="margin-top:28px">OFF <span class="the">THE</span><br>RECORD SALON</div><div class="ss">${e(s.ss||'')}</div>${s.name?`<div class="who"><b>${e(s.name)}</b><span>${e(s.role||'')}</span></div>`:''}</div>`,
   brand:s=>`<div class="sl brand"><div class="bw">OFF <span class="the">THE</span> RECORD SALON</div><div class="ln"></div><div class="ss">${e(s.ss||'')}</div>${s.wh?`<div class="wh">${e(s.wh)}</div>`:''}</div>`,
@@ -149,8 +150,9 @@ function qaSlides(d,m){const L=[],cats=(d.cats||[]).filter(c=>c.title);
   const ag={t:'agenda',cats:cats.map(c=>({title:c.title}))};L.push(ag);
   cats.forEach((c,k)=>{ag.cats[k].at=L.length;const n=k+1;
     L.push({t:'cover',n,title:c.title,desc:c.desc});
-    const qs=parseQs(c.qs);if(d.mode==='one')qs.forEach((x,j)=>L.push({t:'q',n,cat:c.title,qi:j+1,qn:qs.length,text:x.q,raw:uniqRaw(x.raw)}));
-    else if(qs.length)L.push({t:'qall',n,cat:c.title,qs:qs.map(x=>x.q),raw:uniqRaw(qs.flatMap(x=>x.raw))});
+    const qs=parseQs(c.qs),showQ=d.showCore!==false,showR=d.showRaw!==false;
+    if(d.mode==='one')qs.forEach((x,j)=>L.push({t:'q',n,cat:c.title,qi:j+1,qn:qs.length,text:x.q,raw:showR?uniqRaw(x.raw):[]}));
+    else{const core=showQ?qs.map(x=>x.q):[],raw=showR?uniqRaw(qs.flatMap(x=>x.raw)):[];if(core.length||raw.length)L.push({t:'qall',n,cat:c.title,qs:core,raw});}
     const kw=(c.kw||[]).filter(Boolean);if(kw.length)L.push({t:'kw',n,cat:c.title,items:kw});
     if(k<cats.length-1)L.push({...ag,cur:k+1});});
   L.push({t:'title',eyebrow:'Thank you',title:`오늘의 질문은<br><span class="gold">이 자리에</span> 남겨 둡니다`,sub:m.speaker?`${e(m.speaker)}님, 솔직한 이야기 감사합니다.`:''});
