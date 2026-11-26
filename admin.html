@@ -378,7 +378,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .lg,.hprev-text b{letter-spacing:.02em!important;word-spacing:-.18em!important}
 
 /* THE: 옆 단어의 2/3 크기 */
-.the{font-size:.66em}
+.the{font-size:.66em}.sl{margin-left:.45em}
 
 /* 신청 목록: 한 화면에 보기 */
 #v-apps td{padding:.55rem .75rem;vertical-align:middle;font-size:.86rem}
@@ -1231,7 +1231,7 @@ function tagRender(){const n=apSess,on=TAGS.filter(t=>t.on).length+tagBlank;
   <div style="margin-top:.8rem;font-size:.88rem">빈 명찰 (현장 추가용) <input type="number" min="0" max="40" value="${tagBlank}" style="width:4rem;margin-left:.4rem" onchange="tagBlank=Math.max(0,Math.min(40,+this.value||0));tagRender()"> 장</div>
   <div class="mn-actions"><span class="note" style="margin:0 auto 0 0">총 ${on}장 · A4 ${Math.ceil(on/6)||0}장</span><button class="mn-btn ghost" onclick="closeModal()">닫기</button><button class="mn-btn" ${on?'':'disabled'} onclick="tagPrint()">PDF로 저장 · 인쇄</button></div>`;}
 function tagDoc(list,one){const n=apSess,fs=t=>{const l=[...t].length;return l<=3?50:l===4?40:l<=6?30:22;},rs=t=>{const l=[...t].length;return l<=16?20:l<=26?16:13;};
-  const card=t=>`<div class="t g-${t.g}"><div class="hd">OFF <span class="the">THE</span> RECORD SALON</div><div class="bd">${t.post&&t.g!=='연사'?`<div class="ps">${esc(t.post)}</div>`:''}<div class="nm" style="font-size:${fs(t.name)}pt">${esc(t.name)||'&nbsp;'}</div><div class="rl" style="font-size:${rs(t.role||'')}pt">${esc(t.role)||'&nbsp;'}</div></div><div class="ft"><b>${TAG_G[t.g]}</b><span>Season ${SEASON}</span></div></div>`;
+  const card=t=>`<div class="t g-${t.g}"><div class="hd">OFF <span class="the">THE</span> RECORD <span class="sl">SALON</span></div><div class="bd">${t.post&&t.g!=='연사'?`<div class="ps">${esc(t.post)}</div>`:''}<div class="nm" style="font-size:${fs(t.name)}pt">${esc(t.name)||'&nbsp;'}</div><div class="rl" style="font-size:${rs(t.role||'')}pt">${esc(t.role)||'&nbsp;'}</div></div><div class="ft"><b>${TAG_G[t.g]}</b><span>Season ${SEASON}</span></div></div>`;
   const pages=[];for(let i=0;i<list.length;i+=6)pages.push(list.slice(i,i+6));
   return `<!doctype html><html><head><meta charset="utf-8"><title>오프더레코드살롱_S${SEASON}_명찰</title>
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;800&display=swap" rel="stylesheet">
