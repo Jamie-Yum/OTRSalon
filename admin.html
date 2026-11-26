@@ -763,6 +763,16 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .tbl select.mb-gs{border:0;border-radius:999px;padding:.3rem .7rem;font:inherit;font-size:.8rem;font-weight:600;color:#fff;background:var(--g);cursor:pointer}
 .tbl select.mb-gs option{color:#141414;background:#fff}
 .g-리피움{--g:#5F7466}.g-리피움운영{--g:#B8994F}.g-운영{--g:#3D5A80}
+#v-mbt{min-width:0;table-layout:auto;font-size:.86rem}
+#v-mbt td,#v-mbt th{padding:.5rem .55rem;vertical-align:middle}
+#v-mbt .nw{white-space:nowrap}
+#v-mbt .mb-in{padding:.18rem .3rem;min-width:4.5rem;font-size:.86rem}
+#v-mbt tbody tr:hover td{background:rgba(20,20,20,.02)}
+#v-mbt select.mb-gs{padding:.2rem .55rem;font-size:.74rem}
+#v-mbt .ic{width:28px;height:28px;border:0;border-radius:50%;background:transparent;color:var(--tl);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+#v-mbt .ic:hover{background:#FBEDED;color:#A12A2A}#v-mbt .ic svg{width:17px;height:17px;pointer-events:none}
+#v-mbt td:last-child{text-align:right;width:1%}
+.mb-g{margin-top:.6rem}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
   <h2><span class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span><small>ADMIN</small></h2>
@@ -1177,7 +1187,7 @@ const MB_G=[['리피움','리피움 멤버'],['리피움운영','리피움 · �
 const mbOrd=g=>{const k=MB_G.findIndex(x=>x[0]===g);return k<0?9:k;};
 function renderMembers(){const el=$('v-members');if(!el)return;const L=MB.filter(inS).sort((a,b)=>mbOrd(a.grp)-mbOrd(b.grp)||(a.sort||0)-(b.sort||0)||a.created_at.localeCompare(b.created_at)),c=k=>L.filter(r=>(r[k]||{})[apSess]).length;
   el.innerHTML=`<div class="mb-g"><div class="mb-h"><h3>${MB_G.map(([g,t])=>`<span class="mb-lg g-${g}">${t} ${L.filter(r=>r.grp===g).length}</span>`).join('')}<small>총 ${L.length}명 · S0${apSess} 1부 ${c('attend')} · 2부 ${c('after_party')}</small></h3><button class="mn-btn ghost" onclick="mbAdd('리피움')">+ 추가</button></div>
-  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>구분</th><th>이름</th><th>소속 / 직함</th><th>연락처</th><th class="nw">S0${apSess} 참석</th><th>메모</th><th></th></tr></thead><tbody>${L.map(r=>`<tr data-mb="${r.id}">
+  <div class="tbl-wrap" style="margin-top:.6rem"><table class="tbl" id="v-mbt"><thead><tr><th>구분</th><th>이름</th><th>소속 / 직함</th><th>연락처</th><th class="nw">S0${apSess} 참석</th><th>메모</th><th></th></tr></thead><tbody>${L.map(r=>`<tr data-mb="${r.id}">
   <td class="nw"><select class="mb-gs g-${esc(r.grp)}" onchange="this.className='mb-gs g-'+this.value;mbSave('${r.id}',{grp:this.value});renderMembers()">${MB_G.map(([g,t])=>`<option value="${g}" ${g===r.grp?'selected':''}>${t}</option>`).join('')}</select></td>
   ${['name','role','phone'].map(k=>`<td><input class="mb-in" value="${esc(r[k]||'')}" placeholder="${MB_PH[k]}" onchange="mbSave('${r.id}',{${k}:this.value.trim()})"></td>`).join('')}
   <td class="ap-td nw">${[['attend','1부'],['after_party','2부']].map(([k,l])=>`<label class="ap-ck" title="Session 0${apSess} ${l} 참석"><input type="checkbox" ${(r[k]||{})[apSess]?'checked':''} onchange="mbAtt('${r.id}','${k}',this.checked)"><span></span><i>${l}</i></label>`).join('')}</td>
