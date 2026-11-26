@@ -738,6 +738,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .sh-list{display:flex;flex-direction:column;gap:.35rem}.sh-row{display:grid;grid-template-columns:8rem 1fr auto auto;gap:.7rem;align-items:center;font-size:.82rem}
 .sh-row code{font-size:.74rem;color:var(--tl);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:var(--bg);padding:.25rem .5rem;border-radius:6px}
 @media(max-width:700px){.sh-row{grid-template-columns:1fr auto auto}.sh-row code{grid-column:1/-1;grid-row:2}}
+.qa-f .qa-kq{border-color:#C9B37E;background:#FBF8F1;font-weight:600}
 .qa-opt{display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;margin:0 0 .6rem}.qa-opt .chk{font-size:.84rem}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
@@ -868,7 +869,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 
 <div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="mn-editor" id="mForm"></div></div>
 <footer><p>© 2026 OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON · REPIUM LAB · 내부 공유용</p></footer>
-<script src="stage.js?v=9"></script>
+<script src="stage.js?v=10"></script>
 <script>
 const SU='https://dvlrzbckneucpvlacdll.supabase.co';
 const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE';
@@ -1286,7 +1287,8 @@ function qaRender(){const L=a=>esc((a||[]).join('\n'));
   <label class="chk"><input type="checkbox" ${qaShow.raw?'checked':''} onchange="if(!this.checked&&!qaShow.core&&qaMode==='all'){this.checked=true;return alert('둘 중 하나는 보여야 합니다.');}qaShow.raw=this.checked"> 참가자 원래 질문 보이기</label></div>
   ${qaDraft.map((c,i)=>`<div class="qa-cat"><div class="qa-no">${String(i+1).padStart(2,'0')}</div><div class="qa-f">
     <input value="${esc(c.title)}" placeholder="주제 이름 예) 개인 동기·마인드" oninput="qaDraft[${i}].title=this.value">
-    <input value="${esc(c.desc)}" placeholder="주제 설명 한 줄 (표지에 표시)" oninput="qaDraft[${i}].desc=this.value">
+    <input class="qa-kq" value="${esc(c.key||'')}" placeholder="Key Question — 이 주제를 한 문장으로 묻는 질문 (표지·질문 장 위에 표시)" oninput="qaDraft[${i}].key=this.value">
+    <input value="${esc(c.desc)}" placeholder="주제 설명 (Key Question이 없을 때만 표지에 표시)" oninput="qaDraft[${i}].desc=this.value">
     <div class="qa-2"><label>질문 <small>(↳ 참가자 원래 질문)</small><textarea rows="9" oninput="qaDraft[${i}].qs=this.value.split('\n').map(x=>x.trim()).filter(Boolean)">${L(c.qs)}</textarea></label>
     <label>연사 답변 키워드<textarea rows="9" oninput="qaDraft[${i}].kw=this.value.split('\n').map(x=>x.trim()).filter(Boolean)">${L(c.kw)}</textarea></label></div></div>
     <span class="tt-btn"><button class="ic" ${i?'':'disabled'} onclick="qaMove(${i},-1)">↑</button><button class="ic" ${i<qaDraft.length-1?'':'disabled'} onclick="qaMove(${i},1)">↓</button><button class="ic del" onclick="qaDraft.splice(${i},1);qaRender()">✕</button></span></div>`).join('')}
