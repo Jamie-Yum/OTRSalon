@@ -891,7 +891,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 
 <div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="mn-editor" id="mForm"></div></div>
 <footer><p>© 2026 OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON · REPIUM LAB · 내부 공유용</p></footer>
-<script src="stage.js?v=20"></script>
+<script src="stage.js?v=21"></script>
 <script>
 const SU='https://dvlrzbckneucpvlacdll.supabase.co';
 const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE';
@@ -1333,8 +1333,8 @@ async function runPdf(which){const n=runSess,parts=[],lab={label:`SESSION 0${n}`
     if(k==='welcome')parts.push({slides:Stage.slides.welcome({...runCtx(n,'welcome'),live:1}),meta:lab,qr:()=>livePv(n).get().then(d=>d.url)});
     if(k==='farewell')parts.push({slides:Stage.slides.farewell(runCtx(n,'farewell')),meta:lab});
     if(k==='live')parts.push({slides:Stage.slides.live(),meta:lab,live:livePv(n)});
-    if(k==='qa'){const qa=deckOf(n,'qa');if(qa&&(qa.data.cats||[]).some(c=>c.title))parts.push({slides:Stage.slides.qa(qa.data,runMeta(n)),meta:runMeta(n),nonum:qa.data.showNum===false});else if(which==='qa')return alert('질문 덱 내용이 없습니다.');}
-    if(k==='talk'){const b=await talkBlob();let doc=null;if(b){doc=await Stage.loadPdf(b);if(doc===false)return;}const m=runCtx(n,'talk');parts.push({slides:Stage.slides.talk(m,doc),meta:{label:`SESSION 0${n}${m.speaker.name?' · '+m.speaker.name:''}`}});}}
+    if(k==='qa'){const qa=deckOf(n,'qa');if(qa&&(qa.data.cats||[]).some(c=>c.title))parts.push({slides:Stage.slides.qa(qa.data,runMeta(n)),meta:runMeta(n),nonum:qa.data.showNum===false,qr:()=>livePv(n).get().then(d=>d.url),corner:1});else if(which==='qa')return alert('질문 덱 내용이 없습니다.');}
+    if(k==='talk'){const b=await talkBlob();let doc=null;if(b){doc=await Stage.loadPdf(b);if(doc===false)return;}const m=runCtx(n,'talk');parts.push({slides:Stage.slides.talk(m,doc),meta:{label:`SESSION 0${n}${m.speaker.name?' · '+m.speaker.name:''}`},qr:()=>livePv(n).get().then(d=>d.url),corner:1});}}
   Stage.print(parts,`오프더레코드살롱_S${SEASON}-0${n}_${which==='all'?'전체장표':NM[which]}`);}
 /* 진행 화면을 띄우면 현장 질문 받기가 열리고, QR은 ① 안내 장 + ②③ 왼쪽 아래에 */
 function runChain(k,loop){const n=runSess,skip=o=>{const f=o.atEnd?o.prev:o.next;if(f)f();},pv=livePv(n),qr=pv.start().then(()=>pv.get()).then(d=>d.url).catch(()=>'');
@@ -1416,7 +1416,7 @@ function qaRender(){const L=a=>esc((a||[]).join('\n'));
     <label>연사 답변 키워드<textarea rows="9" oninput="qaDraft[${i}].kw=this.value.split('\n').map(x=>x.trim()).filter(Boolean)">${L(c.kw)}</textarea></label></div></div>
     <span class="tt-btn"><button class="ic" ${i?'':'disabled'} onclick="qaMove(${i},-1)">↑</button><button class="ic" ${i<qaDraft.length-1?'':'disabled'} onclick="qaMove(${i},1)">↓</button><button class="ic del" onclick="qaDraft.splice(${i},1);qaRender()">✕</button></span></div>`).join('')}
   <button class="lnk" onclick="qaDraft.push({title:'',desc:'',qs:[],kw:[]});qaRender()">+ 주제 추가</button>
-  <div class="mn-actions"><button class="mn-btn ghost" style="margin-right:auto" onclick="Stage.qa({mode:qaMode,agenda:qaAg,showNum:qaShow.num,showKey:qaShow.key,showCore:qaShow.core,showRaw:qaShow.raw,cats:qaDraft},runMeta(runSess))">미리 띄우기</button><button class="mn-btn ghost" onclick="qaDraft=null;renderRun()">닫기</button><button class="mn-btn" id="qaSave" onclick="qaSave()">저장</button></div></div>`;}
+  <div class="mn-actions"><button class="mn-btn ghost" style="margin-right:auto" onclick="Stage.qa({mode:qaMode,agenda:qaAg,showNum:qaShow.num,showKey:qaShow.key,showCore:qaShow.core,showRaw:qaShow.raw,cats:qaDraft},runMeta(runSess),{qr:()=>livePv(runSess,1).get().then(d=>d.url),corner:1})">미리 띄우기</button><button class="mn-btn ghost" onclick="qaDraft=null;renderRun()">닫기</button><button class="mn-btn" id="qaSave" onclick="qaSave()">저장</button></div></div>`;}
 function agThumb(v){const cats=qaDraft.filter(c=>c.title).map(c=>({title:c.title,key:qaShow.key?c.key:'',at:0}));if(!cats.length)return '<i class="ag-empty">주제를 먼저 적어 주세요</i>';
   return Stage.thumb({t:'agenda',v,cur:Math.min(1,cats.length-1),cats},{label:'SESSION 0'+runSess},{nonum:!qaShow.num},200);}
 function qaMove(i,d){const j=i+d;[qaDraft[i],qaDraft[j]]=[qaDraft[j],qaDraft[i]];qaRender();}

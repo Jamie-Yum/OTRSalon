@@ -282,8 +282,8 @@ function key(ev){if(!root||!root.classList.contains('on'))return;const k=ev.key;
   else if(/^[1-9]$/.test(k)){const c=S.findIndex(s=>s.t==='cover'&&s.n===+k);if(c>=0)go(c);}}
 function close(){clearInterval(loopT);clearInterval(liveT);if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});root.classList.remove('on');stage.innerHTML='';}
 /* 현장 질의응답: pv = {get()→{url,open,qs:[{id,body,hidden}]}, start()?, hide(id)?} */
-const QRJS='https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js';
-function qrLib(){return window.qrcode?Promise.resolve(window.qrcode):new Promise((ok,no)=>{const sc=document.createElement('script');sc.src=QRJS;sc.onload=()=>ok(window.qrcode);sc.onerror=()=>no(new Error('QR'));document.head.appendChild(sc);});}
+const QRJS=['/qrcode.min.js','https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js'];
+function qrLib(k=0){return window.qrcode?Promise.resolve(window.qrcode):new Promise((ok,no)=>{const sc=document.createElement('script');sc.src=QRJS[k];sc.onload=()=>window.qrcode?ok(window.qrcode):no(new Error('QR'));sc.onerror=()=>k+1<QRJS.length?qrLib(k+1).then(ok,no):no(new Error('QR'));document.head.appendChild(sc);});}
 async function qrSvg(t){try{const q=(await qrLib())(0,'M');q.addData(t);q.make();return q.createSvgTag({cellSize:8,margin:0,scalable:true});}catch(er){return '';}}
 function liveList(sl,d,pv){const qs=(d.qs||[]).filter(x=>!x.hidden),box=sl.querySelector('.lv-qs'),seen=new Set([...box.querySelectorAll('li[data-id]')].map(x=>x.dataset.id)),first=!box.dataset.ok;box.dataset.ok=1;
   box.innerHTML=qs.length?qs.slice(0,8).map(x=>`<li data-id="${e(x.id)}" class="${!first&&!seen.has(x.id)?'new':''}"><p>${e(x.body)}</p>${pv.hide?`<button data-hide="${e(x.id)}">숨기기</button>`:''}</li>`).join(''):'<li class="empty">첫 질문을 기다리고 있습니다</li>';
@@ -345,9 +345,10 @@ async function printParts(parts,title){ensure();clearInterval(loopT);
   root.classList.add('on','print');stage.innerHTML='';stage.style.transform='none';
   const jobs=[];clearInterval(liveT);
   for(const p of parts){const keep=meta;meta=p.meta||{};
-    for(const sl of p.slides){const pp=document.createElement('div');pp.className='pp'+(p.nonum?' nonum':'');pp.innerHTML=R[sl.t](sl);stage.appendChild(pp);
+    for(const sl of p.slides){const pp=document.createElement('div');pp.className='pp'+(p.nonum?' nonum':'');pp.dataset.part=parts.indexOf(p);pp.innerHTML=R[sl.t](sl);stage.appendChild(pp);
       const el=pp.querySelector('.sl');el.classList.add('on');if(el.hasAttribute('data-fit'))fitText(el);if(sl.t==='pdf')jobs.push(sl.render(el));if(sl.t==='live')jobs.push(liveRun(el,p.live,1));if(sl.t==='qrn')jobs.push(qrFill(el.querySelector('.lv-qr'),p.qr));}
     meta=keep;}
+  for(const p of parts)if(p.corner&&p.qr){const svg=await qrOf(p.qr);if(svg)stage.querySelectorAll(`.pp[data-part="${parts.indexOf(p)}"]`).forEach(pp=>{const d=document.createElement('div');d.className='cq';d.innerHTML=`<div class="cqr">${svg}</div><span>실시간 질문 보내기</span>`;pp.appendChild(d);});}
   await Promise.all(jobs);await (document.fonts?document.fonts.ready:Promise.resolve());
   await Promise.all([...stage.querySelectorAll('img')].map(im=>im.complete?0:new Promise(r=>{im.onload=im.onerror=r;})));
   const t0=document.title;document.title=title||t0;document.body.classList.add('stg-printing');

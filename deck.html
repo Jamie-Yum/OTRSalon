@@ -26,7 +26,7 @@ h1{font-size:clamp(1.8rem,5vw,2.6rem);font-weight:700;line-height:1.3}
 @media(max-width:620px){.g{grid-template-columns:1fr}}
 </style></head><body>
 <div class="w" id="app"><div class="wm">OFF <span class="the">THE</span> RECORD SALON</div><p class="sub" style="margin-top:2rem">불러오는 중…</p></div>
-<script src="/stage.js?v=20"></script>
+<script src="/stage.js?v=21"></script>
 <script>
 const SU='https://dvlrzbckneucpvlacdll.supabase.co',SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE';
 const q=new URLSearchParams(location.search),TOK=q.get('k'),$=id=>document.getElementById(id);
@@ -47,8 +47,8 @@ async function savePdf(which){const parts=[],lab={label:`SESSION 0${D.n}`},NM={w
     if(k==='live')parts.push({slides:Stage.slides.live(),meta:lab,live:LIVE});
     if(k==='welcome')parts.push({slides:Stage.slides.welcome({...ctx('welcome'),live:1}),meta:lab,qr:QR});
     if(k==='farewell')parts.push({slides:Stage.slides.farewell(ctx('farewell')),meta:lab});
-    if(k==='qa'&&((D.decks.qa||{}).cats||[]).some(c=>c.title))parts.push({slides:Stage.slides.qa(D.decks.qa,META()),meta:META(),nonum:D.decks.qa.showNum===false});
-    if(k==='talk'){const b=await talkPdf();let doc=null;if(b){doc=await Stage.loadPdf(b);if(doc===false)return;}parts.push({slides:Stage.slides.talk(ctx('talk'),doc),meta:{label:META().label}});}}
+    if(k==='qa'&&((D.decks.qa||{}).cats||[]).some(c=>c.title))parts.push({slides:Stage.slides.qa(D.decks.qa,META()),meta:META(),nonum:D.decks.qa.showNum===false,qr:QR,corner:1});
+    if(k==='talk'){const b=await talkPdf();let doc=null;if(b){doc=await Stage.loadPdf(b);if(doc===false)return;}parts.push({slides:Stage.slides.talk(ctx('talk'),doc),meta:{label:META().label},qr:QR,corner:1});}}
   Stage.print(parts,`오프더레코드살롱_S${D.season}-0${D.n}_${which==='all'?'전체장표':NM[which]}`);}
 function openDeck(k){const meta={speaker:D.speaker&&D.speaker.name?D.speaker.name+' '+(D.speaker.role||'').split(' ').pop():'',label:`SESSION 0${D.n}${D.speaker&&D.speaker.name?' · '+D.speaker.name:''}`};
   const hasQa=((D.decks.qa||{}).cats||[]).some(c=>c.title),skip=o=>{const f=o.atEnd?o.prev:o.next;if(f)f();};
