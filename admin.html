@@ -753,6 +753,12 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .lv-list{max-height:46vh;overflow:auto;border-top:1px solid var(--ln,#e5e0d5)}
 .lv-q{display:grid;grid-template-columns:3.6rem 1fr auto auto;gap:.6rem;align-items:start;padding:.65rem 0;border-bottom:1px solid var(--ln,#e5e0d5);font-size:.9rem}
 .lv-q span{color:#999;font-size:.8rem;padding-top:.1rem}.lv-q p{line-height:1.55;white-space:pre-wrap}.lv-q.hid p{opacity:.4;text-decoration:line-through}
+.mb-g{margin-top:1.4rem}.mb-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}.mb-h h3{font-size:1rem}.mb-h small{font-weight:400;color:var(--tl);margin-left:.4rem;font-size:.82rem}
+.mb-in{width:100%;border:1px solid transparent;background:none;font:inherit;padding:.3rem .4rem;border-radius:6px;min-width:6rem}.mb-in:hover{border-color:var(--ln,#e5e0d5)}.mb-in:focus{border-color:var(--ac,#C9B37E);background:#fff;outline:none}
+.tg-g{margin:.9rem 0 .3rem;font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:.6rem}.tg-g button{font-size:.78rem}
+.tg-r{display:grid;grid-template-columns:1.4rem 5.5rem 1fr;gap:.5rem;align-items:center;padding:.15rem 0;font-size:.88rem}.tg-r input[type=text]{border:1px solid var(--ln,#e5e0d5);border-radius:6px;padding:.25rem .45rem;font:inherit;font-size:.84rem}
+.tg-list{max-height:48vh;overflow:auto;border-top:1px solid var(--ln,#e5e0d5);border-bottom:1px solid var(--ln,#e5e0d5);padding:.2rem 0 .6rem}
+.tg-pv{display:flex;gap:.6rem;flex-wrap:wrap;margin:.4rem 0 1rem}.tg-pv iframe{border:0;width:182px;height:142px;box-shadow:0 1px 6px rgba(0,0,0,.15)}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
   <h2><span class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span><small>ADMIN</small></h2>
@@ -780,6 +786,9 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
   <div class="ap-sum" id="apSum"></div>
   <div class="ap-add"><button class="mn-btn" onclick="appAdd()">+ 신청자 추가</button><span class="note" style="margin:0">마감 뒤 직접 등록할 때 씁니다. 본인이 직접 쓰게 하려면 추가 신청 링크 <a href="https://off-record.kr/apply/late" target="_blank" style="color:var(--ac)">off-record.kr/apply/late</a> 를 보내세요.</span></div>
   <div class="tbl-wrap"><table class="tbl" id="v-apps"></table></div>
+  <div class="mn-head" style="margin-top:3.5rem"><div><div class="eyebrow">Members</div><h2 class="title" style="margin:0">운영멤버 · 리피움 멤버</h2></div><button class="mn-btn" onclick="tagOpen()">명찰 만들기</button></div>
+  <p class="note">신청서로 들어오지 않는 분들입니다. 칸을 누르면 바로 고칠 수 있고, 다른 곳을 누르면 저장됩니다. 참석 체크는 위 '세션 참석'에서 고른 세션 기준입니다.</p>
+  <div id="v-members"></div>
   <div class="mn-head" style="margin-top:3.5rem"><div><div class="eyebrow">Messages</div><h2 class="title" style="margin:0">안내 문자</h2></div><button class="mn-btn" onclick="edit('messages')">+ 문자 추가</button></div>
   <p class="note">참가자 대상 발송은 승인자 컨펌 후 실행합니다. [ ] 부분은 확정 후 기입하세요.</p>
   <div class="msg-grid" id="v-messages"></div>
@@ -1158,11 +1167,69 @@ async function bpSave(btn){
 }
 function setSeason(v){SEASON=Number(v)||1;try{localStorage.setItem('otr_season',SEASON)}catch(e){}
   ['apps','speakers','schedule','fees','actions','milestones','messages','checklist'].forEach(k=>{try{if(D[k])RENDER[k]()}catch(e){}});try{if(D.surveys)renderSurveys()}catch(e){}try{renderRun()}catch(e){}}
+let MB=[];
+async function loadMembers(){MB=await rpc('otr_list',{tbl:'otr_members'});renderMembers();}
+const MB_G=[['운영','운영멤버'],['리피움','리피움 멤버']],MB_PH={name:'이름',role:'소속 / 직함',phone:'010-0000-0000',memo:'메모'};
+function renderMembers(){const el=$('v-members');if(!el)return;const L=MB.filter(inS).sort((a,b)=>(a.sort||0)-(b.sort||0)||a.created_at.localeCompare(b.created_at));
+  el.innerHTML=MB_G.map(([g,t])=>{const R=L.filter(r=>r.grp===g),c=k=>R.filter(r=>(r[k]||{})[apSess]).length;
+  return `<div class="mb-g"><div class="mb-h"><h3>${t}<small>${R.length}명 · S0${apSess} 1부 ${c('attend')} · 2부 ${c('after_party')}</small></h3><button class="mn-btn ghost" onclick="mbAdd('${g}')">+ 추가</button></div>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr><th>이름</th><th>소속 / 직함</th><th>연락처</th><th class="nw">S0${apSess} 참석</th><th>메모</th><th></th></tr></thead><tbody>${R.map(r=>`<tr data-mb="${r.id}">
+  ${['name','role','phone'].map(k=>`<td><input class="mb-in" value="${esc(r[k]||'')}" placeholder="${MB_PH[k]}" onchange="mbSave('${r.id}',{${k}:this.value.trim()})"></td>`).join('')}
+  <td class="ap-td nw">${[['attend','1부'],['after_party','2부']].map(([k,l])=>`<label class="ap-ck" title="Session 0${apSess} ${l} 참석"><input type="checkbox" ${(r[k]||{})[apSess]?'checked':''} onchange="mbAtt('${r.id}','${k}',this.checked)"><span></span><i>${l}</i></label>`).join('')}</td>
+  <td><input class="mb-in" value="${esc(r.memo||'')}" placeholder="메모" onchange="mbSave('${r.id}',{memo:this.value.trim()})"></td>
+  <td><button class="ic del" title="삭제" onclick="mbDel('${r.id}')">${IC.del}</button></td></tr>`).join('')||`<tr><td colspan="6" style="text-align:center;color:var(--tl);padding:1.4rem">아직 명단이 없습니다. '+ 추가'를 눌러 주세요.</td></tr>`}</tbody></table></div></div>`;}).join('');}
+async function mbSave(id,patch){const r=MB.find(x=>x.id===id);Object.assign(r,patch);
+  try{await rpc('otr_save',{tbl:'otr_members',row_data:{id,season_no:r.season_no||SEASON,grp:r.grp,name:r.name||'',...patch}});}catch(e){alert('저장 실패: '+e.message);}
+  if(patch.attend||patch.after_party)renderMembers();}
+function mbAtt(id,k,on){const r=MB.find(x=>x.id===id),a={...(r[k]||{})};if(on)a[apSess]=true;else delete a[apSess];mbSave(id,{[k]:a});}
+async function mbAdd(g){const sort=Math.max(0,...MB.map(r=>r.sort||0))+1;
+  try{const id=await rpc('otr_save',{tbl:'otr_members',row_data:{season_no:SEASON,grp:g,name:'',sort}});await loadMembers();const i=document.querySelector(`tr[data-mb="${id}"] input`);if(i)i.focus();}catch(e){alert('추가 실패: '+e.message);}}
+async function mbDel(id){const r=MB.find(x=>x.id===id);if(!confirm(`${r.name||'이 줄'}을(를) 명단에서 지울까요?`))return;
+  try{await rpc('otr_delete',{tbl:'otr_members',rid:id});await loadMembers();}catch(e){alert('삭제 실패: '+e.message);}}
+/* 명찰 90×70mm · A4 한 장에 8개 */
+let TAGS=[],tagBlank=0;
+const TAG_G={'참가자':'참가자','운영':'운영진','리피움':'리피움'};
+function tagOpen(){const n=apSess,apps=(D.apps||[]).filter(inS).filter(r=>r.status==='확정'&&(/Season|4회/.test(r.pass||'')||r.salon_no===n)).sort((a,b)=>a.name.localeCompare(b.name,'ko'));
+  const mem=MB.filter(inS).filter(r=>(r.name||'').trim()).sort((a,b)=>(a.sort||0)-(b.sort||0));
+  const pre=(L,r)=>L.some(x=>(x.attend||{})[n])?!!(r.attend||{})[n]:true;
+  TAGS=[...apps.map(r=>({g:'참가자',name:r.name,role:r.role||'',on:pre(apps,r)})),...MB_G.flatMap(([g])=>{const L=mem.filter(r=>r.grp===g);return L.map(r=>({g,name:r.name,role:r.role||'',on:pre(L,r)}));})];
+  cur={key:'_tag',id:null};tagRender();$('modal').classList.add('open');}
+function tagRender(){const n=apSess,on=TAGS.filter(t=>t.on).length+tagBlank;
+  $('mForm').innerHTML=`<h3>Session 0${n} 명찰 <small style="font-weight:400;color:var(--tl)">90×70mm · A4 한 장에 8개</small></h3>
+  <p class="note" style="margin:-.4rem 0 .6rem">세션은 신청 화면의 '세션 참석'에서 고른 세션입니다. 1부 참석 체크가 있으면 체크한 분만, 하나도 없으면 전원이 미리 골라져 있습니다. 소속·직함은 명찰에만 쓰이도록 여기서 고칠 수 있습니다.</p>
+  <div class="tg-pv">${['참가자','운영','리피움'].map(g=>{const t=TAGS.find(x=>x.g===g);return t?`<iframe srcdoc="${esc(tagDoc([t],1))}"></iframe>`:'';}).join('')}</div>
+  <div class="tg-list">${['참가자','운영','리피움'].map(g=>{const L=TAGS.map((t,i)=>[t,i]).filter(([t])=>t.g===g);if(!L.length)return '';
+    return `<div class="tg-g">${TAG_G[g]} ${L.filter(([t])=>t.on).length}/${L.length}<button class="lnk" onclick="TAGS.forEach(t=>{if(t.g==='${g}')t.on=true});tagRender()">모두</button><button class="lnk" onclick="TAGS.forEach(t=>{if(t.g==='${g}')t.on=false});tagRender()">해제</button></div>`+
+    L.map(([t,i])=>`<label class="tg-r"><input type="checkbox" ${t.on?'checked':''} onchange="TAGS[${i}].on=this.checked;tagRender()"><b>${esc(t.name)}</b><input type="text" value="${esc(t.role)}" placeholder="소속 / 직함" onchange="TAGS[${i}].role=this.value.trim()"></label>`).join('');}).join('')}</div>
+  <div style="margin-top:.8rem;font-size:.88rem">빈 명찰 (현장 추가용) <input type="number" min="0" max="40" value="${tagBlank}" style="width:4rem;margin-left:.4rem" onchange="tagBlank=Math.max(0,Math.min(40,+this.value||0));tagRender()"> 장</div>
+  <div class="mn-actions"><span class="note" style="margin:0 auto 0 0">총 ${on}장 · A4 ${Math.ceil(on/8)||0}장</span><button class="mn-btn ghost" onclick="closeModal()">닫기</button><button class="mn-btn" ${on?'':'disabled'} onclick="tagPrint()">PDF로 저장 · 인쇄</button></div>`;}
+function tagDoc(list,one){const n=apSess,fs=t=>{const l=[...t].length;return l<=3?30:l===4?26:l<=6?21:16;};
+  const card=t=>`<div class="t g-${t.g}"><div class="hd">OFF <span class="the">THE</span> RECORD SALON</div><div class="bd"><div class="nm" style="font-size:${fs(t.name)}pt">${esc(t.name)||'&nbsp;'}</div><div class="rl">${esc(t.role)||'&nbsp;'}</div></div><div class="ft"><span>Season ${SEASON} · Session 0${n}</span><b>${TAG_G[t.g]}</b></div></div>`;
+  const pages=[];for(let i=0;i<list.length;i+=8)pages.push(list.slice(i,i+8));
+  return `<!doctype html><html><head><meta charset="utf-8"><title>오프더레코드살롱_S${SEASON}-0${n}_명찰</title>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;800&display=swap" rel="stylesheet">
+<style>@page{size:A4;margin:0}*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Pretendard',sans-serif;background:${one?'#fff':'#eee'};color:#141414;word-break:keep-all}
+.pg{width:210mm;height:297mm;padding:8.5mm 15mm;display:grid;grid-template-columns:90mm 90mm;grid-auto-rows:70mm;background:#fff;margin:0 auto 6mm;break-after:page;page-break-after:always}
+.pg:last-child{break-after:auto;page-break-after:auto}
+.t{width:90mm;height:70mm;outline:.2mm dashed #c8c8c8;outline-offset:-.1mm;display:flex;flex-direction:column;overflow:hidden;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.hd{padding:6mm 7mm 0;font-family:'Inter Tight',sans-serif;font-weight:800;font-size:8pt;letter-spacing:.02em;word-spacing:-.18em}.the{font-size:.66em}
+.hd::after{content:'';display:block;width:8mm;height:.7mm;background:#C9B37E;margin-top:2.6mm}
+.bd{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 7mm}
+.nm{font-weight:800;letter-spacing:.06em;line-height:1.1}.rl{font-size:9.5pt;color:#555;margin-top:2.4mm;line-height:1.35;max-height:2.7em;overflow:hidden}
+.ft{height:10.5mm;display:flex;align-items:center;justify-content:space-between;padding:0 7mm;font-family:'Inter Tight','Pretendard',sans-serif;font-size:7.5pt;letter-spacing:.14em;text-transform:uppercase}.ft b{letter-spacing:.08em;font-weight:700}
+.g-참가자 .ft{background:#141414;color:#C9B37E}.g-운영 .ft{background:#C9B37E;color:#141414}.g-리피움 .ft{background:#5F7466;color:#fff}
+${one?'.t{zoom:.53;outline:0}':''}
+@media print{body{background:#fff}.pg{margin:0}}</style></head><body>${one?card(list[0]):pages.map(p=>`<div class="pg">${p.map(card).join('')}</div>`).join('')}</body></html>`;}
+function tagPrint(){const list=[...TAGS.filter(t=>t.on),...Array.from({length:tagBlank},()=>({g:'참가자',name:'',role:''}))];
+  const w=window.open('','_blank');if(!w)return alert('팝업이 막혔습니다. 이 사이트의 팝업을 허용해 주세요.');
+  w.document.write(tagDoc(list));w.document.close();
+  setTimeout(()=>{(w.document.fonts?w.document.fonts.ready:Promise.resolve()).then(()=>setTimeout(()=>{w.focus();w.print();},300));},400);}
 async function loadApps(){D.apps=await rpc('otr_app_list');RENDER.apps();}
 async function loadAll(){
   loadDecks().catch(e=>{$('v-run').innerHTML='<div class="mn-empty">진행 장표를 불러오지 못했습니다. ('+esc(e.message)+')</div>';});
   loadSite().catch(e=>{$('hMsg').textContent='설정을 불러오지 못했습니다. ('+e.message+')';});
   loadSurveys().catch(e=>{const b=$('v-surveys');if(b)b.innerHTML='<div class="mn-empty">설문을 불러오지 못했습니다. ('+esc(e.message)+')</div>';});
+  loadMembers().catch(e=>{const b=$('v-members');if(b)b.innerHTML='<div class="mn-empty">명단을 불러오지 못했습니다. ('+esc(e.message)+')</div>';});
   loadApps().catch(e=>{$('v-apps').innerHTML='<tr><td style="padding:2rem;color:var(--tl)">신청 내역을 불러오지 못했습니다. ('+esc(e.message)+')</td></tr>';});
   await Promise.all(Object.keys(T).map(k=>load(k).catch(e=>{
     const el=$('v-'+k);if(el)el.innerHTML='<div class="mn-empty">데이터를 불러오지 못했습니다. ('+esc(e.message)+')</div>';
@@ -1389,7 +1456,7 @@ async function saveHero(){
   $('hSave').disabled=false;
 }
 const RENDER={
-  apps(){
+  apps(){renderMembers();
     const all=(D.apps||[]).filter(inS);
     $('appChips').innerHTML=['전체',...APP_STATUS].map(c=>`<button class="${c===appFilter?'on':''}" onclick="appFilter='${c}';RENDER.apps()" data-as="${APP_STATUS.indexOf(c)}">${c}<small style="opacity:.6;margin-left:.3rem">${c==='전체'?all.length:all.filter(r=>r.status===c).length}</small></button>`).join('')+`<button onclick="appCsv()">CSV ↓</button>`;
     [...new Set(all.map(r=>(r.inviter||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ko')).forEach(n=>invTag(n));
