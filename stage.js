@@ -222,9 +222,18 @@ const css=`
 #stg .lv-qs li.empty{color:rgba(237,230,214,.35);cursor:default;border:0;padding-top:64px}
 #stg .lv-qs li button{position:absolute;right:0;top:50%;transform:translateY(-50%);display:none;background:#141414;border:1px solid rgba(237,230,214,.3);color:#EDE6D6;border-radius:999px;padding:8px 20px;font:inherit;font-size:18px;cursor:pointer}
 #stg.mv .lv-qs li:hover button{display:block}
-#stg .lv-spot{position:absolute;inset:0;background:rgba(11,11,11,.97);display:flex;flex-direction:column;justify-content:center;padding:150px 220px;z-index:5;cursor:pointer}
-#stg .lv-spot .eb{margin-bottom:40px}
-#stg .lv-spot div{font-size:64px;font-weight:700;line-height:1.45}
+#stg .lv-spot{position:absolute;inset:0;background:#141414;display:flex;flex-direction:column;padding:150px 150px 90px;z-index:5}
+#stg .lv-spot .sp-h{display:flex;justify-content:space-between;align-items:center}
+#stg .lv-spot .sp-h button{background:none;border:1px solid rgba(237,230,214,.3);color:rgba(237,230,214,.75);border-radius:999px;padding:10px 26px;font:inherit;font-size:20px;cursor:pointer}
+#stg .lv-spot .sp-q{flex:1;display:flex;align-items:center;cursor:pointer;min-height:0}
+#stg .lv-spot .sp-q div{font-weight:700;line-height:1.45;border-left:6px solid #C9B37E;padding-left:48px}
+#stg .lv-spot .sp-o{border-top:1px solid rgba(237,230,214,.18);padding-top:26px}
+#stg .lv-spot .sp-o .sh{font-size:20px;letter-spacing:.16em;color:rgba(237,230,214,.45);font-family:'Inter Tight',sans-serif;text-transform:uppercase;margin-bottom:18px}
+#stg .lv-spot .sp-o ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+#stg .lv-spot .sp-o li{background:#1E1E1E;border-radius:14px;padding:20px 24px;font-size:23px;line-height:1.5;color:rgba(237,230,214,.82);cursor:pointer;min-height:112px;border:1px solid transparent}
+#stg .lv-spot .sp-o li:hover{border-color:#C9B37E;color:#EDE6D6}
+#stg .lv-spot .sp-o li p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#stg .lv-spot .sp-o li.nw{animation:lvn 1.4s ease}
 #stg .ag li.lvi b{color:#E2CD94}
 #stg .hint{position:fixed;right:20px;bottom:16px;z-index:10000;font:13px/1.5 'Pretendard',sans-serif;color:#888;background:rgba(0,0,0,.6);padding:8px 12px;border-radius:8px;opacity:0;transition:opacity .3s;pointer-events:none}
 #stg.mv .hint{opacity:1}
@@ -239,8 +248,9 @@ function ensure(){if(root)return;ensureCss();
   document.addEventListener('keydown',key);
   root.addEventListener('click',e=>{if(e.target.closest('.x')){close();return;}
     const hd=e.target.closest('[data-hide]');if(hd){const pv=opt.live;if(pv&&pv.hide)pv.hide(hd.dataset.hide).then(()=>hd.closest('li').remove()).catch(er=>alert('실패: '+er.message));return;}
-    const sp=e.target.closest('.lv-spot');if(sp){sp.remove();return;}
-    const lq=e.target.closest('.lv-qs li[data-id]');if(lq){spot(lq.querySelector('p').textContent);return;}const a=e.target.closest('[data-go]');if(a){go(+a.dataset.go);return;}if(e.clientX<innerWidth*.25)prev();else next();});
+    const so=e.target.closest('.sp-o li[data-id]');if(so){spot(so.dataset.id);return;}
+    if(e.target.closest('.sp-x,.sp-q')){spotClose();return;}if(e.target.closest('.lv-spot'))return;
+    const lq=e.target.closest('.lv-qs li[data-id]');if(lq){spot(lq.dataset.id);return;}const a=e.target.closest('[data-go]');if(a){go(+a.dataset.go);return;}if(e.clientX<innerWidth*.25)prev();else next();});
   const show=()=>{root.classList.add('mv');clearTimeout(hideT);hideT=setTimeout(()=>root.classList.remove('mv'),2500);};root.addEventListener('mousemove',show);root.addEventListener('touchstart',show,{passive:true});}
 function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform=`translate(${-960*s}px,${-540*s}px) scale(${s})`;}
 const e=t=>(t==null?'':String(t)).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -264,7 +274,7 @@ const R={
 };
 function steps(s){return s.t==='kw'?s.items.length:0;}
 function draw(){const s=S[i];stage.innerHTML=R[s.t](s)+`<div class="bar" style="width:${(i+1)/S.length*100}%"></div>`+(s.t==='pdf'?'':`<div class="pg">${i===S.length-1&&opt.nextLabel?`→ ${e(opt.nextLabel)} &nbsp;·&nbsp; `:''}${i+1} / ${S.length}</div>`);
-  clearInterval(liveT);const sl=stage.querySelector('.sl');if(s.t==='pdf')s.render(sl);if(s.t==='live')liveRun(sl,opt.live);if(s.t==='qrn')qrFill(sl.querySelector('.lv-qr'),opt.qr);if(opt.corner&&opt.qr)corner(i);
+  clearInterval(liveT);spotId=null;const sl=stage.querySelector('.sl');if(s.t==='pdf')s.render(sl);if(s.t==='live')liveRun(sl,opt.live);if(s.t==='qrn')qrFill(sl.querySelector('.lv-qr'),opt.qr);if(opt.corner&&opt.qr)corner(i);
   if(sl.hasAttribute('data-fit'))fitText(sl);
   requestAnimationFrame(()=>{sl.classList.add('on');paint();});}
 function fitText(sl){const els=[...sl.querySelectorAll('h2,li,.raw,.kq div:last-child')];const base=els.map(x=>parseFloat(getComputedStyle(x).fontSize));
@@ -274,9 +284,13 @@ function next(){const s=S[i];if(step<steps(s)){step++;paint();return;}if(i<S.len
 function prev(){if(step>0&&S[i].t==='kw'){step--;paint();return;}if(i>0){i--;step=steps(S[i]);draw();}else if(opt.prev){clearInterval(loopT);opt.prev();}}
 function go(n){if(n<0||n>=S.length)return;i=n;step=0;draw();}
 function key(ev){if(!root||!root.classList.contains('on'))return;const k=ev.key;
+  if(spotId&&stage.querySelector('.lv-spot')){const L=liveQs,j=L.findIndex(x=>x.id===spotId);
+    if(['ArrowRight','ArrowDown',' ','PageDown','Enter'].includes(k)){ev.preventDefault();if(L[j+1])spot(L[j+1].id);return;}
+    if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(k)){ev.preventDefault();if(j>0)spot(L[j-1].id);return;}
+    if(k==='Escape'){spotClose();return;}}
   if(['ArrowRight','ArrowDown',' ','PageDown','Enter'].includes(k)){ev.preventDefault();next();}
   else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(k)){ev.preventDefault();prev();}
-  else if(k==='Escape'){const sp=stage.querySelector('.lv-spot');sp?sp.remove():close();}
+  else if(k==='Escape'){close();}
   else if(k==='f'||k==='F'){document.fullscreenElement?document.exitFullscreen():root.requestFullscreen().catch(()=>{});}
   else if(k==='m'||k==='M'||k==='Home'){const a=S.findIndex(s=>s.t==='agenda');if(a>=0)go(a);}
   else if(/^[1-9]$/.test(k)){const c=S.findIndex(s=>s.t==='cover'&&s.n===+k);if(c>=0)go(c);}}
@@ -285,7 +299,7 @@ function close(){clearInterval(loopT);clearInterval(liveT);if(document.fullscree
 const QRJS=['/qrcode.min.js','https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js'];
 function qrLib(k=0){return window.qrcode?Promise.resolve(window.qrcode):new Promise((ok,no)=>{const sc=document.createElement('script');sc.src=QRJS[k];sc.onload=()=>window.qrcode?ok(window.qrcode):no(new Error('QR'));sc.onerror=()=>k+1<QRJS.length?qrLib(k+1).then(ok,no):no(new Error('QR'));document.head.appendChild(sc);});}
 async function qrSvg(t){try{const q=(await qrLib())(0,'M');q.addData(t);q.make();return q.createSvgTag({cellSize:8,margin:0,scalable:true});}catch(er){return '';}}
-function liveList(sl,d,pv){const qs=(d.qs||[]).filter(x=>!x.hidden),box=sl.querySelector('.lv-qs'),seen=new Set([...box.querySelectorAll('li[data-id]')].map(x=>x.dataset.id)),first=!box.dataset.ok;box.dataset.ok=1;
+function liveList(sl,d,pv){const qs=(d.qs||[]).filter(x=>!x.hidden);liveQs=qs;if(spotId)spotRender();const box=sl.querySelector('.lv-qs'),seen=new Set([...box.querySelectorAll('li[data-id]')].map(x=>x.dataset.id)),first=!box.dataset.ok;box.dataset.ok=1;
   box.innerHTML=qs.length?qs.slice(0,8).map(x=>`<li data-id="${e(x.id)}" class="${!first&&!seen.has(x.id)?'new':''}"><p>${e(x.body)}</p>${pv.hide?`<button data-hide="${e(x.id)}">숨기기</button>`:''}</li>`).join(''):'<li class="empty">첫 질문을 기다리고 있습니다</li>';
   sl.querySelector('.lv-n').textContent=qs.length?`질문 ${qs.length}개`:'';const st=sl.querySelector('.lv-st');st.className='lv-st'+(d.open?' on':'');st.textContent=d.open?'질문 받는 중':'질문 받기 전';}
 async function liveRun(sl,pv,once){if(!pv)return;let d;
@@ -297,7 +311,17 @@ const qrC={};
 async function qrOf(src){try{const u=await (typeof src==='function'?src():src);if(!u)return '';return qrC[u]||(qrC[u]=await qrSvg(u));}catch(er){return '';}}
 async function qrFill(el,src){const svg=await qrOf(src);if(svg)el.innerHTML=svg;else el.style.visibility='hidden';}
 async function corner(at){const svg=await qrOf(opt.qr);if(!svg||i!==at||stage.querySelector('.cq'))return;const d=document.createElement('div');d.className='cq';d.innerHTML=`<div class="cqr">${svg}</div><span>실시간 질문 보내기</span>`;stage.appendChild(d);}
-function spot(t){const d=document.createElement('div');d.className='lv-spot';d.innerHTML=`<div class="eb">Question</div><div>${e(t)}</div>`;stage.querySelector('.sl').appendChild(d);}
+/* 질문 크게 보기: 위에 고른 질문, 아래에 다른 질문 6개 (누르면 바꿈 · ←→ 이동 · Esc/다시 누르면 목록) */
+let liveQs=[],spotId=null,spotSeen=new Set();
+function spot(id){spotId=id;spotSeen=new Set(liveQs.map(x=>x.id));spotRender(1);}
+function spotClose(){spotId=null;const d=stage.querySelector('.lv-spot');if(d)d.remove();}
+function spotRender(fresh){const sl=stage.querySelector('.sl.lv');if(!sl)return;const L=liveQs,j=L.findIndex(x=>x.id===spotId);if(j<0)return spotClose();
+  let d=sl.querySelector('.lv-spot');if(!d){d=document.createElement('div');d.className='lv-spot';sl.appendChild(d);}
+  const q=L[j],n=[...q.body].length,fs=n<=50?76:n<=100?62:n<=170?52:n<=240?44:38,others=[...L.slice(j+1),...L.slice(0,j)].slice(0,6);
+  d.innerHTML=`<div class="sp-h"><div class="eb">Question ${L.length-j} / ${L.length}</div><button class="sp-x">목록으로</button></div>
+  <div class="sp-q"><div style="font-size:${fs}px">${e(q.body)}</div></div>
+  ${others.length?`<div class="sp-o"><div class="sh">다른 질문 ${L.length-1}개</div><ul>${others.map(x=>`<li data-id="${e(x.id)}" class="${!fresh&&!spotSeen.has(x.id)?'nw':''}"><p>${e(x.body)}</p></li>`).join('')}</ul></div>`:''}`;
+  liveQs.forEach(x=>spotSeen.add(x.id));}
 /* 질문 덱: data = {mode:'all'|'one', cats:[{title,desc,qs:[],kw:[]}]} · qs 중 '↳'로 시작하는 줄 = 위 질문의 참가자 원래 질문 */
 const RAW=/^\s*(↳|>)\s*/;
 function parseQs(lines){const out=[];(lines||[]).filter(Boolean).forEach(l=>{if(RAW.test(l)){if(out.length)out[out.length-1].raw.push(l.replace(RAW,''));}else out.push({q:l.trim(),raw:[]});});return out;}
