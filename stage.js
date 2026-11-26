@@ -189,6 +189,16 @@ const css=`
 #stg.print .pp{position:relative;width:1920px;height:1080px;overflow:hidden;background:#141414;page-break-after:always;break-after:page;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 #stg.print .pp .sl{opacity:1;transition:none}
 #stg.print .pp .kw li{opacity:1;transform:none}
+/* 실시간 질문 QR: 안내 장 + 강연·질문 장 왼쪽 아래 */
+#stg .qrn{flex-direction:row;align-items:center;gap:120px}
+#stg .qrn .tx{flex:1}
+#stg .qrn h2{font-size:80px;font-weight:700;line-height:1.28;margin:24px 0 36px}
+#stg .qrn p{font-size:30px;line-height:1.7;color:rgba(237,230,214,.7)}
+#stg .qrn .lv-qr{width:400px;height:400px;background:#fff;border-radius:24px;padding:28px;flex:none}
+#stg .qrn .lv-qr svg,#stg .cq svg{width:100%;height:100%;display:block}
+#stg .cq{position:absolute;left:24px;bottom:24px;z-index:4;width:128px;padding:10px 10px 8px;background:rgba(20,20,20,.88);border-radius:14px;text-align:center}
+#stg .cq .cqr{width:108px;height:108px;background:#fff;border-radius:8px;padding:7px}
+#stg .cq span{display:block;margin-top:7px;font-size:14px;font-weight:600;letter-spacing:.02em;color:#E2CD94;white-space:nowrap}
 /* 현장 질의응답 */
 #stg .lv{flex-direction:row;gap:96px;padding-top:180px}
 #stg .lv .lv-l{width:560px;flex:none;display:flex;flex-direction:column}
@@ -249,11 +259,12 @@ const R={
   pr:s=>`<div class="sl pr">${top()}<div class="eb">${e(s.eyebrow||'')}</div><h2>${s.title}</h2>${s.sub?`<p>${s.sub}</p>`:''}</div>`,
   nt:s=>`<div class="sl nt">${top()}<div class="eb">${e(s.eyebrow||'Notice')}</div><h2>${e(s.title)}</h2><ul>${s.items.map(x=>`<li>${e(x)}</li>`).join('')}</ul></div>`,
   pdf:s=>`<div class="sl pdf"></div>`,
+  qrn:s=>`<div class="sl qrn">${top()}<div class="tx"><div class="eb">Live Q&amp;A</div><h2>강연을 들으며 떠오른 질문을<br><span class="gold">바로 보내 주세요</span></h2><p>휴대폰 카메라로 QR을 찍으면 이름 없이 질문을 보낼 수 있습니다.<br>강연과 질문 장표 왼쪽 아래에도 같은 QR이 늘 떠 있습니다.<br>보내주신 질문은 현장 질의응답 시간에 화면에 띄웁니다.</p></div><div class="lv-qr"></div></div>`,
   live:s=>`<div class="sl lv">${top()}<div class="lv-l"><div class="eb">Open Q&amp;A</div><h2>현장 질의응답</h2><p>휴대폰 카메라로 QR을 찍어<br>궁금한 것을 자유롭게 남겨 주세요.<br>이름 없이 보내집니다.</p><div class="lv-qr"></div><div class="lv-u"></div></div><div class="lv-r"><div class="lv-h"><span class="lv-st">질문 받기 전</span><span class="lv-n"></span></div><ul class="lv-qs"><li class="empty">첫 질문을 기다리고 있습니다</li></ul></div></div>`
 };
 function steps(s){return s.t==='kw'?s.items.length:0;}
 function draw(){const s=S[i];stage.innerHTML=R[s.t](s)+`<div class="bar" style="width:${(i+1)/S.length*100}%"></div>`+(s.t==='pdf'?'':`<div class="pg">${i===S.length-1&&opt.nextLabel?`→ ${e(opt.nextLabel)} &nbsp;·&nbsp; `:''}${i+1} / ${S.length}</div>`);
-  clearInterval(liveT);const sl=stage.querySelector('.sl');if(s.t==='pdf')s.render(sl);if(s.t==='live')liveRun(sl,opt.live);
+  clearInterval(liveT);const sl=stage.querySelector('.sl');if(s.t==='pdf')s.render(sl);if(s.t==='live')liveRun(sl,opt.live);if(s.t==='qrn')qrFill(sl.querySelector('.lv-qr'),opt.qr);if(opt.corner&&opt.qr)corner(i);
   if(sl.hasAttribute('data-fit'))fitText(sl);
   requestAnimationFrame(()=>{sl.classList.add('on');paint();});}
 function fitText(sl){const els=[...sl.querySelectorAll('h2,li,.raw,.kq div:last-child')];const base=els.map(x=>parseFloat(getComputedStyle(x).fontSize));
@@ -282,6 +293,10 @@ async function liveRun(sl,pv,once){if(!pv)return;let d;
   if(d.url){sl.querySelector('.lv-qr').innerHTML=await qrSvg(d.url);sl.querySelector('.lv-u').textContent=d.url.replace(/^https?:\/\//,'');}
   liveList(sl,d,pv);if(once)return;
   liveT=setInterval(async()=>{if(!sl.isConnected)return clearInterval(liveT);try{liveList(sl,await pv.get(),pv);}catch(er){}},4000);}
+const qrC={};
+async function qrOf(src){try{const u=await (typeof src==='function'?src():src);if(!u)return '';return qrC[u]||(qrC[u]=await qrSvg(u));}catch(er){return '';}}
+async function qrFill(el,src){const svg=await qrOf(src);if(svg)el.innerHTML=svg;else el.style.visibility='hidden';}
+async function corner(at){const svg=await qrOf(opt.qr);if(!svg||i!==at||stage.querySelector('.cq'))return;const d=document.createElement('div');d.className='cq';d.innerHTML=`<div class="cqr">${svg}</div><span>실시간 질문 보내기</span>`;stage.appendChild(d);}
 function spot(t){const d=document.createElement('div');d.className='lv-spot';d.innerHTML=`<div class="eb">Question</div><div>${e(t)}</div>`;stage.querySelector('.sl').appendChild(d);}
 /* 질문 덱: data = {mode:'all'|'one', cats:[{title,desc,qs:[],kw:[]}]} · qs 중 '↳'로 시작하는 줄 = 위 질문의 참가자 원래 질문 */
 const RAW=/^\s*(↳|>)\s*/;
@@ -306,6 +321,7 @@ function welcomeSlides(m){const sp=m.speaker||{},L=[];
   L.push({t:'brand',ss:`Season 1 · Session 0${m.n}`,wh:[fd(m.date),sp.name?`${sp.name} ${(sp.role||'').split(' ').pop()}`:''].filter(Boolean).join('  ·  ')});
   const nm=t=>(t||'').replace(/\s*\([가-힣]{3}\)/g,'').trim(),tt=(m.timetable||[]).filter(r=>r.pub!==false&&(r.title||'').trim()).map(r=>({t:r.t,title:nm(r.title),note:nm(r.note)}));if(tt.length)L.push({t:'tt',rows:tt});
   L.push({t:'pr',eyebrow:'Off the record',title:`이 자리에서 오간 이야기는<br><span class="gold">이 자리에</span> 남겨 둡니다`,sub:'연사와 참가자 모두 솔직하게 이야기할 수 있도록<br>오늘의 이야기는 외부에 기록하거나 공개하지 않습니다.'});
+  if(m.live)L.push({t:'qrn'});
   const nt=(m.notes||[]).filter(Boolean);if(nt.length)L.push({t:'nt',eyebrow:'Notice',title:'안내',items:nt});
   return L;}
 function farewellSlides(m){const sp=m.speaker||{},L=[];
@@ -330,7 +346,7 @@ async function printParts(parts,title){ensure();clearInterval(loopT);
   const jobs=[];clearInterval(liveT);
   for(const p of parts){const keep=meta;meta=p.meta||{};
     for(const sl of p.slides){const pp=document.createElement('div');pp.className='pp'+(p.nonum?' nonum':'');pp.innerHTML=R[sl.t](sl);stage.appendChild(pp);
-      const el=pp.querySelector('.sl');el.classList.add('on');if(el.hasAttribute('data-fit'))fitText(el);if(sl.t==='pdf')jobs.push(sl.render(el));if(sl.t==='live')jobs.push(liveRun(el,p.live,1));}
+      const el=pp.querySelector('.sl');el.classList.add('on');if(el.hasAttribute('data-fit'))fitText(el);if(sl.t==='pdf')jobs.push(sl.render(el));if(sl.t==='live')jobs.push(liveRun(el,p.live,1));if(sl.t==='qrn')jobs.push(qrFill(el.querySelector('.lv-qr'),p.qr));}
     meta=keep;}
   await Promise.all(jobs);await (document.fonts?document.fonts.ready:Promise.resolve());
   await Promise.all([...stage.querySelectorAll('img')].map(im=>im.complete?0:new Promise(r=>{im.onload=im.onerror=r;})));

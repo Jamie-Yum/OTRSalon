@@ -758,7 +758,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .tg-g{margin:.9rem 0 .3rem;font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:.6rem}.tg-g button{font-size:.78rem}
 .tg-r{display:grid;grid-template-columns:1.4rem 5.5rem 1fr;gap:.5rem;align-items:center;padding:.15rem 0;font-size:.88rem}.tg-r input[type=text]{border:1px solid var(--ln,#e5e0d5);border-radius:6px;padding:.25rem .45rem;font:inherit;font-size:.84rem}
 .tg-list{max-height:48vh;overflow:auto;border-top:1px solid var(--ln,#e5e0d5);border-bottom:1px solid var(--ln,#e5e0d5);padding:.2rem 0 .6rem}
-.tg-pv{display:flex;gap:.6rem;flex-wrap:wrap;margin:.4rem 0 1rem}.tg-pv iframe{border:0;width:182px;height:142px;box-shadow:0 1px 6px rgba(0,0,0,.15)}
+.tg-pv{display:flex;gap:.6rem;flex-wrap:wrap;margin:.4rem 0 1rem}.tg-pv iframe{border:0;width:153px;height:191px;box-shadow:0 1px 6px rgba(0,0,0,.15)}
 </style></head><body>
 <div class="gate" id="gate"><div class="gate-box">
   <h2><span class="lg">OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON</span><small>ADMIN</small></h2>
@@ -786,7 +786,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
   <div class="ap-sum" id="apSum"></div>
   <div class="ap-add"><button class="mn-btn" onclick="appAdd()">+ 신청자 추가</button><span class="note" style="margin:0">마감 뒤 직접 등록할 때 씁니다. 본인이 직접 쓰게 하려면 추가 신청 링크 <a href="https://off-record.kr/apply/late" target="_blank" style="color:var(--ac)">off-record.kr/apply/late</a> 를 보내세요.</span></div>
   <div class="tbl-wrap"><table class="tbl" id="v-apps"></table></div>
-  <div class="mn-head" style="margin-top:3.5rem"><div><div class="eyebrow">Members</div><h2 class="title" style="margin:0">운영멤버 · 리피움 멤버</h2></div><button class="mn-btn" onclick="tagOpen()">명찰 만들기</button></div>
+  <div class="mn-head" style="margin-top:3.5rem"><div><div class="eyebrow">Members</div><h2 class="title" style="margin:0">기획단 · 리피움 멤버</h2></div><button class="mn-btn" onclick="tagOpen()">명찰 만들기</button></div>
   <p class="note">신청서로 들어오지 않는 분들입니다. 칸을 누르면 바로 고칠 수 있고, 다른 곳을 누르면 저장됩니다. 참석 체크는 위 '세션 참석'에서 고른 세션 기준입니다.</p>
   <div id="v-members"></div>
   <div class="mn-head" style="margin-top:3.5rem"><div><div class="eyebrow">Messages</div><h2 class="title" style="margin:0">안내 문자</h2></div><button class="mn-btn" onclick="edit('messages')">+ 문자 추가</button></div>
@@ -891,7 +891,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 
 <div class="modal" id="modal" onclick="if(event.target===this)closeModal()"><div class="mn-editor" id="mForm"></div></div>
 <footer><p>© 2026 OFF&nbsp;<span class="the">THE</span>&nbsp;RECORD SALON · REPIUM LAB · 내부 공유용</p></footer>
-<script src="stage.js?v=19"></script>
+<script src="stage.js?v=20"></script>
 <script>
 const SU='https://dvlrzbckneucpvlacdll.supabase.co';
 const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE';
@@ -1169,7 +1169,7 @@ function setSeason(v){SEASON=Number(v)||1;try{localStorage.setItem('otr_season',
   ['apps','speakers','schedule','fees','actions','milestones','messages','checklist'].forEach(k=>{try{if(D[k])RENDER[k]()}catch(e){}});try{if(D.surveys)renderSurveys()}catch(e){}try{renderRun()}catch(e){}}
 let MB=[];
 async function loadMembers(){MB=await rpc('otr_list',{tbl:'otr_members'});renderMembers();}
-const MB_G=[['운영','운영멤버'],['리피움','리피움 멤버']],MB_PH={name:'이름',role:'소속 / 직함',phone:'010-0000-0000',memo:'메모'};
+const MB_G=[['운영','기획단'],['리피움','리피움 멤버']],MB_PH={name:'이름',role:'소속 / 직함',phone:'010-0000-0000',memo:'메모'};
 function renderMembers(){const el=$('v-members');if(!el)return;const L=MB.filter(inS).sort((a,b)=>(a.sort||0)-(b.sort||0)||a.created_at.localeCompare(b.created_at));
   el.innerHTML=MB_G.map(([g,t])=>{const R=L.filter(r=>r.grp===g),c=k=>R.filter(r=>(r[k]||{})[apSess]).length;
   return `<div class="mb-g"><div class="mb-h"><h3>${t}<small>${R.length}명 · S0${apSess} 1부 ${c('attend')} · 2부 ${c('after_party')}</small></h3><button class="mn-btn ghost" onclick="mbAdd('${g}')">+ 추가</button></div>
@@ -1186,39 +1186,40 @@ async function mbAdd(g){const sort=Math.max(0,...MB.map(r=>r.sort||0))+1;
   try{const id=await rpc('otr_save',{tbl:'otr_members',row_data:{season_no:SEASON,grp:g,name:'',sort}});await loadMembers();const i=document.querySelector(`tr[data-mb="${id}"] input`);if(i)i.focus();}catch(e){alert('추가 실패: '+e.message);}}
 async function mbDel(id){const r=MB.find(x=>x.id===id);if(!confirm(`${r.name||'이 줄'}을(를) 명단에서 지울까요?`))return;
   try{await rpc('otr_delete',{tbl:'otr_members',rid:id});await loadMembers();}catch(e){alert('삭제 실패: '+e.message);}}
-/* 명찰 90×70mm · A4 한 장에 8개 */
+/* 명찰 80×100mm · A4 가로 한 장에 6개 */
 let TAGS=[],tagBlank=0;
-const TAG_G={'참가자':'참가자','운영':'운영진','리피움':'리피움'};
+const TAG_G={'참가자':'참가자','운영':'기획단','리피움':'리피움'};
 function tagOpen(){const n=apSess,apps=(D.apps||[]).filter(inS).filter(r=>r.status==='확정'&&(/Season|4회/.test(r.pass||'')||r.salon_no===n)).sort((a,b)=>a.name.localeCompare(b.name,'ko'));
   const mem=MB.filter(inS).filter(r=>(r.name||'').trim()).sort((a,b)=>(a.sort||0)-(b.sort||0));
   const pre=(L,r)=>L.some(x=>(x.attend||{})[n])?!!(r.attend||{})[n]:true;
-  TAGS=[...apps.map(r=>({g:'참가자',name:r.name,role:r.role||'',on:pre(apps,r)})),...MB_G.flatMap(([g])=>{const L=mem.filter(r=>r.grp===g);return L.map(r=>({g,name:r.name,role:r.role||'',on:pre(L,r)}));})];
+  TAGS=[...apps.map(r=>({g:'참가자',name:r.name,role:r.role||'',on:pre(apps,r)})),...MB_G.flatMap(([g])=>{const L=mem.filter(r=>r.grp===g);return L.filter(r=>g==='운영'||!mem.some(x=>x.grp==='운영'&&x.name.trim()===r.name.trim())).map(r=>({g,name:r.name,role:r.role||(mem.find(x=>x.grp!==g&&x.name.trim()===r.name.trim())||{}).role||'',on:pre(L,r)}));})];
   cur={key:'_tag',id:null};tagRender();$('modal').classList.add('open');}
 function tagRender(){const n=apSess,on=TAGS.filter(t=>t.on).length+tagBlank;
-  $('mForm').innerHTML=`<h3>Session 0${n} 명찰 <small style="font-weight:400;color:var(--tl)">90×70mm · A4 한 장에 8개</small></h3>
+  $('mForm').innerHTML=`<h3>Session 0${n} 명찰 <small style="font-weight:400;color:var(--tl)">80×100mm · A4 가로 한 장에 6개</small></h3>
   <p class="note" style="margin:-.4rem 0 .6rem">세션은 신청 화면의 '세션 참석'에서 고른 세션입니다. 1부 참석 체크가 있으면 체크한 분만, 하나도 없으면 전원이 미리 골라져 있습니다. 소속·직함은 명찰에만 쓰이도록 여기서 고칠 수 있습니다.</p>
   <div class="tg-pv">${['참가자','운영','리피움'].map(g=>{const t=TAGS.find(x=>x.g===g);return t?`<iframe srcdoc="${esc(tagDoc([t],1))}"></iframe>`:'';}).join('')}</div>
   <div class="tg-list">${['참가자','운영','리피움'].map(g=>{const L=TAGS.map((t,i)=>[t,i]).filter(([t])=>t.g===g);if(!L.length)return '';
     return `<div class="tg-g">${TAG_G[g]} ${L.filter(([t])=>t.on).length}/${L.length}<button class="lnk" onclick="TAGS.forEach(t=>{if(t.g==='${g}')t.on=true});tagRender()">모두</button><button class="lnk" onclick="TAGS.forEach(t=>{if(t.g==='${g}')t.on=false});tagRender()">해제</button></div>`+
     L.map(([t,i])=>`<label class="tg-r"><input type="checkbox" ${t.on?'checked':''} onchange="TAGS[${i}].on=this.checked;tagRender()"><b>${esc(t.name)}</b><input type="text" value="${esc(t.role)}" placeholder="소속 / 직함" onchange="TAGS[${i}].role=this.value.trim()"></label>`).join('');}).join('')}</div>
   <div style="margin-top:.8rem;font-size:.88rem">빈 명찰 (현장 추가용) <input type="number" min="0" max="40" value="${tagBlank}" style="width:4rem;margin-left:.4rem" onchange="tagBlank=Math.max(0,Math.min(40,+this.value||0));tagRender()"> 장</div>
-  <div class="mn-actions"><span class="note" style="margin:0 auto 0 0">총 ${on}장 · A4 ${Math.ceil(on/8)||0}장</span><button class="mn-btn ghost" onclick="closeModal()">닫기</button><button class="mn-btn" ${on?'':'disabled'} onclick="tagPrint()">PDF로 저장 · 인쇄</button></div>`;}
-function tagDoc(list,one){const n=apSess,fs=t=>{const l=[...t].length;return l<=3?30:l===4?26:l<=6?21:16;};
-  const card=t=>`<div class="t g-${t.g}"><div class="hd">OFF <span class="the">THE</span> RECORD SALON</div><div class="bd"><div class="nm" style="font-size:${fs(t.name)}pt">${esc(t.name)||'&nbsp;'}</div><div class="rl">${esc(t.role)||'&nbsp;'}</div></div><div class="ft"><span>Season ${SEASON} · Session 0${n}</span><b>${TAG_G[t.g]}</b></div></div>`;
-  const pages=[];for(let i=0;i<list.length;i+=8)pages.push(list.slice(i,i+8));
+  <div class="mn-actions"><span class="note" style="margin:0 auto 0 0">총 ${on}장 · A4 ${Math.ceil(on/6)||0}장</span><button class="mn-btn ghost" onclick="closeModal()">닫기</button><button class="mn-btn" ${on?'':'disabled'} onclick="tagPrint()">PDF로 저장 · 인쇄</button></div>`;}
+function tagDoc(list,one){const n=apSess,fs=t=>{const l=[...t].length;return l<=3?34:l===4?28:l<=6?22:17;};
+  const card=t=>`<div class="t g-${t.g}"><div class="hd">OFF <span class="the">THE</span> RECORD SALON</div><div class="bd"><div class="nm" style="font-size:${fs(t.name)}pt">${esc(t.name)||'&nbsp;'}</div><div class="rl">${esc(t.role)||'&nbsp;'}</div></div><div class="ft"><b>${TAG_G[t.g]}</b><span>Season ${SEASON} · Session 0${n}</span></div></div>`;
+  const pages=[];for(let i=0;i<list.length;i+=6)pages.push(list.slice(i,i+6));
   return `<!doctype html><html><head><meta charset="utf-8"><title>오프더레코드살롱_S${SEASON}-0${n}_명찰</title>
 <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;800&display=swap" rel="stylesheet">
-<style>@page{size:A4;margin:0}*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Pretendard',sans-serif;background:${one?'#fff':'#eee'};color:#141414;word-break:keep-all}
-.pg{width:210mm;height:297mm;padding:8.5mm 15mm;display:grid;grid-template-columns:90mm 90mm;grid-auto-rows:70mm;background:#fff;margin:0 auto 6mm;break-after:page;page-break-after:always}
+<style>@page{size:A4 landscape;margin:0}*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Pretendard',sans-serif;background:${one?'#fff':'#eee'};color:#141414;word-break:keep-all}
+.pg{width:297mm;height:210mm;padding:5mm 28.5mm;display:grid;grid-template-columns:repeat(3,80mm);grid-auto-rows:100mm;background:#fff;margin:0 auto 6mm;break-after:page;page-break-after:always}
 .pg:last-child{break-after:auto;page-break-after:auto}
-.t{width:90mm;height:70mm;outline:.2mm dashed #c8c8c8;outline-offset:-.1mm;display:flex;flex-direction:column;overflow:hidden;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.hd{padding:6mm 7mm 0;font-family:'Inter Tight',sans-serif;font-weight:800;font-size:8pt;letter-spacing:.02em;word-spacing:-.18em}.the{font-size:.66em}
-.hd::after{content:'';display:block;width:8mm;height:.7mm;background:#C9B37E;margin-top:2.6mm}
-.bd{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 7mm}
-.nm{font-weight:800;letter-spacing:.06em;line-height:1.1}.rl{font-size:9.5pt;color:#555;margin-top:2.4mm;line-height:1.35;max-height:2.7em;overflow:hidden}
-.ft{height:10.5mm;display:flex;align-items:center;justify-content:space-between;padding:0 7mm;font-family:'Inter Tight','Pretendard',sans-serif;font-size:7.5pt;letter-spacing:.14em;text-transform:uppercase}.ft b{letter-spacing:.08em;font-weight:700}
+.t{width:80mm;height:100mm;outline:.2mm dashed #c8c8c8;outline-offset:-.1mm;display:flex;flex-direction:column;overflow:hidden;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.hd{padding:8mm 7mm 0;font-family:'Inter Tight',sans-serif;font-weight:800;font-size:8.5pt;letter-spacing:.02em;word-spacing:-.18em}.the{font-size:.66em}
+.hd::after{content:'';display:block;width:9mm;height:.7mm;background:#C9B37E;margin-top:3mm}
+.bd{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 7mm 4mm}
+.nm{font-weight:800;letter-spacing:.06em;line-height:1.15}.rl{font-size:10pt;color:#555;margin-top:3mm;line-height:1.4;max-height:4.2em;overflow:hidden}
+.ft{height:15mm;display:flex;flex-direction:column;justify-content:center;gap:1mm;padding:0 7mm;font-family:'Inter Tight','Pretendard',sans-serif}
+.ft b{font-family:'Pretendard',sans-serif;font-size:10pt;font-weight:700;letter-spacing:.08em}.ft span{font-size:6.5pt;letter-spacing:.16em;text-transform:uppercase;opacity:.85}
 .g-참가자 .ft{background:#141414;color:#C9B37E}.g-운영 .ft{background:#C9B37E;color:#141414}.g-리피움 .ft{background:#5F7466;color:#fff}
-${one?'.t{zoom:.53;outline:0}':''}
+${one?'.t{zoom:.5;outline:0}':''}
 @media print{body{background:#fff}.pg{margin:0}}</style></head><body>${one?card(list[0]):pages.map(p=>`<div class="pg">${p.map(card).join('')}</div>`).join('')}</body></html>`;}
 function tagPrint(){const list=[...TAGS.filter(t=>t.on),...Array.from({length:tagBlank},()=>({g:'참가자',name:'',role:''}))];
   const w=window.open('','_blank');if(!w)return alert('팝업이 막혔습니다. 이 사이트의 팝업을 허용해 주세요.');
@@ -1329,17 +1330,18 @@ async function talkGo(o){Stage.talk(runCtx(runSess,'talk'),await talkBlob(),o);}
 async function runPdf(which){const n=runSess,parts=[],lab={label:`SESSION 0${n}`},NM={welcome:'입장안내',talk:'강연',qa:'질문',live:'현장질문',farewell:'퇴장안내'};
   const W=which==='all'?['welcome','talk','qa','live','farewell']:[which];
   for(const k of W){
-    if(k==='welcome')parts.push({slides:Stage.slides.welcome(runCtx(n,'welcome')),meta:lab});
+    if(k==='welcome')parts.push({slides:Stage.slides.welcome({...runCtx(n,'welcome'),live:1}),meta:lab,qr:()=>livePv(n).get().then(d=>d.url)});
     if(k==='farewell')parts.push({slides:Stage.slides.farewell(runCtx(n,'farewell')),meta:lab});
     if(k==='live')parts.push({slides:Stage.slides.live(),meta:lab,live:livePv(n)});
     if(k==='qa'){const qa=deckOf(n,'qa');if(qa&&(qa.data.cats||[]).some(c=>c.title))parts.push({slides:Stage.slides.qa(qa.data,runMeta(n)),meta:runMeta(n),nonum:qa.data.showNum===false});else if(which==='qa')return alert('질문 덱 내용이 없습니다.');}
     if(k==='talk'){const b=await talkBlob();let doc=null;if(b){doc=await Stage.loadPdf(b);if(doc===false)return;}const m=runCtx(n,'talk');parts.push({slides:Stage.slides.talk(m,doc),meta:{label:`SESSION 0${n}${m.speaker.name?' · '+m.speaker.name:''}`}});}}
   Stage.print(parts,`오프더레코드살롱_S${SEASON}-0${n}_${which==='all'?'전체장표':NM[which]}`);}
-function runChain(k,loop){const n=runSess,skip=o=>{const f=o.atEnd?o.prev:o.next;if(f)f();};
-  Stage.chain([{label:'① 입장 안내',loop:loop?10000:0,run:o=>Stage.welcome(runCtx(n,'welcome'),o)},
-    {label:'② 강연',run:o=>talkGo(o)},
-    {label:'③ 질문',run:o=>{const qa=deckOf(n,'qa');if(qa&&(qa.data.cats||[]).some(c=>c.title))Stage.qa(qa.data,runMeta(n),o);else skip(o);}},
-    {label:'④ 현장 질문',run:o=>Stage.live({n},{...o,live:livePv(n)})},
+/* 진행 화면을 띄우면 현장 질문 받기가 열리고, QR은 ① 안내 장 + ②③ 왼쪽 아래에 */
+function runChain(k,loop){const n=runSess,skip=o=>{const f=o.atEnd?o.prev:o.next;if(f)f();},pv=livePv(n),qr=pv.start().then(()=>pv.get()).then(d=>d.url).catch(()=>'');
+  Stage.chain([{label:'① 입장 안내',loop:loop?10000:0,run:o=>Stage.welcome({...runCtx(n,'welcome'),live:1},{...o,qr})},
+    {label:'② 강연',run:o=>talkGo({...o,qr,corner:1})},
+    {label:'③ 질문',run:o=>{const qa=deckOf(n,'qa');if(qa&&(qa.data.cats||[]).some(c=>c.title))Stage.qa(qa.data,runMeta(n),{...o,qr,corner:1});else skip(o);}},
+    {label:'④ 현장 질문',run:o=>Stage.live({n},{...o,live:pv})},
     {label:'⑤ 퇴장 안내',run:o=>Stage.farewell(runCtx(n,'farewell'),o)}],k);}
 const liveUrl=c=>'https://off-record.kr/ask.html?c='+c;
 /* 현장 질문: preview=1이면 띄워도 질문 받기를 열지 않음 */
@@ -1351,7 +1353,7 @@ async function liveEdit(){cur={key:'_live',id:null};$('mForm').innerHTML='<p cla
 async function liveLoad(){try{liveD=await rpc('otr_live_admin',{season:SEASON,salon:runSess});}catch(e){$('mForm').innerHTML=`<p class="note">불러오지 못했습니다: ${esc(e.message)}</p>`;return;}
   if(!cur||cur.key!=='_live')return;const d=liveD,u=liveUrl(d.code),vis=d.qs.filter(q=>!q.hidden).length,tm=t=>new Date(t).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
   $('mForm').innerHTML=`<h3>Session 0${runSess} 현장 질문</h3>
-  <p class="note" style="margin:-.4rem 0 1rem">④ 현장 질문 장표에 QR이 뜨고, 참가자가 보낸 질문이 4초마다 화면에 올라옵니다. 진행 화면에서 그 장표를 띄우면 질문 받기가 자동으로 열립니다.</p>
+  <p class="note" style="margin:-.4rem 0 1rem">① 입장 안내의 QR 안내 장과 ②③ 장표 왼쪽 아래에 QR이 뜨고, ④ 현장 질문 장표에 들어온 질문이 4초마다 올라옵니다. 진행 화면에서 장표를 띄우면 질문 받기가 자동으로 열립니다.</p>
   <div class="lv-bar"><span class="lv-dot ${d.open?'on':''}">${d.open?'질문 받는 중':'닫힘'}</span><button class="mn-btn ${d.open?'ghost':''}" onclick="liveSet(${!d.open})">${d.open?'질문 받기 닫기':'질문 받기 열기'}</button></div>
   <div class="sh-row" style="margin:.8rem 0"><b>참가자 주소</b><code>${u}</code><button class="lnk" onclick="shCopy(this,'${u}')">복사</button><a class="lnk" href="${u}" target="_blank">열기</a></div>
   <div class="lv-h2">질문 ${d.qs.length}개${d.qs.length-vis?` · 숨김 ${d.qs.length-vis}개`:''}</div>
@@ -1392,7 +1394,7 @@ function renderRun(){if(!$('v-run'))return;
     ${(()=>{const c=runCtx(runSess,'welcome');return card('① 입장 안내',`환영 · ${c.timetable.filter(r=>r.pub!==false).length?'시간표 · ':''}원칙${c.notes.length?` · 안내 ${c.notes.length}줄`:''} — 자동 넘김은 10초 간격으로 반복`,`<button class="mn-btn ghost" onclick="notesEdit('welcome')">안내 문구</button><button class="mn-btn ghost" onclick="runChain(0)">띄우기</button><button class="mn-btn" onclick="runChain(0,1)">자동 넘김</button><button class="mn-btn ghost" title="PDF로 저장" onclick="runPdf('welcome')">PDF</button>`);})()}
     ${(()=>{const f=FILES.find(x=>(x.season_no||1)===SEASON&&x.salon_no===runSess&&x.kind==='talk');return card('② 강연',`인트로(연사 소개) → 연사 PDF → 아우트로(질문 세션으로)<br>${f?`<b style="color:var(--dk)">${esc(f.name)}</b> · ${(f.size/1048576).toFixed(1)}MB`:'아직 PDF가 없습니다'}`,`<label class="mn-btn ghost" style="cursor:pointer">${f?'PDF 바꾸기':'PDF 올리기'}<input type="file" accept="application/pdf" hidden onchange="talkUp(this.files[0])"></label><button class="mn-btn" id="talkGo" onclick="runChain(1)">띄우기</button><button class="mn-btn ghost" title="PDF로 저장" onclick="runPdf('talk')">PDF</button>`);})()}
     ${card('③ 질문',nc?`주제 ${nc}개 · 질문 ${(qa.data.cats||[]).reduce((a,c)=>a+(c.qs||[]).filter(Boolean).length,0)}개 · 주제마다 답변 키워드`:'아직 내용이 없습니다',`<button class="mn-btn ghost" onclick="qaEdit()">편집</button><button class="mn-btn" ${nc?'':'disabled'} onclick="runChain(2)">띄우기</button><button class="mn-btn ghost" title="PDF로 저장" onclick="runPdf('qa')">PDF</button>`)}
-    ${card('④ 현장 질문','QR로 참가자 질문을 받아 화면에 실시간으로 띄움 — 띄우면 질문 받기가 자동으로 열림',`<button class="mn-btn ghost" onclick="liveEdit()">질문 관리</button><button class="mn-btn" onclick="runChain(3)">띄우기</button><button class="mn-btn ghost" title="PDF로 저장" onclick="runPdf('live')">PDF</button>`)}
+    ${card('④ 현장 질문','QR로 받은 참가자 질문을 화면에 실시간으로 띄움 — ①~⑤ 어느 장표든 띄우면 질문 받기가 자동으로 열리고, ① 안내 장과 ②③ 왼쪽 아래에 QR이 뜸',`<button class="mn-btn ghost" onclick="liveEdit()">질문 관리</button><button class="mn-btn" onclick="runChain(3)">띄우기</button><button class="mn-btn ghost" title="PDF로 저장" onclick="runPdf('live')">PDF</button>`)}
     ${(()=>{const c=runCtx(runSess,'farewell');return card('⑤ 퇴장 안내',`감사 인사${c.notes.length?' · 2부 안내':''}${c.next&&c.next.name?` · 다음 세션(${esc(c.next.name)}) 예고`:''}`,`<button class="mn-btn ghost" onclick="notesEdit('farewell')">2부 안내 문구</button><button class="mn-btn" onclick="runChain(4)">띄우기</button><button class="mn-btn ghost" title="PDF로 저장" onclick="runPdf('farewell')">PDF</button>`);})()}
   </div>${shareBox()}<div id="qaEd"></div>`;
   if(qaDraft)qaRender();}
