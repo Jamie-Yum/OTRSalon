@@ -51,6 +51,13 @@ const css=`
 #stg .hero .who span{display:block;font-size:34px;color:rgba(237,230,214,.7);margin-top:10px}
 #stg .hero .ph{position:absolute;right:0;top:0;bottom:0;width:760px;background:#1E1E1E center 18%/cover no-repeat}
 #stg .hero .ph::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,#141414 0%,rgba(20,20,20,.35) 30%,transparent 55%)}
+#stg .brand{justify-content:center;align-items:center;text-align:center;padding:0}
+#stg .brand::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,rgba(201,179,126,.13),transparent 62%)}
+#stg .brand .bw{position:relative;font-family:'Inter Tight',sans-serif;font-weight:800;font-size:148px;line-height:1;letter-spacing:.01em;word-spacing:-.16em;color:#EDE6D6;white-space:nowrap}
+#stg .brand .bw .the{font-size:.66em;color:#C9B37E}
+#stg .brand .ln{position:relative;width:120px;height:3px;background:#C9B37E;margin:70px auto 56px}
+#stg .brand .ss{position:relative;font-family:'Inter Tight',sans-serif;font-size:34px;letter-spacing:.28em;color:#C9B37E;text-transform:uppercase}
+#stg .brand .wh{position:relative;font-size:40px;color:rgba(237,230,214,.72);margin-top:28px}
 #stg .tt{justify-content:center}
 #stg .tt h2{font-size:60px;font-weight:700;margin:20px 0 48px}
 #stg .tt ol{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:max-content 1fr;column-gap:56px;row-gap:22px}
@@ -90,6 +97,7 @@ const R={
   q:s=>`<div class="sl q">${top()}<div class="qn">${String(s.n).padStart(2,'0')} · ${e(s.cat)} &nbsp;—&nbsp; ${s.qi} / ${s.qn}</div><h2><span>${e(s.text)}</span></h2></div>`,
   kw:s=>`<div class="sl kw">${top()}<div class="eb">${String(s.n).padStart(2,'0')} · Keywords</div><h2>${e(s.cat)}</h2><ul class="${s.items.length>5?'many':''}">${s.items.map(x=>{const [a,b]=String(x).split('|');return `<li>${e(a.trim())}${b?`<small>${e(b.trim())}</small>`:''}</li>`}).join('')}</ul></div>`,
   hero:s=>`<div class="sl hero">${top()}${s.photo?`<div class="ph" style="background-image:url('${e(s.photo)}')"></div>`:''}<div class="eb">${e(s.eyebrow||'')}</div><div class="wmb" style="margin-top:28px">OFF <span class="the">THE</span><br>RECORD SALON</div><div class="ss">${e(s.ss||'')}</div>${s.name?`<div class="who"><b>${e(s.name)}</b><span>${e(s.role||'')}</span></div>`:''}</div>`,
+  brand:s=>`<div class="sl brand"><div class="bw">OFF <span class="the">THE</span> RECORD SALON</div><div class="ln"></div><div class="ss">${e(s.ss||'')}</div>${s.wh?`<div class="wh">${e(s.wh)}</div>`:''}</div>`,
   tt:s=>`<div class="sl tt">${top()}<div class="eb">Timetable</div><h2>${e(s.title||'오늘의 진행 순서')}</h2><ol class="${s.rows.length>8?'dense':''}">${s.rows.map(r=>`<li><span>${e(r.t||'·')}</span><b>${e(r.title)}${r.note?`<small>${e(r.note)}</small>`:''}</b></li>`).join('')}</ol></div>`,
   pr:s=>`<div class="sl pr">${top()}<div class="eb">${e(s.eyebrow||'')}</div><h2>${s.title}</h2>${s.sub?`<p>${s.sub}</p>`:''}</div>`,
   nt:s=>`<div class="sl nt">${top()}<div class="eb">${e(s.eyebrow||'Notice')}</div><h2>${e(s.title)}</h2><ul>${s.items.map(x=>`<li>${e(x)}</li>`).join('')}</ul></div>`,
@@ -125,7 +133,7 @@ function qaSlides(d,m){const L=[],cats=(d.cats||[]).filter(c=>c.title);
 /* 입장·퇴장: m = {n, speaker:{name,role,photo}, date, timetable:[], notes:[], next:{n,name,role,date}} */
 const fd=d=>{if(!d)return '';const x=new Date(d+'T00:00:00');return `${x.getFullYear()}. ${x.getMonth()+1}. ${x.getDate()} (${'일월화수목금토'[x.getDay()]})`;};
 function welcomeSlides(m){const sp=m.speaker||{},L=[];
-  L.push({t:'hero',eyebrow:'Welcome',ss:`Season 1 · Session 0${m.n} · ${fd(m.date)}`,name:sp.name,role:sp.role,photo:sp.photo});
+  L.push({t:'brand',ss:`Season 1 · Session 0${m.n}`,wh:[fd(m.date),sp.name?`${sp.name} ${(sp.role||'').split(' ').pop()}`:''].filter(Boolean).join('  ·  ')});
   const nm=t=>(t||'').replace(/\s*\([가-힣]{3}\)/g,'').trim(),tt=(m.timetable||[]).filter(r=>r.pub!==false&&(r.title||'').trim()).map(r=>({t:r.t,title:nm(r.title),note:nm(r.note)}));if(tt.length)L.push({t:'tt',rows:tt});
   L.push({t:'pr',eyebrow:'Off the record',title:`이 자리에서 오간 이야기는<br><span class="gold">이 자리에</span> 남겨 둡니다`,sub:'연사와 참가자 모두 솔직하게 이야기할 수 있도록<br>오늘의 이야기는 외부에 기록하거나 공개하지 않습니다.'});
   const nt=(m.notes||[]).filter(Boolean);if(nt.length)L.push({t:'nt',eyebrow:'Notice',title:'안내',items:nt});
