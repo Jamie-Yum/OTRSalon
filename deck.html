@@ -26,7 +26,7 @@ h1{font-size:clamp(1.8rem,5vw,2.6rem);font-weight:700;line-height:1.3}
 @media(max-width:620px){.g{grid-template-columns:1fr}}
 </style></head><body>
 <div class="w" id="app"><div class="wm">OFF <span class="the">THE</span> RECORD SALON</div><p class="sub" style="margin-top:2rem">불러오는 중…</p></div>
-<script src="/stage.js?v=18"></script>
+<script src="/stage.js?v=19"></script>
 <script>
 const SU='https://dvlrzbckneucpvlacdll.supabase.co',SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR2bHJ6YmNrbmV1Y3B2bGFjZGxsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODE0OTUsImV4cCI6MjA5MDU1NzQ5NX0.ofzGfyjndiT-FAIcG9TCFtUSXsagTBYOnhsP91vx0sE';
 const q=new URLSearchParams(location.search),TOK=q.get('k'),$=id=>document.getElementById(id);
@@ -41,23 +41,24 @@ async function talkPdf(){const b=$('b-talk');if(!pdf&&D.pdf){b.querySelector('sp
   return pdf;}
 async function talk(o){Stage.talk(ctx('talk'),await talkPdf(),o);}
 const META=()=>({speaker:D.speaker&&D.speaker.name?D.speaker.name+' '+(D.speaker.role||'').split(' ').pop():'',label:`SESSION 0${D.n}${D.speaker&&D.speaker.name?' · '+D.speaker.name:''}`});
-async function savePdf(which){const parts=[],lab={label:`SESSION 0${D.n}`},NM={welcome:'입장안내',talk:'강연',qa:'질문',farewell:'퇴장안내'};
-  for(const k of which==='all'?['welcome','talk','qa','farewell']:[which]){
+async function savePdf(which){const parts=[],lab={label:`SESSION 0${D.n}`},NM={welcome:'입장안내',talk:'강연',qa:'질문',live:'현장질문',farewell:'퇴장안내'};
+  for(const k of which==='all'?['welcome','talk','qa','live','farewell']:[which]){
+    if(k==='live')parts.push({slides:Stage.slides.live(),meta:lab,live:LIVE});
     if(k==='welcome')parts.push({slides:Stage.slides.welcome(ctx('welcome')),meta:lab});
     if(k==='farewell')parts.push({slides:Stage.slides.farewell(ctx('farewell')),meta:lab});
-    if(k==='qa'&&((D.decks.qa||{}).cats||[]).some(c=>c.title))parts.push({slides:Stage.slides.qa(D.decks.qa,META()),meta:META(),nonum:D.decks.qa.showNum===false,live:LIVE});
+    if(k==='qa'&&((D.decks.qa||{}).cats||[]).some(c=>c.title))parts.push({slides:Stage.slides.qa(D.decks.qa,META()),meta:META(),nonum:D.decks.qa.showNum===false});
     if(k==='talk'){const b=await talkPdf();let doc=null;if(b){doc=await Stage.loadPdf(b);if(doc===false)return;}parts.push({slides:Stage.slides.talk(ctx('talk'),doc),meta:{label:META().label}});}}
   Stage.print(parts,`오프더레코드살롱_S${D.season}-0${D.n}_${which==='all'?'전체장표':NM[which]}`);}
 function openDeck(k){const meta={speaker:D.speaker&&D.speaker.name?D.speaker.name+' '+(D.speaker.role||'').split(' ').pop():'',label:`SESSION 0${D.n}${D.speaker&&D.speaker.name?' · '+D.speaker.name:''}`};
   const hasQa=((D.decks.qa||{}).cats||[]).some(c=>c.title),skip=o=>{const f=o.atEnd?o.prev:o.next;if(f)f();};
   Stage.chain([{label:'① 입장 안내',run:o=>Stage.welcome(ctx('welcome'),o)},{label:'② 강연',run:o=>talk(o)},
-    {label:'③ 질문',run:o=>hasQa?Stage.qa(D.decks.qa,meta,{...o,live:LIVE}):skip(o)},{label:'④ 퇴장 안내',run:o=>Stage.farewell(ctx('farewell'),o)}],['welcome','talk','qa','farewell'].indexOf(k));}
-const DESC={welcome:'참가자가 입장해 기다리는 동안 띄워 두는 장표',talk:'연사 소개 → 강연 자료 → 질문 세션으로 넘어가는 장표',qa:'미리 받은 질문을 다섯 가지 주제로 묶어 묻고, 주제마다 답변 키워드를 정리',farewell:'감사 인사 · 2부 안내 · 다음 세션 예고'};
+    {label:'③ 질문',run:o=>hasQa?Stage.qa(D.decks.qa,meta,o):skip(o)},{label:'④ 현장 질문',run:o=>Stage.live({n:D.n},{...o,live:LIVE})},{label:'⑤ 퇴장 안내',run:o=>Stage.farewell(ctx('farewell'),o)}],['welcome','talk','qa','live','farewell'].indexOf(k));}
+const DESC={welcome:'참가자가 입장해 기다리는 동안 띄워 두는 장표',talk:'연사 소개 → 강연 자료 → 질문 세션으로 넘어가는 장표',qa:'미리 받은 질문을 다섯 가지 주제로 묶어 묻고, 주제마다 답변 키워드를 정리',live:'참가자가 QR로 보낸 질문이 화면에 실시간으로 올라오는 장표',farewell:'감사 인사 · 2부 안내 · 다음 세션 예고'};
 (async()=>{
   if(!TOK){$('app').innerHTML+='<p class="sub err">링크가 올바르지 않습니다.</p>';return;}
   try{D=await call('otr_share_get',{tok:TOK});}catch(e){$('app').innerHTML=`<div class="wm">OFF <span class="the">THE</span> RECORD SALON</div><p class="sub err" style="margin-top:2rem">${esc(e.message)}</p>`;return;}
   const sp=D.speaker||{},qa=((D.decks.qa||{}).cats||[]).filter(c=>c.title).length;
-  const L=[['welcome','① 입장 안내',1],['talk','② 강연',1],['qa','③ 질문',qa>0],['farewell','④ 퇴장 안내',1]];
+  const L=[['welcome','① 입장 안내',1],['talk','② 강연',1],['qa','③ 질문',qa>0],['live','④ 현장 질문',1],['farewell','⑤ 퇴장 안내',1]];
   $('app').innerHTML=`<div class="wm">OFF <span class="the">THE</span> RECORD SALON</div>
   <div class="eb">Season ${D.season} · Session 0${D.n}</div><h1>${sp.name?esc(sp.name)+' '+esc((sp.role||'').split(' ').pop())+'님 세션':'진행 장표'}</h1>
   <p class="sub">당일 현장 화면에 띄울 장표입니다. 카드를 누르면 실제 화면과 같은 모습으로 열립니다.</p>

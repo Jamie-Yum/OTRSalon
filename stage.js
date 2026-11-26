@@ -224,7 +224,7 @@ const css=`
 let root,stage,S=[],i=0,step=0,meta={},hideT,loopT,liveT,opt={};
 let cssOn=0;function ensureCss(){if(cssOn)return;cssOn=1;const st=document.createElement('style');st.textContent=css+css.replace(/\/\*P\*\/[\s\S]*?\/\*\/P\*\//,'').replace(/#stg/g,'.stgt')+'.stgt{position:relative!important;inset:auto!important;z-index:auto!important;display:block!important;cursor:default!important;overflow:hidden;background:#141414}.stgt .stage{left:0!important;top:0!important;transform-origin:0 0}';document.head.appendChild(st);}
 function ensure(){if(root)return;ensureCss();
-  root=document.createElement('div');root.id='stg';root.innerHTML='<div class="stage"></div><button class="x" title="닫기 (Esc)">✕</button><div class="hint">→ 다음 · ← 이전 · M 목차 · 1~9 주제 이동 · Q 현장 질문 · F 전체 화면 · Esc 닫기</div>';document.body.appendChild(root);stage=root.querySelector('.stage');
+  root=document.createElement('div');root.id='stg';root.innerHTML='<div class="stage"></div><button class="x" title="닫기 (Esc)">✕</button><div class="hint">→ 다음 · ← 이전 · M 목차 · 1~9 주제 이동 · F 전체 화면 · Esc 닫기</div>';document.body.appendChild(root);stage=root.querySelector('.stage');
   addEventListener('resize',fit);
   document.addEventListener('keydown',key);
   root.addEventListener('click',e=>{if(e.target.closest('.x')){close();return;}
@@ -266,7 +266,6 @@ function key(ev){if(!root||!root.classList.contains('on'))return;const k=ev.key;
   if(['ArrowRight','ArrowDown',' ','PageDown','Enter'].includes(k)){ev.preventDefault();next();}
   else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(k)){ev.preventDefault();prev();}
   else if(k==='Escape'){const sp=stage.querySelector('.lv-spot');sp?sp.remove():close();}
-  else if(k==='q'||k==='Q'){const c=S.findIndex(s=>s.t==='live');if(c>=0)go(c);}
   else if(k==='f'||k==='F'){document.fullscreenElement?document.exitFullscreen():root.requestFullscreen().catch(()=>{});}
   else if(k==='m'||k==='M'||k==='Home'){const a=S.findIndex(s=>s.t==='agenda');if(a>=0)go(a);}
   else if(/^[1-9]$/.test(k)){const c=S.findIndex(s=>s.t==='cover'&&s.n===+k);if(c>=0)go(c);}}
@@ -291,15 +290,14 @@ function uniqRaw(list){const key=t=>t.replace(/[^0-9A-Za-z가-힣]/g,'').slice(0
   list.forEach(t=>{const k=key(t),c=t.replace(/\s*\(…\)\s*/g,' … ').trim();if(!m.has(k)||c.length>m.get(k).length)m.set(k,c);});return [...m.values()];}
 function qaSlides(d,m){const L=[],cats=(d.cats||[]).filter(c=>c.title);
   L.push({t:'title',eyebrow:'Q&A Session',title:`질문에서 시작하는<br><span class="gold">대화</span>`,sub:`참가자 여러분이 미리 보내주신 질문을<br>다섯 가지 주제로 묶었습니다.`});
-  const live=d.showLive!==false,ag={t:'agenda',v:d.agenda||'cols',cats:cats.map(c=>({title:c.title,key:d.showKey!==false?c.key:''}))};if(live){ag.cats.push({title:'현장 질의응답',key:'궁금한 것을 자유롭게 물어보세요',live:1});ag.title=`${['','한','두','세','네','다섯','여섯','일곱','여덟','아홉'][cats.length]||cats.length} 가지 주제와 현장 질의응답`;}L.push(ag);
+  const ag={t:'agenda',v:d.agenda||'cols',cats:cats.map(c=>({title:c.title,key:d.showKey!==false?c.key:''}))};L.push(ag);
   cats.forEach((c,k)=>{ag.cats[k].at=L.length;const n=k+1;
     const key=d.showKey!==false?c.key:'';L.push({t:'cover',n,title:c.title,desc:c.desc,key});
     const qs=parseQs(c.qs),showQ=d.showCore!==false,showR=d.showRaw!==false;
     if(d.mode==='one')qs.forEach((x,j)=>L.push({t:'q',n,cat:c.title,qi:j+1,qn:qs.length,text:x.q,raw:showR?uniqRaw(x.raw):[]}));
     else{const core=showQ?qs.map(x=>x.q):[],raw=showR?uniqRaw(qs.flatMap(x=>x.raw)):[];if(core.length||raw.length)L.push({t:'qall',n,cat:c.title,key,qs:core,raw});}
     const kw=(c.kw||[]).filter(Boolean);if(kw.length)L.push({t:'kw',n,cat:c.title,items:kw});
-    if(k<cats.length-1||live)L.push({...ag,cur:k+1});});
-  if(live){ag.cats[cats.length].at=L.length;L.push({t:'live'});}
+    if(k<cats.length-1)L.push({...ag,cur:k+1});});
   L.push({t:'title',eyebrow:'Thank you',title:`오늘의 질문은<br><span class="gold">이 자리에</span> 남겨 둡니다`,sub:m.speaker?`${e(m.speaker)}님, 솔직한 이야기 감사합니다.`:''});
   return L;}
 /* 입장·퇴장: m = {n, speaker:{name,role,photo}, date, timetable:[], notes:[], next:{n,name,role,date}} */
@@ -344,7 +342,7 @@ function thumb(sl,m,o,w){ensureCss();const k=meta;meta=m||{};const h=R[sl.t](sl)
   return `<div class="stgt" style="width:${1920*sc}px;height:${1080*sc}px"><div class="stage${o&&o.nonum?' nonum':''}" style="transform:scale(${sc})">${h}</div></div>`;}
 window.Stage={
   thumb,
-  slides:{welcome:m=>welcomeSlides(m),farewell:m=>farewellSlides(m),qa:(d,m)=>qaSlides(d,m||{}),talk:(m,doc)=>talkSlides(m,doc)},
+  slides:{live:()=>[{t:'live'}],welcome:m=>welcomeSlides(m),farewell:m=>farewellSlides(m),qa:(d,m)=>qaSlides(d,m||{}),talk:(m,doc)=>talkSlides(m,doc)},
   print:printParts,
   async loadPdf(file){let tk=null;try{const lib=await pdfLib();tk=lib.getDocument({data:await file.arrayBuffer()});tk.onPassword=(cb,why)=>{const pw=prompt(why===2?'비밀번호가 맞지 않습니다. 다시 입력해 주세요.':'이 PDF는 비밀번호가 필요합니다.');if(pw==null){tk.cancelled=1;tk.destroy();}else cb(pw);};return await tk.promise;}catch(err){if(tk&&tk.cancelled)return false;alert('PDF를 열지 못했습니다: '+err.message);return false;}},
   async talk(m,file,o){let doc=null;if(file){doc=await this.loadPdf(file);if(doc===false)return;}
@@ -352,9 +350,10 @@ window.Stage={
   open(slides,m,o){ensure();clearInterval(loopT);opt=o||{};meta=m||{};S=slides;i=opt.atEnd?slides.length-1:0;step=opt.atEnd?steps(S[i]):0;stage.classList.toggle('nonum',!!opt.nonum);const was=root.classList.contains('on');root.classList.add('on');fit();draw();if(!was&&!document.fullscreenElement)root.requestFullscreen?.().catch(()=>{});
     if(o&&o.loop&&S.length>1)loopT=setInterval(()=>{i=(i+1)%S.length;step=0;draw();},o.loop);},
   welcome(m,o){this.open(welcomeSlides(m),{label:`SESSION 0${m.n}`},o);},
+  live(m,o){this.open([{t:'live'}],{label:`SESSION 0${m.n}`},o);},
   farewell(m,o){this.open(farewellSlides(m),{label:`SESSION 0${m.n}`},o);},
   qa(d,m,o){if(!(d.cats||[]).some(c=>c.title))return alert('질문 덱 내용이 없습니다.');this.open(qaSlides(d,m||{}),m,{...(o||{}),nonum:d.showNum===false});},
-  /* 4개 덱 잇기: list=[{label,run(o)}], 마지막 장 → 다음 덱, 첫 장 ← 이전 덱 */
+  /* 덱 잇기: list=[{label,run(o)}], 마지막 장 → 다음 덱, 첫 장 ← 이전 덱 */
   chain(list,k,atEnd){const go=(j,end)=>{const it=list[j];if(!it)return;it.run({atEnd:end,loop:it.loop,nextLabel:list[j+1]&&list[j+1].label,next:list[j+1]?()=>go(j+1,false):null,prev:j>0?()=>go(j-1,true):null});};go(k||0,!!atEnd);}
 };
 })();
