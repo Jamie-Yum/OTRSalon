@@ -89,6 +89,11 @@ const css=`
 #stg .qa2 .raw{list-style:none;padding:0;margin:0;display:grid;gap:18px;font-size:24px}
 #stg .qa2 .rc{border-left:1px solid rgba(237,230,214,.14);padding-left:56px}
 #stg .qa2 .cols.rawonly .raw{font-size:34px;gap:26px}
+#stg .nonum .ag li b,#stg .nonum .cv .no,#stg .nonum .qa2 .hd b,#stg .nonum .nm{display:none}
+#stg .nonum .ag.v-cards li{justify-content:flex-end;height:260px}#stg .nonum .ag.v-big li{padding-top:40px;height:auto}
+#stg .nonum .ag.v-path li i{margin-top:0}#stg .nonum .ag.v-path ol::before{top:15px}
+#stg .nonum .ag.v-list li{grid-template-columns:560px 1fr}
+#stg .nonum .cv.hk h2{margin-top:0}
 #stg .kw{justify-content:center}
 #stg .kw h2{font-size:56px;font-weight:700;margin:20px 0 56px}
 #stg .kw ul{list-style:none;padding:0;margin:0;display:grid;gap:26px}
@@ -152,9 +157,9 @@ const R={
   title:s=>`<div class="sl ttl">${top()}<div class="eb">${e(s.eyebrow)}</div><h1>${s.title}</h1>${s.sub?`<p>${s.sub}</p>`:''}</div>`,
   agenda:s=>`<div class="sl ag v-${s.v||'cols'}">${top()}<div class="eb">${e(s.eyebrow||'Topics')}</div><h2>${e(s.title||'오늘의 다섯 가지 주제')}</h2><ol>${s.cats.map((c,k)=>`<li data-go="${c.at}" class="${s.cur!=null&&k<s.cur?'dn':''}${s.cur!=null&&k===s.cur?' nx':''}"><b>${String(k+1).padStart(2,'0')}</b>${s.v==='path'?'<i></i>':''}<span>${e(c.title)}</span>${(s.v==='list'||s.v==='big')&&c.key?`<em>${e(c.key)}</em>`:''}</li>`).join('')}</ol></div>`,
   cover:s=>`<div class="sl cv${s.key?' hk':''}" data-fit>${top()}<div class="no">${String(s.n).padStart(2,'0')}</div><h2>${e(s.title)}</h2>${s.key?`<div class="kq"><div class="eb">Key Question</div><div>${e(s.key)}</div></div>`:s.desc?`<p>${e(s.desc)}</p>`:''}</div>`,
-  q:s=>`<div class="sl q${(s.raw||[]).length?' has-raw':''}" data-fit>${top()}<div class="qn">${String(s.n).padStart(2,'0')} · ${e(s.cat)} &nbsp;—&nbsp; ${s.qi} / ${s.qn}</div><h2><span>${e(s.text)}</span></h2>${(s.raw||[]).length?`<ul class="raw">${s.raw.map(x=>`<li>${e(x)}</li>`).join('')}</ul>`:''}</div>`,
+  q:s=>`<div class="sl q${(s.raw||[]).length?' has-raw':''}" data-fit>${top()}<div class="qn"><span class="nm">${String(s.n).padStart(2,'0')} · </span>${e(s.cat)} &nbsp;—&nbsp; ${s.qi} / ${s.qn}</div><h2><span>${e(s.text)}</span></h2>${(s.raw||[]).length?`<ul class="raw">${s.raw.map(x=>`<li>${e(x)}</li>`).join('')}</ul>`:''}</div>`,
   qall:s=>`<div class="sl qa2" data-fit>${top()}<div class="hd"><b>${String(s.n).padStart(2,'0')}</b><h2>${e(s.cat)}</h2></div>${s.key?`<div class="kqs">${e(s.key)}</div>`:''}<div class="cols ${s.raw.length&&s.qs.length?'':'solo'}${s.qs.length?'':' rawonly'}">${s.qs.length?`<div><div class="sh">Questions</div><ol class="core">${s.qs.map(x=>`<li>${e(x)}</li>`).join('')}</ol></div>`:''}${s.raw.length?`<div class="${s.qs.length?'rc':''}"><div class="sh">참가자 여러분이 보내주신 질문</div><ul class="raw">${s.raw.map(x=>`<li>${e(x)}</li>`).join('')}</ul></div>`:''}</div></div>`,
-  kw:s=>`<div class="sl kw">${top()}<div class="eb">${String(s.n).padStart(2,'0')} · Keywords</div><h2>${e(s.cat)}</h2><ul class="${s.items.length>5?'many':''}">${s.items.map(x=>{const [a,b]=String(x).split('|');return `<li>${e(a.trim())}${b?`<small>${e(b.trim())}</small>`:''}</li>`}).join('')}</ul></div>`,
+  kw:s=>`<div class="sl kw">${top()}<div class="eb"><span class="nm">${String(s.n).padStart(2,'0')} · </span>Keywords</div><h2>${e(s.cat)}</h2><ul class="${s.items.length>5?'many':''}">${s.items.map(x=>{const [a,b]=String(x).split('|');return `<li>${e(a.trim())}${b?`<small>${e(b.trim())}</small>`:''}</li>`}).join('')}</ul></div>`,
   hero:s=>`<div class="sl hero">${top()}${s.photo?`<div class="ph" style="background-image:url('${e(s.photo)}')"></div>`:''}<div class="eb">${e(s.eyebrow||'')}</div><div class="wmb" style="margin-top:28px">OFF <span class="the">THE</span><br>RECORD SALON</div><div class="ss">${e(s.ss||'')}</div>${s.name?`<div class="who"><b>${e(s.name)}</b><span>${e(s.role||'')}</span></div>`:''}</div>`,
   brand:s=>`<div class="sl brand"><div class="bw">OFF <span class="the">THE</span> RECORD SALON</div><div class="ln"></div><div class="ss">${e(s.ss||'')}</div>${s.wh?`<div class="wh">${e(s.wh)}</div>`:''}</div>`,
   tt:s=>`<div class="sl tt">${top()}<div class="eb">Timetable</div><h2>${e(s.title||'오늘의 진행 순서')}</h2><ol class="${s.rows.length>8?'dense':''}">${s.rows.map(r=>`<li><span>${e(r.t||'·')}</span><b>${e(r.title)}${r.note?`<small>${e(r.note)}</small>`:''}</b></li>`).join('')}</ol></div>`,
@@ -225,11 +230,11 @@ function talkSlides(m,doc){const sp=m.speaker||{},L=[];
 window.Stage={
   async talk(m,file,o){let doc=null,tk=null;if(file){try{const lib=await pdfLib();tk=lib.getDocument({data:await file.arrayBuffer()});tk.onPassword=(cb,why)=>{const pw=prompt(why===2?'비밀번호가 맞지 않습니다. 다시 입력해 주세요.':'이 PDF는 비밀번호가 필요합니다.');if(pw==null){tk.cancelled=1;tk.destroy();}else cb(pw);};doc=await tk.promise;}catch(err){if(tk&&tk.cancelled)return;return alert('PDF를 열지 못했습니다: '+err.message);}}
     this.open(talkSlides(m,doc),{label:`SESSION 0${m.n}${m.speaker&&m.speaker.name?' · '+m.speaker.name:''}`},o);},
-  open(slides,m,o){ensure();clearInterval(loopT);opt=o||{};meta=m||{};S=slides;i=opt.atEnd?slides.length-1:0;step=opt.atEnd?steps(S[i]):0;const was=root.classList.contains('on');root.classList.add('on');fit();draw();if(!was&&!document.fullscreenElement)root.requestFullscreen?.().catch(()=>{});
+  open(slides,m,o){ensure();clearInterval(loopT);opt=o||{};meta=m||{};S=slides;i=opt.atEnd?slides.length-1:0;step=opt.atEnd?steps(S[i]):0;stage.classList.toggle('nonum',!!opt.nonum);const was=root.classList.contains('on');root.classList.add('on');fit();draw();if(!was&&!document.fullscreenElement)root.requestFullscreen?.().catch(()=>{});
     if(o&&o.loop&&S.length>1)loopT=setInterval(()=>{i=(i+1)%S.length;step=0;draw();},o.loop);},
   welcome(m,o){this.open(welcomeSlides(m),{label:`SESSION 0${m.n}`},o);},
   farewell(m,o){this.open(farewellSlides(m),{label:`SESSION 0${m.n}`},o);},
-  qa(d,m,o){if(!(d.cats||[]).some(c=>c.title))return alert('질문 덱 내용이 없습니다.');this.open(qaSlides(d,m||{}),m,o);},
+  qa(d,m,o){if(!(d.cats||[]).some(c=>c.title))return alert('질문 덱 내용이 없습니다.');this.open(qaSlides(d,m||{}),m,{...(o||{}),nonum:d.showNum===false});},
   /* 4개 덱 잇기: list=[{label,run(o)}], 마지막 장 → 다음 덱, 첫 장 ← 이전 덱 */
   chain(list,k,atEnd){const go=(j,end)=>{const it=list[j];if(!it)return;it.run({atEnd:end,loop:it.loop,nextLabel:list[j+1]&&list[j+1].label,next:list[j+1]?()=>go(j+1,false):null,prev:j>0?()=>go(j-1,true):null});};go(k||0,!!atEnd);}
 };
