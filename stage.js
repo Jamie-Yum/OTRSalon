@@ -176,13 +176,14 @@ const css=`
 #stg .nt ul{list-style:none;padding:0;margin:0;display:grid;gap:30px}
 #stg .nt li{font-size:46px;line-height:1.4;padding-left:56px;position:relative}
 #stg .nt li::before{content:'';position:absolute;left:0;top:.66em;width:22px;height:4px;background:#C9B37E}
-@media print{
+/*P*/@media print{
   @page{size:1920px 1080px;margin:0}
   body.stg-printing>*:not(#stg){display:none!important}
   body.stg-printing{background:#141414!important;margin:0!important;padding:0!important;display:block!important;min-height:0!important}
   #stg.print{position:static!important;display:block!important;background:none}
   #stg.print .x,#stg.print .hint{display:none!important}
 }
+/*/P*/
 #stg.print{cursor:default}
 #stg.print .stage{position:static;transform:none!important;width:1920px;height:auto;background:none}
 #stg.print .pp{position:relative;width:1920px;height:1080px;overflow:hidden;background:#141414;page-break-after:always;break-after:page;-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -194,7 +195,8 @@ const css=`
 #stg.mv .x{opacity:1}
 `;
 let root,stage,S=[],i=0,step=0,meta={},hideT,loopT,opt={};
-function ensure(){if(root)return;const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
+let cssOn=0;function ensureCss(){if(cssOn)return;cssOn=1;const st=document.createElement('style');st.textContent=css+css.replace(/\/\*P\*\/[\s\S]*?\/\*\/P\*\//,'').replace(/#stg/g,'.stgt')+'.stgt{position:relative!important;inset:auto!important;z-index:auto!important;display:block!important;cursor:default!important;overflow:hidden;background:#141414}.stgt .stage{left:0!important;top:0!important;transform-origin:0 0}';document.head.appendChild(st);}
+function ensure(){if(root)return;ensureCss();
   root=document.createElement('div');root.id='stg';root.innerHTML='<div class="stage"></div><button class="x" title="닫기 (Esc)">✕</button><div class="hint">→ 다음 · ← 이전 · M 목차 · 1~9 주제 이동 · F 전체 화면 · Esc 닫기</div>';document.body.appendChild(root);stage=root.querySelector('.stage');
   addEventListener('resize',fit);
   document.addEventListener('keydown',key);
@@ -291,7 +293,11 @@ async function printParts(parts,title){ensure();clearInterval(loopT);
   const t0=document.title;document.title=title||t0;document.body.classList.add('stg-printing');
   const done=()=>{document.body.classList.remove('stg-printing');document.title=t0;root.classList.remove('on','print');stage.innerHTML='';fit();removeEventListener('afterprint',done);};
   addEventListener('afterprint',done);setTimeout(()=>print(),300);}
+/* 미리보기 그림: 장 하나를 w px 폭으로 축소해 HTML로 돌려줌 */
+function thumb(sl,m,o,w){ensureCss();const k=meta;meta=m||{};const h=R[sl.t](sl).replace('class="sl ','class="sl on ');meta=k;const sc=(w||240)/1920;
+  return `<div class="stgt" style="width:${1920*sc}px;height:${1080*sc}px"><div class="stage${o&&o.nonum?' nonum':''}" style="transform:scale(${sc})">${h}</div></div>`;}
 window.Stage={
+  thumb,
   slides:{welcome:m=>welcomeSlides(m),farewell:m=>farewellSlides(m),qa:(d,m)=>qaSlides(d,m||{}),talk:(m,doc)=>talkSlides(m,doc)},
   print:printParts,
   async loadPdf(file){let tk=null;try{const lib=await pdfLib();tk=lib.getDocument({data:await file.arrayBuffer()});tk.onPassword=(cb,why)=>{const pw=prompt(why===2?'비밀번호가 맞지 않습니다. 다시 입력해 주세요.':'이 PDF는 비밀번호가 필요합니다.');if(pw==null){tk.cancelled=1;tk.destroy();}else cb(pw);};return await tk.promise;}catch(err){if(tk&&tk.cancelled)return false;alert('PDF를 열지 못했습니다: '+err.message);return false;}},
