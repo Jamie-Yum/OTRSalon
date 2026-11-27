@@ -751,7 +751,7 @@ footer{background:var(--dk)}footer p{color:rgba(237,230,214,.35)}
 .lv-bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.8rem 1rem;border:1px solid var(--ln,#e5e0d5);border-radius:10px}
 .lv-dot{display:flex;align-items:center;gap:.5rem;font-weight:600}.lv-dot::before{content:'';width:9px;height:9px;border-radius:50%;background:#aaa}.lv-dot.on{color:#8a6d2b}.lv-dot.on::before{background:#C9B37E;box-shadow:0 0 0 4px rgba(201,179,126,.25)}
 .lv-h2{font-size:.85rem;font-weight:600;margin:.6rem 0 .4rem}
-.lv-list{max-height:46vh;overflow:auto;border-top:1px solid var(--ln,#e5e0d5)}
+.lv-list{max-height:62vh;overflow:auto;border-top:1px solid var(--ln,#e5e0d5)}
 .lv-q{display:grid;grid-template-columns:3.6rem 1fr auto auto;gap:.6rem;align-items:start;padding:.65rem 0;border-bottom:1px solid var(--ln,#e5e0d5);font-size:.9rem}
 .lv-q span{color:#999;font-size:.8rem;padding-top:.1rem}.lv-q p{line-height:1.55;white-space:pre-wrap}.lv-q.hid p{opacity:.4;text-decoration:line-through}
 .mb-g{margin-top:1.4rem}.mb-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}.mb-h h3{font-size:1rem}.mb-h small{font-weight:400;color:var(--tl);margin-left:.4rem;font-size:.82rem}
@@ -1377,7 +1377,7 @@ const liveUrl=c=>'https://off-record.kr/ask.html?c='+c;
 function livePv(n,preview){const get=async()=>{const d=await rpc('otr_live_admin',{season:SEASON,salon:n});return {...d,url:liveUrl(d.code)};};
   return {get,start:preview?null:async()=>{const d=await get();if(!d.open)await rpc('otr_live_set',{season:SEASON,salon:n,is_open:true});},hide:id=>rpc('otr_live_mod',{qid:id,hide:true})};}
 let liveTm=null,liveD=null;
-async function liveEdit(){cur={key:'_live',id:null};$('mForm').innerHTML='<p class="note">불러오는 중…</p>';$('modal').classList.add('open');await liveLoad();
+async function liveEdit(){cur={key:'_live',id:null};$('mForm').classList.add('wide');$('mForm').innerHTML='<p class="note">불러오는 중…</p>';$('modal').classList.add('open');await liveLoad();
   clearInterval(liveTm);liveTm=setInterval(()=>{if(!cur||cur.key!=='_live')return clearInterval(liveTm);liveLoad();},5000);}
 async function liveLoad(){try{liveD=await rpc('otr_live_admin',{season:SEASON,salon:runSess});}catch(e){$('mForm').innerHTML=`<p class="note">불러오지 못했습니다: ${esc(e.message)}</p>`;return;}
   if(!cur||cur.key!=='_live')return;const d=liveD,u=liveUrl(d.code),vis=d.qs.filter(q=>!q.hidden).length,tm=t=>new Date(t).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});

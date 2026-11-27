@@ -213,15 +213,19 @@ const css=`
 #stg .lv-st::before{content:'';width:12px;height:12px;border-radius:50%;background:rgba(237,230,214,.35)}
 #stg .lv-st.on{color:#E2CD94}#stg .lv-st.on::before{background:#C9B37E;animation:lvp 1.6s infinite}
 @keyframes lvp{0%{box-shadow:0 0 0 0 rgba(201,179,126,.6)}100%{box-shadow:0 0 0 14px rgba(201,179,126,0)}}
-#stg .lv-qs{list-style:none;margin:0;padding:0;overflow:hidden;flex:1}
-#stg .lv-qs li{padding:26px 150px 26px 0;border-bottom:1px solid rgba(237,230,214,.1);font-size:32px;line-height:1.5;cursor:pointer;position:relative}
-#stg .lv-qs li p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#stg .lv-qs{list-style:none;margin:0;padding:0;overflow:auto;flex:1;min-height:0;display:grid;grid-template-columns:repeat(var(--cols,1),1fr);grid-auto-rows:max-content;column-gap:36px;align-content:start;scrollbar-width:none}
+#stg .lv-qs::-webkit-scrollbar{display:none}
+#stg .lv-qs li{padding:22px 150px 22px 0;border-bottom:1px solid rgba(237,230,214,.1);font-size:var(--fs,32px);line-height:1.5;cursor:pointer;position:relative;display:flex;gap:.6em;align-items:flex-start}
+#stg .lv-qs.dense li{padding:14px 0}
+#stg .lv-qs li i{font-style:normal;font-family:'Inter Tight',sans-serif;font-weight:700;color:#C9B37E;font-size:.72em;line-height:1.5em;flex:none;min-width:1.6em;opacity:.8}
+#stg .lv-qs li p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin:0}
+#stg .lv-qs.dense li p{-webkit-line-clamp:3}
 #stg .lv-qs li:hover p{color:#E2CD94}
 #stg .lv-qs li.new{animation:lvn 1.4s ease}
-@keyframes lvn{from{background:rgba(201,179,126,.28);transform:translateX(24px);opacity:0}to{background:transparent;transform:none;opacity:1}}
-#stg .lv-qs li.empty{color:rgba(237,230,214,.35);cursor:default;border:0;padding-top:64px}
+#stg .lv-qs li.empty{color:rgba(237,230,214,.35);cursor:default;border:0;padding-top:64px;grid-column:1/-1}
 #stg .lv-qs li button{position:absolute;right:0;top:50%;transform:translateY(-50%);display:none;background:#141414;border:1px solid rgba(237,230,214,.3);color:#EDE6D6;border-radius:999px;padding:8px 20px;font:inherit;font-size:18px;cursor:pointer}
 #stg.mv .lv-qs li:hover button{display:block}
+#stg .lv-qs.dense li button{position:static;transform:none;margin-left:auto;padding:4px 12px;font-size:14px}
 #stg .lv-spot{position:absolute;inset:0;background:#141414;display:flex;flex-direction:column;padding:150px 150px 90px;z-index:5}
 #stg .lv-spot .sp-h{display:flex;justify-content:space-between;align-items:center}
 #stg .lv-spot .sp-h button{background:none;border:1px solid rgba(237,230,214,.3);color:rgba(237,230,214,.75);border-radius:999px;padding:10px 26px;font:inherit;font-size:20px;cursor:pointer}
@@ -300,7 +304,10 @@ const QRJS=['/qrcode.min.js','https://cdnjs.cloudflare.com/ajax/libs/qrcode-gene
 function qrLib(k=0){return window.qrcode?Promise.resolve(window.qrcode):new Promise((ok,no)=>{const sc=document.createElement('script');sc.src=QRJS[k];sc.onload=()=>window.qrcode?ok(window.qrcode):no(new Error('QR'));sc.onerror=()=>k+1<QRJS.length?qrLib(k+1).then(ok,no):no(new Error('QR'));document.head.appendChild(sc);});}
 async function qrSvg(t){try{const q=(await qrLib())(0,'M');q.addData(t);q.make();return q.createSvgTag({cellSize:8,margin:0,scalable:true});}catch(er){return '';}}
 function liveList(sl,d,pv){const qs=(d.qs||[]).filter(x=>!x.hidden);liveQs=qs;if(spotId)spotRender();const box=sl.querySelector('.lv-qs'),seen=new Set([...box.querySelectorAll('li[data-id]')].map(x=>x.dataset.id)),first=!box.dataset.ok;box.dataset.ok=1;
-  box.innerHTML=qs.length?qs.slice(0,8).map(x=>`<li data-id="${e(x.id)}" class="${!first&&!seen.has(x.id)?'new':''}"><p>${e(x.body)}</p>${pv.hide?`<button data-hide="${e(x.id)}">숨기기</button>`:''}</li>`).join(''):'<li class="empty">첫 질문을 기다리고 있습니다</li>';
+  const n=qs.length,cols=n<=7?1:n<=16?2:3,fs=n<=5?32:n<=7?28:n<=12?24:n<=16?22:n<=24?20:n<=36?18:16;
+  box.style.setProperty('--cols',cols);box.style.setProperty('--fs',fs+'px');box.classList.toggle('dense',cols>1);
+  box.innerHTML=n?qs.map((x,k)=>`<li data-id="${e(x.id)}" class="${!first&&!seen.has(x.id)?'new':''}"><i>${n-k}</i><p>${e(x.body)}</p>${pv.hide?`<button data-hide="${e(x.id)}">숨기기</button>`:''}</li>`).join(''):'<li class="empty">첫 질문을 기다리고 있습니다</li>';
+  if(n>7){let f=fs,c=cols;for(let t=0;t<12&&box.scrollHeight>box.clientHeight+2;t++){if(f>14)f-=1;else if(c<4)c++;else break;box.style.setProperty('--fs',f+'px');box.style.setProperty('--cols',c);}}
   sl.querySelector('.lv-n').textContent=qs.length?`질문 ${qs.length}개`:'';const st=sl.querySelector('.lv-st');st.className='lv-st'+(d.open?' on':'');st.textContent=d.open?'질문 받는 중':'질문 받기 전';}
 async function liveRun(sl,pv,once){if(!pv)return;let d;
   try{if(!once&&pv.start)await pv.start();d=await pv.get();}catch(er){sl.querySelector('.lv-qs').innerHTML=`<li class="empty">질문을 불러오지 못했습니다 (${e(er.message)})</li>`;return;}
