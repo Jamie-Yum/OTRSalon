@@ -13,6 +13,8 @@ const css=`
 #stg .eb{font-family:'Inter Tight',sans-serif;font-size:26px;font-weight:600;letter-spacing:.22em;color:#C9B37E;text-transform:uppercase}
 #stg .bar{position:absolute;left:0;bottom:0;height:6px;background:#C9B37E;transition:width .45s ease}
 #stg .pg{position:absolute;right:150px;bottom:48px;font-family:'Inter Tight',sans-serif;font-size:20px;color:rgba(237,230,214,.35);letter-spacing:.1em;cursor:pointer;pointer-events:auto}#stg .pg:hover{color:#E2CD94}
+#stg .np{position:fixed;left:50%;bottom:72px;transform:translateX(-50%);z-index:10002;background:rgba(0,0,0,.75);border:1px solid rgba(201,179,126,.5);color:#EDE6D6;border-radius:999px;padding:10px 26px;font:600 22px 'Inter Tight','Pretendard',sans-serif;letter-spacing:.06em;pointer-events:none}
+#stg .np small{font-size:13px;color:#999;margin-left:12px;letter-spacing:0;font-weight:400}
 #stg .jp{position:fixed;inset:0;z-index:10002;background:rgba(10,10,10,.92);color:#EDE6D6;display:flex;flex-direction:column;padding:48px 64px;font-family:'Pretendard',sans-serif;cursor:default;overflow:auto}
 #stg .jp .jp-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
 #stg .jp .jp-h b{font-family:'Inter Tight',sans-serif;font-size:14px;letter-spacing:.18em;color:#C9B37E;text-transform:uppercase}
@@ -260,7 +262,7 @@ const css=`
 let root,stage,S=[],i=0,step=0,meta={},hideT,loopT,liveT,opt={};
 let cssOn=0;function ensureCss(){if(cssOn)return;cssOn=1;const st=document.createElement('style');st.textContent=css+css.replace(/\/\*P\*\/[\s\S]*?\/\*\/P\*\//,'').replace(/#stg/g,'.stgt')+'.stgt{position:relative!important;inset:auto!important;z-index:auto!important;display:block!important;cursor:default!important;overflow:hidden;background:#141414}.stgt .stage{left:0!important;top:0!important;transform-origin:0 0}';document.head.appendChild(st);}
 function ensure(){if(root)return;ensureCss();
-  root=document.createElement('div');root.id='stg';root.innerHTML='<div class="stage"></div><button class="x" title="닫기 (Esc)">✕</button><div class="hint">→ 다음 · ← 이전 · G 장 이동 · Home/End 첫·끝 장 · Shift+←→ 이전·다음 덱 · M 목차 · 1~9 주제 · F 전체 화면 · Esc 닫기</div>';document.body.appendChild(root);stage=root.querySelector('.stage');
+  root=document.createElement('div');root.id='stg';root.innerHTML='<div class="stage"></div><button class="x" title="닫기 (Esc)">✕</button><div class="hint">→ 다음 · ← 이전 · 숫자+Enter 장 번호로 이동 · G 장 목록 · Home/End 첫·끝 장 · Shift+←→ 이전·다음 덱 · M 질문 목차 · F 전체 화면 · Esc 닫기</div>';document.body.appendChild(root);stage=root.querySelector('.stage');
   addEventListener('resize',fit);
   document.addEventListener('keydown',key);
   root.addEventListener('click',e=>{if(e.target.closest('.x')){close();return;}
@@ -292,7 +294,7 @@ const R={
   live:s=>`<div class="sl lv">${top()}<div class="lv-l"><div class="eb">Open Q&amp;A</div><h2>현장 질의응답</h2><p>휴대폰 카메라로 QR을 찍어<br>궁금한 것을 자유롭게 남겨 주세요.<br>이름 없이 보내집니다.</p><div class="lv-qr"></div><div class="lv-u"></div></div><div class="lv-r"><div class="lv-h"><span class="lv-st">질문 받기 전</span><span class="lv-n"></span></div><ul class="lv-qs"><li class="empty">첫 질문을 기다리고 있습니다</li></ul></div></div>`
 };
 function steps(s){return s.t==='kw'?s.items.length:0;}
-function draw(){jumpClose();const s=S[i];stage.innerHTML=R[s.t](s)+`<div class="bar" style="width:${(i+1)/S.length*100}%"></div>`+(s.t==='pdf'?'':`<div class="pg">${i===S.length-1&&opt.nextLabel?`→ ${e(opt.nextLabel)} &nbsp;·&nbsp; `:''}${i+1} / ${S.length}</div>`);
+function draw(){jumpClose();npClear();const s=S[i];stage.innerHTML=R[s.t](s)+`<div class="bar" style="width:${(i+1)/S.length*100}%"></div>`+(s.t==='pdf'?'':`<div class="pg">${i===S.length-1&&opt.nextLabel?`→ ${e(opt.nextLabel)} &nbsp;·&nbsp; `:''}${i+1} / ${S.length}</div>`);
   clearInterval(liveT);spotId=null;const sl=stage.querySelector('.sl');if(s.t==='pdf')s.render(sl);if(s.t==='live')liveRun(sl,opt.live);if(s.t==='qrn')qrFill(sl.querySelector('.lv-qr'),opt.qr);if(opt.corner&&opt.qr)corner(i);
   if(sl.hasAttribute('data-fit'))fitText(sl);
   requestAnimationFrame(()=>{sl.classList.add('on');paint();});}
@@ -308,9 +310,16 @@ function jumpOpen(){let d=root.querySelector('.jp');if(d)return jumpClose();d=do
   ${ch?`<div class="jp-d">${ch.list.map((it,j)=>`<button data-deck="${j}" class="${j===ch.j?'on':''}">${e(it.label)}${j===ch.j?`<small>${S.length}장</small>`:''}</button>`).join('')}</div>`:''}
   <div class="jp-s">${S.map((x,k)=>{const l=slLabel(x);return `<button data-go="${k}" class="${k===i?'on':''}"><i>${k+1} / ${S.length} · ${e(l.k)}</i><span>${e(l.t)||'&nbsp;'}</span></button>`;}).join('')}</div>`;
   root.appendChild(d);root.classList.add('mv');}
+let npBuf='',npT;
+function npShow(){let d=root.querySelector('.np');if(!d){d=document.createElement('div');d.className='np';root.appendChild(d);}const n=+npBuf,ok=n>=1&&n<=S.length;d.innerHTML=`${npBuf} / ${S.length}<small>${ok?'Enter로 이동':'없는 장'}</small>`;clearTimeout(npT);npT=setTimeout(npClear,3000);}
+function npClear(){npBuf='';clearTimeout(npT);const d=root&&root.querySelector('.np');if(d)d.remove();}
 function jumpClose(){const d=root.querySelector('.jp');if(d)d.remove();}
 function key(ev){if(!root||!root.classList.contains('on'))return;const k=ev.key;
   if(root.querySelector('.jp')){if(k==='Escape'||k==='g'||k==='G'){ev.preventDefault();jumpClose();}return;}
+  if(/^[0-9]$/.test(k)){ev.preventDefault();npBuf=(npBuf+k).slice(-3);npShow();return;}
+  if(npBuf){if(k==='Enter'){ev.preventDefault();const n=+npBuf;npClear();spotClose();if(n>=1&&n<=S.length)go(n-1);return;}
+    if(k==='Backspace'){ev.preventDefault();npBuf=npBuf.slice(0,-1);npBuf?npShow():npClear();return;}
+    if(k==='Escape'){ev.preventDefault();npClear();return;}npClear();}
   if(k==='g'||k==='G'){ev.preventDefault();jumpOpen();return;}
   if(k==='Home'){ev.preventDefault();spotClose();if(ev.shiftKey&&opt.chain)opt.chain.go(0,false);else go(0);return;}
   if(k==='End'){ev.preventDefault();spotClose();if(ev.shiftKey&&opt.chain)opt.chain.go(opt.chain.list.length-1,true);else{go(S.length-1);step=steps(S[i]);paint();}return;}
@@ -323,8 +332,7 @@ function key(ev){if(!root||!root.classList.contains('on'))return;const k=ev.key;
   else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(k)){ev.preventDefault();prev();}
   else if(k==='Escape'){close();}
   else if(k==='f'||k==='F'){document.fullscreenElement?document.exitFullscreen():root.requestFullscreen().catch(()=>{});}
-  else if(k==='m'||k==='M'){const a=S.findIndex(s=>s.t==='agenda');if(a>=0)go(a);}
-  else if(/^[1-9]$/.test(k)){const c=S.findIndex(s=>s.t==='cover'&&s.n===+k);if(c>=0)go(c);}}
+  else if(k==='m'||k==='M'){const a=S.findIndex(s=>s.t==='agenda');if(a>=0)go(a);else if(opt.chain){const j=opt.chain.list.findIndex(it=>it.qa);if(j>=0&&j!==opt.chain.j)opt.chain.go(j,false);}}}
 function close(){clearInterval(loopT);clearInterval(liveT);if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});root.classList.remove('on');stage.innerHTML='';}
 /* 현장 질의응답: pv = {get()→{url,open,qs:[{id,body,hidden}]}, start()?, hide(id)?} */
 const QRJS=['/qrcode.min.js','https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js'];

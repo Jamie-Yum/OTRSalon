@@ -1369,7 +1369,7 @@ async function runPdf(which){const n=runSess,parts=[],lab={label:`SESSION 0${n}`
 function runChain(k,loop){const n=runSess,skip=o=>{const f=o.atEnd?o.prev:o.next;if(f)f();},pv=livePv(n),qr=pv.start().then(()=>pv.get()).then(d=>d.url).catch(()=>'');
   Stage.chain([{label:'① 입장 안내',loop:loop?10000:0,run:o=>Stage.welcome({...runCtx(n,'welcome'),live:1},{...o,qr})},
     {label:'② 강연',run:o=>talkGo({...o,qr,corner:1})},
-    {label:'③ 질문',run:o=>{const qa=deckOf(n,'qa');if(qa&&(qa.data.cats||[]).some(c=>c.title))Stage.qa(qa.data,runMeta(n),{...o,qr,corner:1});else skip(o);}},
+    {label:'③ 질문',qa:1,run:o=>{const qa=deckOf(n,'qa');if(qa&&(qa.data.cats||[]).some(c=>c.title))Stage.qa(qa.data,runMeta(n),{...o,qr,corner:1});else skip(o);}},
     {label:'④ 현장 질문',run:o=>Stage.live({n},{...o,live:pv})},
     {label:'⑤ 퇴장 안내',run:o=>Stage.farewell(runCtx(n,'farewell'),o)}],k);}
 const liveUrl=c=>'https://off-record.kr/ask.html?c='+c;
