@@ -12,7 +12,20 @@ const css=`
 #stg .gold{color:#C9B37E}
 #stg .eb{font-family:'Inter Tight',sans-serif;font-size:26px;font-weight:600;letter-spacing:.22em;color:#C9B37E;text-transform:uppercase}
 #stg .bar{position:absolute;left:0;bottom:0;height:6px;background:#C9B37E;transition:width .45s ease}
-#stg .pg{position:absolute;right:150px;bottom:48px;font-family:'Inter Tight',sans-serif;font-size:20px;color:rgba(237,230,214,.35);letter-spacing:.1em}
+#stg .pg{position:absolute;right:150px;bottom:48px;font-family:'Inter Tight',sans-serif;font-size:20px;color:rgba(237,230,214,.35);letter-spacing:.1em;cursor:pointer;pointer-events:auto}#stg .pg:hover{color:#E2CD94}
+#stg .jp{position:fixed;inset:0;z-index:10002;background:rgba(10,10,10,.92);color:#EDE6D6;display:flex;flex-direction:column;padding:48px 64px;font-family:'Pretendard',sans-serif;cursor:default;overflow:auto}
+#stg .jp .jp-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+#stg .jp .jp-h b{font-family:'Inter Tight',sans-serif;font-size:14px;letter-spacing:.18em;color:#C9B37E;text-transform:uppercase}
+#stg .jp .jp-h span{font-size:13px;color:#888}
+#stg .jp .jp-d{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:32px}
+#stg .jp .jp-d button{background:#1E1E1E;border:1px solid rgba(237,230,214,.15);color:#EDE6D6;border-radius:999px;padding:10px 20px;font:inherit;font-size:16px;font-weight:600;cursor:pointer}
+#stg .jp .jp-d button:hover{border-color:#C9B37E}#stg .jp .jp-d button.on{background:#C9B37E;color:#141414;border-color:#C9B37E}
+#stg .jp .jp-d button small{font-weight:400;opacity:.6;margin-left:6px;font-size:12px}
+#stg .jp .jp-s{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+#stg .jp .jp-s button{text-align:left;background:#1A1A1A;border:1px solid rgba(237,230,214,.1);color:rgba(237,230,214,.85);border-radius:12px;padding:14px 16px;font:inherit;font-size:14px;line-height:1.45;cursor:pointer;min-height:76px;display:flex;flex-direction:column;gap:6px}
+#stg .jp .jp-s button:hover{border-color:#C9B37E;color:#EDE6D6}#stg .jp .jp-s button.on{border-color:#C9B37E;background:#242016}
+#stg .jp .jp-s button i{font-style:normal;font-family:'Inter Tight',sans-serif;font-size:11px;letter-spacing:.14em;color:#C9B37E}
+#stg .jp .jp-s button span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 #stg .ttl{justify-content:center}
 #stg .ttl h1{font-size:112px;font-weight:700;line-height:1.15;letter-spacing:-.02em;margin:36px 0 0}
 #stg .ttl p{font-size:40px;margin-top:40px;color:rgba(237,230,214,.7);line-height:1.5}
@@ -247,10 +260,12 @@ const css=`
 let root,stage,S=[],i=0,step=0,meta={},hideT,loopT,liveT,opt={};
 let cssOn=0;function ensureCss(){if(cssOn)return;cssOn=1;const st=document.createElement('style');st.textContent=css+css.replace(/\/\*P\*\/[\s\S]*?\/\*\/P\*\//,'').replace(/#stg/g,'.stgt')+'.stgt{position:relative!important;inset:auto!important;z-index:auto!important;display:block!important;cursor:default!important;overflow:hidden;background:#141414}.stgt .stage{left:0!important;top:0!important;transform-origin:0 0}';document.head.appendChild(st);}
 function ensure(){if(root)return;ensureCss();
-  root=document.createElement('div');root.id='stg';root.innerHTML='<div class="stage"></div><button class="x" title="닫기 (Esc)">✕</button><div class="hint">→ 다음 · ← 이전 · M 목차 · 1~9 주제 이동 · F 전체 화면 · Esc 닫기</div>';document.body.appendChild(root);stage=root.querySelector('.stage');
+  root=document.createElement('div');root.id='stg';root.innerHTML='<div class="stage"></div><button class="x" title="닫기 (Esc)">✕</button><div class="hint">→ 다음 · ← 이전 · G 장 이동 · Home/End 첫·끝 장 · Shift+←→ 이전·다음 덱 · M 목차 · 1~9 주제 · F 전체 화면 · Esc 닫기</div>';document.body.appendChild(root);stage=root.querySelector('.stage');
   addEventListener('resize',fit);
   document.addEventListener('keydown',key);
   root.addEventListener('click',e=>{if(e.target.closest('.x')){close();return;}
+    const jp=e.target.closest('.jp');if(jp){const d=e.target.closest('[data-deck]'),g=e.target.closest('[data-go]');if(d){jumpClose();opt.chain&&opt.chain.go(+d.dataset.deck,false);}else if(g){jumpClose();go(+g.dataset.go);}else if(e.target===jp)jumpClose();return;}
+    if(e.target.closest('.pg')){jumpOpen();return;}
     const hd=e.target.closest('[data-hide]');if(hd){const pv=opt.live;if(pv&&pv.hide)pv.hide(hd.dataset.hide).then(()=>hd.closest('li').remove()).catch(er=>alert('실패: '+er.message));return;}
     const so=e.target.closest('.sp-o li[data-id]');if(so){spot(so.dataset.id);return;}
     if(e.target.closest('.sp-x,.sp-q')){spotClose();return;}if(e.target.closest('.lv-spot'))return;
@@ -277,7 +292,7 @@ const R={
   live:s=>`<div class="sl lv">${top()}<div class="lv-l"><div class="eb">Open Q&amp;A</div><h2>현장 질의응답</h2><p>휴대폰 카메라로 QR을 찍어<br>궁금한 것을 자유롭게 남겨 주세요.<br>이름 없이 보내집니다.</p><div class="lv-qr"></div><div class="lv-u"></div></div><div class="lv-r"><div class="lv-h"><span class="lv-st">질문 받기 전</span><span class="lv-n"></span></div><ul class="lv-qs"><li class="empty">첫 질문을 기다리고 있습니다</li></ul></div></div>`
 };
 function steps(s){return s.t==='kw'?s.items.length:0;}
-function draw(){const s=S[i];stage.innerHTML=R[s.t](s)+`<div class="bar" style="width:${(i+1)/S.length*100}%"></div>`+(s.t==='pdf'?'':`<div class="pg">${i===S.length-1&&opt.nextLabel?`→ ${e(opt.nextLabel)} &nbsp;·&nbsp; `:''}${i+1} / ${S.length}</div>`);
+function draw(){jumpClose();const s=S[i];stage.innerHTML=R[s.t](s)+`<div class="bar" style="width:${(i+1)/S.length*100}%"></div>`+(s.t==='pdf'?'':`<div class="pg">${i===S.length-1&&opt.nextLabel?`→ ${e(opt.nextLabel)} &nbsp;·&nbsp; `:''}${i+1} / ${S.length}</div>`);
   clearInterval(liveT);spotId=null;const sl=stage.querySelector('.sl');if(s.t==='pdf')s.render(sl);if(s.t==='live')liveRun(sl,opt.live);if(s.t==='qrn')qrFill(sl.querySelector('.lv-qr'),opt.qr);if(opt.corner&&opt.qr)corner(i);
   if(sl.hasAttribute('data-fit'))fitText(sl);
   requestAnimationFrame(()=>{sl.classList.add('on');paint();});}
@@ -287,7 +302,19 @@ function paint(){stage.querySelectorAll('.kw li').forEach((li,k)=>li.classList.t
 function next(){const s=S[i];if(step<steps(s)){step++;paint();return;}if(i<S.length-1){i++;step=0;draw();}else if(opt.next){clearInterval(loopT);opt.next();}}
 function prev(){if(step>0&&S[i].t==='kw'){step--;paint();return;}if(i>0){i--;step=steps(S[i]);draw();}else if(opt.prev){clearInterval(loopT);opt.prev();}}
 function go(n){if(n<0||n>=S.length)return;i=n;step=0;draw();}
+const slLabel=s=>{const t=s.title||s.cat||s.text||s.ss||'';const k={title:'표지',agenda:'목차',cover:'주제',q:'질문',qall:'질문 모음',kw:'키워드',hero:'연사',brand:'브랜드',tt:'타임테이블',pr:'안내',nt:'공지',pdf:'PDF',qrn:'QR 안내',live:'현장 질문'}[s.t]||s.t;return {k,t:String(t).replace(/<[^>]+>/g,'')};};
+function jumpOpen(){let d=root.querySelector('.jp');if(d)return jumpClose();d=document.createElement('div');d.className='jp';const ch=opt.chain;
+  d.innerHTML=`<div class="jp-h"><b>장 이동</b><span>덱을 누르면 그 덱의 첫 장으로 · 아래 장을 누르면 바로 이동 · G 또는 Esc로 닫기</span></div>
+  ${ch?`<div class="jp-d">${ch.list.map((it,j)=>`<button data-deck="${j}" class="${j===ch.j?'on':''}">${e(it.label)}${j===ch.j?`<small>${S.length}장</small>`:''}</button>`).join('')}</div>`:''}
+  <div class="jp-s">${S.map((x,k)=>{const l=slLabel(x);return `<button data-go="${k}" class="${k===i?'on':''}"><i>${k+1} / ${S.length} · ${e(l.k)}</i><span>${e(l.t)||'&nbsp;'}</span></button>`;}).join('')}</div>`;
+  root.appendChild(d);root.classList.add('mv');}
+function jumpClose(){const d=root.querySelector('.jp');if(d)d.remove();}
 function key(ev){if(!root||!root.classList.contains('on'))return;const k=ev.key;
+  if(root.querySelector('.jp')){if(k==='Escape'||k==='g'||k==='G'){ev.preventDefault();jumpClose();}return;}
+  if(k==='g'||k==='G'){ev.preventDefault();jumpOpen();return;}
+  if(k==='Home'){ev.preventDefault();spotClose();if(ev.shiftKey&&opt.chain)opt.chain.go(0,false);else go(0);return;}
+  if(k==='End'){ev.preventDefault();spotClose();if(ev.shiftKey&&opt.chain)opt.chain.go(opt.chain.list.length-1,true);else{go(S.length-1);step=steps(S[i]);paint();}return;}
+  if(ev.shiftKey&&(k==='ArrowRight'||k==='ArrowLeft')&&opt.chain){ev.preventDefault();spotClose();const j=opt.chain.j+(k==='ArrowRight'?1:-1);if(opt.chain.list[j])opt.chain.go(j,false);return;}
   if(spotId&&stage.querySelector('.lv-spot')){const L=liveQs,j=L.findIndex(x=>x.id===spotId);
     if(['ArrowRight','ArrowDown',' ','PageDown','Enter'].includes(k)){ev.preventDefault();if(L[j+1])spot(L[j+1].id);return;}
     if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(k)){ev.preventDefault();if(j>0)spot(L[j-1].id);return;}
@@ -296,7 +323,7 @@ function key(ev){if(!root||!root.classList.contains('on'))return;const k=ev.key;
   else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(k)){ev.preventDefault();prev();}
   else if(k==='Escape'){close();}
   else if(k==='f'||k==='F'){document.fullscreenElement?document.exitFullscreen():root.requestFullscreen().catch(()=>{});}
-  else if(k==='m'||k==='M'||k==='Home'){const a=S.findIndex(s=>s.t==='agenda');if(a>=0)go(a);}
+  else if(k==='m'||k==='M'){const a=S.findIndex(s=>s.t==='agenda');if(a>=0)go(a);}
   else if(/^[1-9]$/.test(k)){const c=S.findIndex(s=>s.t==='cover'&&s.n===+k);if(c>=0)go(c);}}
 function close(){clearInterval(loopT);clearInterval(liveT);if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});root.classList.remove('on');stage.innerHTML='';}
 /* 현장 질의응답: pv = {get()→{url,open,qs:[{id,body,hidden}]}, start()?, hide(id)?} */
@@ -402,6 +429,6 @@ window.Stage={
   farewell(m,o){this.open(farewellSlides(m),{label:`SESSION 0${m.n}`},o);},
   qa(d,m,o){if(!(d.cats||[]).some(c=>c.title))return alert('질문 덱 내용이 없습니다.');this.open(qaSlides(d,m||{}),m,{...(o||{}),nonum:d.showNum===false});},
   /* 덱 잇기: list=[{label,run(o)}], 마지막 장 → 다음 덱, 첫 장 ← 이전 덱 */
-  chain(list,k,atEnd){const go=(j,end)=>{const it=list[j];if(!it)return;it.run({atEnd:end,loop:it.loop,nextLabel:list[j+1]&&list[j+1].label,next:list[j+1]?()=>go(j+1,false):null,prev:j>0?()=>go(j-1,true):null});};go(k||0,!!atEnd);}
+  chain(list,k,atEnd){const go=(j,end)=>{const it=list[j];if(!it)return;clearInterval(loopT);it.run({atEnd:end,loop:it.loop,nextLabel:list[j+1]&&list[j+1].label,next:list[j+1]?()=>go(j+1,false):null,prev:j>0?()=>go(j-1,true):null,chain:{list,j,go}});};go(k||0,!!atEnd);}
 };
 })();
