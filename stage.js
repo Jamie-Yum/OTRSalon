@@ -262,10 +262,10 @@ const css=`
 let root,stage,S=[],i=0,step=0,meta={},hideT,loopT,liveT,opt={};
 let cssOn=0;function ensureCss(){if(cssOn)return;cssOn=1;const st=document.createElement('style');st.textContent=css+css.replace(/\/\*P\*\/[\s\S]*?\/\*\/P\*\//,'').replace(/#stg/g,'.stgt')+'.stgt{position:relative!important;inset:auto!important;z-index:auto!important;display:block!important;cursor:default!important;overflow:hidden;background:#141414}.stgt .stage{left:0!important;top:0!important;transform-origin:0 0}';document.head.appendChild(st);}
 function ensure(){if(root)return;ensureCss();
-  root=document.createElement('div');root.id='stg';root.innerHTML='<div class="stage"></div><button class="x" title="닫기 (Esc)">✕</button><div class="hint">→ 다음 · ← 이전 · 숫자+Enter 장 번호로 이동 · G 장 목록 · Home/End 첫·끝 장 · Shift+←→ 이전·다음 덱 · M 질문 목차 · F 전체 화면 · Esc 닫기</div>';document.body.appendChild(root);stage=root.querySelector('.stage');
+  root=document.createElement('div');root.id='stg';root.tabIndex=-1;root.style.outline='none';root.innerHTML='<div class="stage"></div><button class="x" title="닫기 (Esc)">✕</button><div class="hint">→ 다음 · ← 이전 · 숫자+Enter 장 번호로 이동 · G 장 목록 · Home/End 첫·끝 장 · Shift+←→ 이전·다음 덱 · M 질문 목차 · F 전체 화면 · Esc 닫기</div>';document.body.appendChild(root);stage=root.querySelector('.stage');
   addEventListener('resize',fit);
   document.addEventListener('keydown',key);
-  root.addEventListener('click',e=>{if(e.target.closest('.x')){close();return;}
+  root.addEventListener('click',e=>{if(!e.target.closest('input,textarea,select,button'))root.focus({preventScroll:true});if(e.target.closest('.x')){close();return;}
     const jp=e.target.closest('.jp');if(jp){const d=e.target.closest('[data-deck]'),g=e.target.closest('[data-go]');if(d){jumpClose();opt.chain&&opt.chain.go(+d.dataset.deck,false);}else if(g){jumpClose();go(+g.dataset.go);}else if(e.target===jp)jumpClose();return;}
     if(e.target.closest('.pg')){jumpOpen();return;}
     const hd=e.target.closest('[data-hide]');if(hd){const pv=opt.live;if(pv&&pv.hide)pv.hide(hd.dataset.hide).then(()=>hd.closest('li').remove()).catch(er=>alert('실패: '+er.message));return;}
@@ -314,7 +314,7 @@ let npBuf='',npT;
 function npShow(){let d=root.querySelector('.np');if(!d){d=document.createElement('div');d.className='np';root.appendChild(d);}const n=+npBuf,ok=n>=1&&n<=S.length;d.innerHTML=`${npBuf} / ${S.length}<small>${ok?'Enter로 이동':'없는 장'}</small>`;clearTimeout(npT);npT=setTimeout(npClear,3000);}
 function npClear(){npBuf='';clearTimeout(npT);const d=root&&root.querySelector('.np');if(d)d.remove();}
 function jumpClose(){const d=root.querySelector('.jp');if(d)d.remove();}
-function key(ev){if(!root||!root.classList.contains('on'))return;const k=ev.key;
+function key(ev){if(!root||!root.classList.contains('on'))return;const k=ev.key;const t=ev.target;if(t&&root.contains(t)&&/^(INPUT|TEXTAREA)$/.test(t.tagName))return;if(t&&!root.contains(t)&&t!==document.body&&t!==document.documentElement){try{t.blur();}catch(e){}root.focus({preventScroll:true});}
   if(root.querySelector('.jp')){if(k==='Escape'||k==='g'||k==='G'){ev.preventDefault();jumpClose();}return;}
   if(/^[0-9]$/.test(k)){ev.preventDefault();npBuf=(npBuf+k).slice(-3);npShow();return;}
   if(npBuf){if(k==='Enter'){ev.preventDefault();const n=+npBuf;npClear();spotClose();if(n>=1&&n<=S.length)go(n-1);return;}
@@ -430,7 +430,7 @@ window.Stage={
   async loadPdf(file){let tk=null;try{const lib=await pdfLib();tk=lib.getDocument({data:await file.arrayBuffer()});tk.onPassword=(cb,why)=>{const pw=prompt(why===2?'비밀번호가 맞지 않습니다. 다시 입력해 주세요.':'이 PDF는 비밀번호가 필요합니다.');if(pw==null){tk.cancelled=1;tk.destroy();}else cb(pw);};return await tk.promise;}catch(err){if(tk&&tk.cancelled)return false;alert('PDF를 열지 못했습니다: '+err.message);return false;}},
   async talk(m,file,o){let doc=null;if(file){doc=await this.loadPdf(file);if(doc===false)return;}
     this.open(talkSlides(m,doc),{label:`SESSION 0${m.n}${m.speaker&&m.speaker.name?' · '+m.speaker.name:''}`},o);},
-  open(slides,m,o){ensure();clearInterval(loopT);opt=o||{};meta=m||{};S=slides;i=opt.atEnd?slides.length-1:0;step=opt.atEnd?steps(S[i]):0;stage.classList.toggle('nonum',!!opt.nonum);const was=root.classList.contains('on');root.classList.add('on');fit();draw();if(!was&&!document.fullscreenElement)root.requestFullscreen?.().catch(()=>{});
+  open(slides,m,o){ensure();clearInterval(loopT);opt=o||{};meta=m||{};S=slides;i=opt.atEnd?slides.length-1:0;step=opt.atEnd?steps(S[i]):0;stage.classList.toggle('nonum',!!opt.nonum);const was=root.classList.contains('on');root.classList.add('on');try{document.activeElement&&document.activeElement.blur();}catch(e){}root.focus({preventScroll:true});fit();draw();if(!was&&!document.fullscreenElement)root.requestFullscreen?.().catch(()=>{});
     if(o&&o.loop&&S.length>1)loopT=setInterval(()=>{i=(i+1)%S.length;step=0;draw();},o.loop);},
   welcome(m,o){this.open(welcomeSlides(m),{label:`SESSION 0${m.n}`},o);},
   live(m,o){this.open([{t:'live'}],{label:`SESSION 0${m.n}`},o);},
